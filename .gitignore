@@ -37,3 +37,10 @@ yarn-error.log
 /boost.json
 /opencode.json
 /opencode.jsonc
+
+# Private AI workspace configuration (not for public repo)
+/.agent
+/globalSkills
+
+# Local SQLite database (contains demo data, not for VCS)
+/database/database.sqlite
