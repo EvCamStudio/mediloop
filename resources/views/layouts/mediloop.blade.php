@@ -1,176 +1,855 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'MediLoop — Clinical & Logistical Decision Support' }}</title>
-
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ filled($title ?? null) ? $title.' - MediLoop' : 'MediLoop' }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
     <style>
+        /* MediLoop Design System */
         :root {
-            --brand-primary: #1D4ED8;
-            --brand-navy: #0B1F4B;
-            --brand-sky: #EAF1FF;
-            --brand-border: #DBE5F5;
-            --brand-muted: #52627F;
-            --brand-risk: #D9480F;
-            --brand-warning: #B7791F;
+            --ml-navy: #0B1F4B;
+            --ml-primary: #1D4ED8;
+            --ml-surface: #F8FAFC;
+            --ml-card: #FFFFFF;
+            --ml-border: #DBE5F5;
+            --ml-text: #0B1F4B;
+            --ml-muted: #52627F;
+            --ml-subtle: #94A3B8;
+            --ml-danger: #EF4444;
+            --ml-warning: #F59E0B;
+            --ml-success: #22C55E;
+            --ml-orange: #F97316;
+            --font-heading: 'Bricolage Grotesque', system-ui, sans-serif;
+            --font-body: 'DM Sans', system-ui, sans-serif;
         }
+        *, ::before, ::after { box-sizing: border-box; }
         body {
-            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-            background-color: #F8FAFC;
-            color: #0B1F4B;
+            font-family: var(--font-body);
+            color: var(--ml-text);
+            background: var(--ml-surface);
+            margin: 0;
+            min-height: 100vh;
         }
+        h1,h2,h3,h4,h5,h6 {
+            font-family: var(--font-heading);
+            letter-spacing: -0.02em;
+        }
+
+        /* Sidebar */
+        .ml-sidebar {
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: 220px;
+            background: var(--ml-navy);
+            display: flex;
+            flex-direction: column;
+            z-index: 40;
+            flex-shrink: 0;
+        }
+        .ml-sidebar-logo {
+            padding: 22px 20px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .ml-sidebar-logo span {
+            font-family: var(--font-heading);
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.03em;
+        }
+        .ml-sidebar-nav {
+            padding: 14px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+        .ml-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.65);
+            text-decoration: none;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-family: var(--font-body);
+            width: 100%;
+            text-align: left;
+        }
+        .ml-nav-item:hover {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.9);
+        }
+        .ml-nav-item.active {
+            background: var(--ml-primary);
+            color: #fff;
+            font-weight: 600;
+        }
+        .ml-nav-item svg { flex-shrink: 0; opacity: 0.8; }
+        .ml-nav-item.active svg { opacity: 1; }
+
+        /* Dropdowns & Popovers */
+        .ml-menu-dropdown {
+            position: absolute;
+            background: #FFFFFF;
+            border: 1px solid var(--ml-border);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(11, 31, 75, 0.15), 0 8px 10px -6px rgba(11, 31, 75, 0.1);
+            z-index: 60;
+            padding: 6px;
+            animation: mlFadeIn 0.15s ease-out;
+        }
+        @keyframes mlFadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Settings menu (upward popup from sidebar bottom) */
+        .ml-settings-container {
+            margin-top: auto;
+            position: relative;
+        }
+        .ml-settings-menu {
+            bottom: calc(100% + 8px);
+            left: 0;
+            right: 0;
+            background: #0f275e;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 -8px 24px rgba(0,0,0,0.35);
+        }
+        .ml-settings-menu .ml-menu-header {
+            padding: 8px 10px 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.45);
+        }
+        .ml-settings-menu .ml-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-body);
+            text-align: left;
+            transition: all 0.12s ease;
+        }
+        .ml-settings-menu .ml-menu-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .ml-settings-menu .ml-menu-item-danger {
+            color: #FCA5A5;
+        }
+        .ml-settings-menu .ml-menu-item-danger:hover {
+            background: rgba(239, 68, 68, 0.22);
+            color: #F87171;
+        }
+        .ml-settings-menu .ml-menu-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.08);
+            margin: 4px 0;
+        }
+
+        /* Profile menu (downward popup in topbar right) */
+        .ml-profile-container {
+            position: relative;
+        }
+        .ml-profile-menu {
+            top: calc(100% + 8px);
+            right: 0;
+            width: 250px;
+        }
+        .ml-profile-dropdown-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+        }
+        .ml-avatar-lg {
+            width: 38px;
+            height: 38px;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .ml-profile-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ml-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ml-profile-email {
+            font-size: 11px;
+            color: var(--ml-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ml-role-badge {
+            display: inline-block;
+            margin-top: 3px;
+            padding: 2px 7px;
+            background: #EFF6FF;
+            color: var(--ml-primary);
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .ml-profile-menu .ml-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ml-text);
+            text-decoration: none;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-body);
+            text-align: left;
+            transition: all 0.12s ease;
+        }
+        .ml-profile-menu .ml-menu-item:hover {
+            background: var(--ml-surface);
+            color: var(--ml-primary);
+        }
+        .ml-profile-menu .ml-menu-item-danger {
+            color: var(--ml-danger);
+        }
+        .ml-profile-menu .ml-menu-item-danger:hover {
+            background: #FEF2F2;
+            color: #DC2626;
+        }
+        .ml-profile-menu .ml-menu-divider {
+            height: 1px;
+            background: var(--ml-border);
+            margin: 4px 0;
+        }
+
+        /* Main layout */
+        .ml-main {
+            margin-left: 220px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Topbar */
+        .ml-topbar {
+            background: #fff;
+            border-bottom: 1px solid var(--ml-border);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+        .ml-search {
+            flex: 1;
+            max-width: 360px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--ml-surface);
+            border: 1px solid var(--ml-border);
+            border-radius: 10px;
+            padding: 8px 14px;
+        }
+        .ml-search input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: var(--font-body);
+            font-size: 13.5px;
+            color: var(--ml-muted);
+            width: 100%;
+        }
+        .ml-search svg { color: var(--ml-subtle); flex-shrink: 0; }
+        .ml-topbar-spacer { flex: 1; }
+        .ml-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .ml-icon-btn {
+            position: relative;
+            width: 36px; height: 36px;
+            border-radius: 9px;
+            border: 1px solid var(--ml-border);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            background: #fff;
+            color: var(--ml-muted);
+            transition: all 0.15s;
+        }
+        .ml-icon-btn:hover { background: var(--ml-surface); }
+        .ml-badge-dot {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--ml-orange);
+            border: 2px solid #fff;
+        }
+        .ml-user-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 10px 5px 6px;
+            border-radius: 12px;
+            border: 1px solid var(--ml-border);
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.15s;
+            outline: none;
+        }
+        .ml-user-chip:hover { background: var(--ml-surface); }
+        .ml-avatar {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            background: var(--ml-primary);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            overflow: hidden;
+        }
+        .ml-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .ml-user-info { line-height: 1.25; text-align: left; }
+        .ml-user-name { font-size: 13px; font-weight: 600; color: var(--ml-text); }
+        .ml-user-role { font-size: 11px; color: var(--ml-muted); }
+
+        /* Content area */
+        .ml-content { padding: 24px; flex: 1; }
+
+        /* Stat Cards */
+        .ml-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+        .ml-stat-card {
+            background: #fff;
+            border: 1px solid var(--ml-border);
+            border-radius: 16px;
+            padding: 18px 20px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .ml-stat-label {
+            font-size: 12.5px;
+            color: var(--ml-muted);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .ml-stat-sublabel {
+            font-size: 11px;
+            color: var(--ml-subtle);
+            margin-bottom: 6px;
+        }
+        .ml-stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            color: var(--ml-text);
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+        .ml-stat-badge {
+            display: inline-block;
+            background: var(--ml-orange);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            padding: 4px 14px;
+            border-radius: 8px;
+            letter-spacing: -0.02em;
+        }
+        .ml-stat-badge-blue {
+            display: inline-block;
+            background: var(--ml-primary);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 800;
+            font-family: var(--font-heading);
+            padding: 4px 14px;
+            border-radius: 8px;
+            letter-spacing: -0.02em;
+        }
+        .ml-stat-sub {
+            font-size: 11.5px;
+            color: var(--ml-muted);
+            margin-top: 6px;
+        }
+        .ml-stat-sub b { color: var(--ml-orange); }
+
+        /* Two-col layout */
+        .ml-two-col {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* Section card */
+        .ml-section {
+            background: #fff;
+            border: 1px solid var(--ml-border);
+            border-radius: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+        .ml-section-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--ml-border);
+        }
+        .ml-section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ml-text);
+            font-family: var(--font-heading);
+        }
+
+        /* Table */
+        .ml-table { width: 100%; border-collapse: collapse; }
+        .ml-table th {
+            padding: 10px 16px;
+            background: #F8FAFC;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--ml-muted);
+            text-align: left;
+            border-bottom: 1px solid var(--ml-border);
+        }
+        .ml-table td {
+            padding: 14px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--ml-border);
+            vertical-align: middle;
+        }
+        .ml-table tr:last-child td { border-bottom: none; }
+        .ml-table tr:hover td { background: #F8FAFC; }
+
+        /* Risk badge */
+        .ml-risk-high {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            background: #FFF4EC;
+            color: var(--ml-orange);
+            border: 1px solid #FDDCBB;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .ml-risk-medium {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            background: #FFFBEB;
+            color: #D97706;
+            border: 1px solid #FDE68A;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Days bar visual */
+        .ml-days-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .ml-days-pill {
+            padding: 3px 9px;
+            border-radius: 99px;
+            font-weight: 600;
+            font-size: 11.5px;
+        }
+        .ml-days-expiry { background: #FFF4EC; color: var(--ml-orange); }
+        .ml-days-deplete { background: #EFF6FF; color: var(--ml-primary); }
+        .ml-days-vs { font-size: 10px; color: var(--ml-subtle); font-weight: 600; }
+
+        /* Find match button */
+        .ml-btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 14px;
+            background: var(--ml-primary);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            font-size: 12.5px;
+            font-weight: 600;
+            font-family: var(--font-body);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .ml-btn-primary:hover { background: #1e40af; transform: translateY(-1px); }
+
+        .ml-btn-ghost {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 14px;
+            background: #fff;
+            color: var(--ml-primary);
+            border: 1.5px solid var(--ml-primary);
+            border-radius: 9px;
+            font-size: 12.5px;
+            font-weight: 600;
+            font-family: var(--font-body);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+        .ml-btn-ghost:hover { background: #EFF6FF; }
+
+        /* Map panel */
+        .ml-map-container {
+            background: #E8F0F8;
+            border-radius: 10px;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            margin: 16px;
+        }
+        .ml-map-pin {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .ml-pin-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+        .ml-pin-label {
+            background: #fff;
+            border-radius: 6px;
+            padding: 3px 7px;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--ml-text);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            white-space: nowrap;
+        }
+        .ml-pin-label small { display: block; color: var(--ml-muted); font-weight: 400; font-size: 9.5px; }
+        .ml-map-route {
+            position: absolute;
+            top: 50%;
+            left: 0; right: 0;
+            height: 1px;
+            border-top: 2px dashed #93C5FD;
+        }
+        .ml-risk-dot { background: var(--ml-orange); }
+        .ml-dest-dot { background: var(--ml-primary); }
+
+        /* Match suggestions */
+        .ml-match-list { padding: 0 16px 16px; }
+        .ml-match-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--ml-border);
+        }
+        .ml-match-item:last-child { border-bottom: none; }
+        .ml-match-rank {
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            background: var(--ml-surface);
+            border: 1px solid var(--ml-border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ml-muted);
+            flex-shrink: 0;
+        }
+        .ml-match-info { flex: 1; }
+        .ml-match-name { font-size: 13px; font-weight: 600; color: var(--ml-text); }
+        .ml-match-meta { font-size: 11px; color: var(--ml-muted); }
     </style>
 </head>
-<body class="min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased">
+<body>
 
-    <!-- Top Navigation Bar -->
-    <header class="sticky top-0 z-40 bg-white border-b border-[#DBE5F5] shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                
-                <!-- Logo & Brand Identity -->
-                <div class="flex items-center gap-6">
-                    <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                        <div class="w-10 h-10 rounded-lg bg-[#1D4ED8] flex items-center justify-center text-white font-black text-xl shadow-xs group-hover:bg-blue-800 transition">
-                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                            </svg>
+{{-- ============================================================ --}}
+{{-- SIDEBAR --}}
+{{-- ============================================================ --}}
+<aside class="ml-sidebar">
+    <div class="ml-sidebar-logo">
+        <span>MediLoop</span>
+    </div>
+    <nav class="ml-sidebar-nav">
+        <a href="{{ route('dashboard') }}" class="ml-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            Overview
+        </a>
+        <a href="#" class="ml-nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            Expiry Forecast
+        </a>
+        <a href="#" class="ml-nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            Network Map
+        </a>
+        <a href="#" class="ml-nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
+            Transfers & Approvals
+        </a>
+        <a href="#" class="ml-nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg>
+            Impact & Reports
+        </a>
+
+        {{-- SETTINGS MENU WITH DROPDOWN --}}
+        <div class="ml-settings-container">
+            <button type="button" class="ml-nav-item" id="ml-settings-btn" aria-expanded="false" aria-haspopup="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>Settings</span>
+                <svg class="ml-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: auto; opacity: 0.6;"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+
+            <!-- Settings Popup Dropdown -->
+            <div id="ml-settings-dropdown" class="ml-menu-dropdown ml-settings-menu" style="display: none;">
+                <div class="ml-menu-header">Pengaturan Sistem</div>
+                <a href="{{ route('profile.edit') }}" class="ml-menu-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Profil & Akun</span>
+                </a>
+                <a href="{{ route('appearance.edit') }}" class="ml-menu-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    <span>Tampilan</span>
+                </a>
+                <a href="{{ route('security.edit') }}" class="ml-menu-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <span>Keamanan</span>
+                </a>
+                <div class="ml-menu-divider"></div>
+                <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                    @csrf
+                    <button type="submit" class="ml-menu-item ml-menu-item-danger">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        <span>Keluar</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+</aside>
+
+{{-- ============================================================ --}}
+{{-- MAIN --}}
+{{-- ============================================================ --}}
+<div class="ml-main">
+    {{-- TOPBAR --}}
+    <header class="ml-topbar">
+        <div class="ml-search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" placeholder="Search">
+        </div>
+        <div class="ml-topbar-spacer"></div>
+        <div class="ml-topbar-right">
+            <div class="ml-icon-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <span class="ml-badge-dot"></span>
+            </div>
+
+            {{-- USER PROFILE CHIP WITH DROPDOWN --}}
+            <div class="ml-profile-container">
+                <div class="ml-user-chip" id="ml-profile-btn" role="button" tabindex="0" aria-expanded="false" aria-haspopup="true">
+                    <div class="ml-avatar">
+                        @auth
+                            {{ auth()->user()->initials() }}
+                        @else
+                            PS
+                        @endauth
+                    </div>
+                    <div class="ml-user-info">
+                        <div class="ml-user-name">
+                            @auth
+                                {{ auth()->user()->facility?->name ?? auth()->user()->name }}
+                            @else
+                                Puskesmas Simpang
+                            @endauth
                         </div>
-                        <div>
-                            <span class="text-xl font-bold tracking-tight text-[#0B1F4B]">MediLoop</span>
-                            <span class="hidden sm:inline-block ml-2 px-2 py-0.5 text-[10px] font-semibold text-blue-800 bg-[#EAF1FF] rounded border border-[#DBE5F5]">Decision Support</span>
+                        <div class="ml-user-role">
+                            @auth
+                                ({{ ucfirst(auth()->user()->role ?? 'Pharmacist') }})
+                            @else
+                                (Pharmacist)
+                            @endauth
                         </div>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--ml-subtle); margin-left: 2px;"><path d="M6 9l6 6 6-6"/></svg>
+                </div>
+
+                <!-- Profile Popup Dropdown -->
+                <div id="ml-profile-dropdown" class="ml-menu-dropdown ml-profile-menu" style="display: none;">
+                    <div class="ml-profile-dropdown-user">
+                        <div class="ml-avatar ml-avatar-lg">
+                            @auth
+                                {{ auth()->user()->initials() }}
+                            @else
+                                PS
+                            @endauth
+                        </div>
+                        <div style="overflow: hidden; flex: 1;">
+                            <div class="ml-profile-name">
+                                @auth
+                                    {{ auth()->user()->name }}
+                                @else
+                                    Puskesmas Simpang
+                                @endauth
+                            </div>
+                            <div class="ml-profile-email">
+                                @auth
+                                    {{ auth()->user()->email }}
+                                @else
+                                    apoteker@simpang.puskesmas.go.id
+                                @endauth
+                            </div>
+                            <span class="ml-role-badge">
+                                @auth
+                                    {{ strtoupper(auth()->user()->role ?? 'Pharmacist') }}
+                                @else
+                                    PHARMACIST
+                                @endauth
+                            </span>
+                        </div>
+                    </div>
+                    <div class="ml-menu-divider"></div>
+                    <a href="{{ route('profile.edit') }}" class="ml-menu-item">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <span>Edit Profil</span>
                     </a>
-
-                    <!-- Main Navigation Links -->
-                    @auth
-                    <nav class="hidden md:flex items-center gap-1">
-                        <a href="{{ route('dashboard') }}" class="px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('dashboard') ? 'bg-[#EAF1FF] text-[#1D4ED8] font-semibold' : 'text-[#52627F] hover:bg-slate-100 hover:text-[#0B1F4B]' }}">
-                            Stok & Risiko Kedaluwarsa
-                        </a>
-                        <a href="{{ route('transfers.index') }}" class="px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('transfers.*') ? 'bg-[#EAF1FF] text-[#1D4ED8] font-semibold' : 'text-[#52627F] hover:bg-slate-100 hover:text-[#0B1F4B]' }}">
-                            Redistribusi Obat
-                        </a>
-                        <a href="{{ route('audit.index') }}" class="px-3 py-2 text-sm font-medium rounded-md {{ request()->routeIs('audit.*') ? 'bg-[#EAF1FF] text-[#1D4ED8] font-semibold' : 'text-[#52627F] hover:bg-slate-100 hover:text-[#0B1F4B]' }}">
-                            Audit Regional Dinkes
-                        </a>
-                    </nav>
-                    @endauth
+                    <a href="{{ route('security.edit') }}" class="ml-menu-item">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <span>Keamanan Akun</span>
+                    </a>
+                    <div class="ml-menu-divider"></div>
+                    <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="ml-menu-item ml-menu-item-danger">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span>Keluar</span>
+                        </button>
+                    </form>
                 </div>
-
-                <!-- Right Side: User & Facility Context -->
-                <div class="flex items-center gap-3">
-                    @auth
-                        <!-- Active Facility Badge -->
-                        @if(auth()->user()->facility)
-                        <div class="hidden lg:flex flex-col text-right">
-                            <span class="text-xs font-semibold text-[#0B1F4B]">{{ auth()->user()->facility->name }}</span>
-                            <span class="text-[11px] text-[#52627F]">{{ auth()->user()->facility->code }} • {{ auth()->user()->facility->type }}</span>
-                        </div>
-                        @endif
-
-                        <!-- Role Pill -->
-                        <span class="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full bg-[#EAF1FF] text-[#1D4ED8] border border-[#DBE5F5]">
-                            {{ auth()->user()->job_title ?? auth()->user()->role }}
-                        </span>
-
-                        <!-- User Profile & Logout -->
-                        <div class="flex items-center gap-2 pl-2 border-l border-[#DBE5F5]">
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="p-2 text-[#52627F] hover:text-[#D9480F] hover:bg-red-50 rounded-md transition" title="Keluar">
-                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    @else
-                        <a href="{{ route('demo.switch', 'donor-staff') }}" class="px-4 py-2 text-xs font-semibold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-md shadow-xs transition">
-                            Masuk Demo Portal
-                        </a>
-                    @endauth
-                </div>
-
             </div>
         </div>
     </header>
 
-    <!-- Global Alert Notifications -->
-    @if(session('status'))
-        <div class="bg-blue-50 border-b border-blue-200">
-            <div class="max-w-7xl mx-auto py-2.5 px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-                <div class="flex items-center gap-2 text-sm text-[#0B1F4B]">
-                    <svg class="w-5 h-5 text-[#1D4ED8] shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                    </svg>
-                    <span>{{ session('status') }}</span>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="bg-orange-50 border-b border-orange-200">
-            <div class="max-w-7xl mx-auto py-2.5 px-4 sm:px-6 lg:px-8 flex items-center gap-2 text-sm text-[#D9480F]">
-                <svg class="w-5 h-5 text-[#D9480F] shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                </svg>
-                <span>{{ session('error') }}</span>
-            </div>
-        </div>
-    @endif
-
-    <!-- Main Content Area -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {{ $slot ?? '' }}
+    {{-- CONTENT --}}
+    <main class="ml-content">
         @yield('content')
     </main>
+</div>
 
-    <!-- Footer with Regulatory Notice -->
-    <footer class="bg-white border-t border-[#DBE5F5] mt-auto py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:flex sm:justify-between sm:items-center text-xs text-[#52627F]">
-            <p><strong>MediLoop</strong> — Platform Pendukung Keputusan Klinis & Logistik Redistribusi Obat Antarfaskes.</p>
-            <p class="mt-2 sm:mt-0 font-mono text-[11px]">Zero Patient Data (PHI) • Human-Approved Invariant • UU PDP & Kemenkes Aligned</p>
-        </div>
-    </footer>
+{{-- Vanilla JS Dropdown Interactions --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const settingsBtn = document.getElementById('ml-settings-btn');
+        const settingsDropdown = document.getElementById('ml-settings-dropdown');
+        const profileBtn = document.getElementById('ml-profile-btn');
+        const profileDropdown = document.getElementById('ml-profile-dropdown');
 
-    <!-- Universal 1-Click Floating Demo Role Switcher Bar -->
-    <aside aria-label="Demo Role Switcher" class="fixed bottom-4 right-4 z-50 bg-[#0B1F4B] text-white p-3 rounded-xl shadow-2xl border border-blue-400/30 max-w-sm sm:max-w-md backdrop-blur-md">
-        <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-orange-400 animate-pulse"></span>
-                <span class="text-xs font-bold uppercase tracking-wider text-[#EAF1FF]">Demo Role Switcher (1-Klik)</span>
-            </div>
-            <span class="text-[10px] text-blue-200">Uji Alur Sistem</span>
-        </div>
-        <p class="text-[11px] text-blue-200/80 mb-2.5 leading-snug">Ganti peran seketika untuk menguji persetujuan berjenjang dan otorisasi wewenang:</p>
-        
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-[11px]">
-            <a href="{{ route('demo.switch', 'donor-staff') }}" class="px-2 py-1.5 rounded bg-blue-900/80 hover:bg-[#1D4ED8] transition text-center truncate {{ auth()->check() && auth()->user()->role === 'DONOR_STAFF' ? 'ring-2 ring-white font-bold bg-[#1D4ED8]' : '' }}" title="Staf Farmasi RSUD Tarakan">
-                🏥 RSUD Staf
-            </a>
-            <a href="{{ route('demo.switch', 'donor-head') }}" class="px-2 py-1.5 rounded bg-blue-900/80 hover:bg-[#1D4ED8] transition text-center truncate {{ auth()->check() && auth()->user()->role === 'DONOR_APPROVER' ? 'ring-2 ring-white font-bold bg-[#1D4ED8]' : '' }}" title="Kepala Farmasi RSUD Tarakan (Approver)">
-                🩺 RSUD Kepala
-            </a>
-            <a href="{{ route('demo.switch', 'recipient-staff') }}" class="px-2 py-1.5 rounded bg-blue-900/80 hover:bg-[#1D4ED8] transition text-center truncate {{ auth()->check() && auth()->user()->role === 'RECIPIENT_STAFF' ? 'ring-2 ring-white font-bold bg-[#1D4ED8]' : '' }}" title="Apoteker Puskesmas Gambir">
-                🏥 PKM Staf
-            </a>
-            <a href="{{ route('demo.switch', 'recipient-head') }}" class="px-2 py-1.5 rounded bg-blue-900/80 hover:bg-[#1D4ED8] transition text-center truncate {{ auth()->check() && auth()->user()->role === 'RECIPIENT_APPROVER' ? 'ring-2 ring-white font-bold bg-[#1D4ED8]' : '' }}" title="Kepala Puskesmas Gambir (Penerima Fisik)">
-                👨‍⚕️ PKM Kepala
-            </a>
-            <a href="{{ route('demo.switch', 'auditor') }}" class="col-span-2 sm:col-span-1 px-2 py-1.5 rounded bg-blue-900/80 hover:bg-[#1D4ED8] transition text-center truncate {{ auth()->check() && auth()->user()->role === 'DINKES_AUDITOR' ? 'ring-2 ring-white font-bold bg-[#1D4ED8]' : '' }}" title="Pengawas Farmalkes Dinkes DKI">
-                🏛️ Dinkes Pengawas
-            </a>
-        </div>
-    </aside>
+        function closeAllDropdowns() {
+            if (settingsDropdown) {
+                settingsDropdown.style.display = 'none';
+                settingsBtn?.setAttribute('aria-expanded', 'false');
+            }
+            if (profileDropdown) {
+                profileDropdown.style.display = 'none';
+                profileBtn?.setAttribute('aria-expanded', 'false');
+            }
+        }
 
+        if (settingsBtn && settingsDropdown) {
+            settingsBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const isOpen = settingsDropdown.style.display === 'block';
+                closeAllDropdowns();
+                if (!isOpen) {
+                    settingsDropdown.style.display = 'block';
+                    settingsBtn.setAttribute('aria-expanded', 'true');
+                }
+            });
+        }
+
+        if (profileBtn && profileDropdown) {
+            profileBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const isOpen = profileDropdown.style.display === 'block';
+                closeAllDropdowns();
+                if (!isOpen) {
+                    profileDropdown.style.display = 'block';
+                    profileBtn.setAttribute('aria-expanded', 'true');
+                }
+            });
+
+            profileBtn.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    profileBtn.click();
+                }
+            });
+        }
+
+        document.addEventListener('click', function (e) {
+            const isClickInsideSettings = settingsBtn?.contains(e.target) || settingsDropdown?.contains(e.target);
+            const isClickInsideProfile = profileBtn?.contains(e.target) || profileDropdown?.contains(e.target);
+
+            if (!isClickInsideSettings && !isClickInsideProfile) {
+                closeAllDropdowns();
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeAllDropdowns();
+            }
+        });
+    });
+</script>
+
+@livewireScripts
 </body>
 </html>

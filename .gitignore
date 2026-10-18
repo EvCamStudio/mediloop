@@ -44,3 +44,5 @@ yarn-error.log
 
 # Local SQLite database (contains demo data, not for VCS)
 /database/database.sqlite
+
+*.bak

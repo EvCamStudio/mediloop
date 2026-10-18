@@ -1,0 +1,6 @@
+{
+  "name": "MediLoop - Medicine Redistribution & Waste Prevention",
+  "description": "Decision support system for medicine waste prevention through proactive burn-rate forecasting, health facility network topology, and official inter-facility redistribution.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
