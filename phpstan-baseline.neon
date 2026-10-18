@@ -1,0 +1,295 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$unit_price_idr\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/AuditController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Batch\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Batch\>\:\:\$current_stock\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Batch\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Batch\>\:\:\$days_to_expiry\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Batch\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Batch\>\:\:\$facility\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Batch\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Batch\>\:\:\$facility_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Batch\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Batch\>\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Batch\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Batch\>\:\:\$medicine_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Batch\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Batch\>\:\:\$projected_waste\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Facility\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Facility\>\:\:\$cold_chain_ready\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Facility\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Facility\>\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Facility\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Facility\>\:\:\$latitude\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Facility\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Facility\>\:\:\$longitude\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Facility\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Facility\>\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$latitude\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$longitude\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/TransferController.php
+
+		-
+			message: '#^Class App\\Models\\AuditLog uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/AuditLog.php
+
+		-
+			message: '#^Method App\\Models\\AuditLog\:\:actor\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/AuditLog.php
+
+		-
+			message: '#^Method App\\Models\\AuditLog\:\:facility\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/AuditLog.php
+
+		-
+			message: '#^Method App\\Models\\AuditLog\:\:transfer\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/AuditLog.php
+
+		-
+			message: '#^Class App\\Models\\Batch uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Batch.php
+
+		-
+			message: '#^Method App\\Models\\Batch\:\:facility\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Batch.php
+
+		-
+			message: '#^Method App\\Models\\Batch\:\:medicine\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Batch.php
+
+		-
+			message: '#^Method App\\Models\\Batch\:\:transfers\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Batch.php
+
+		-
+			message: '#^Class App\\Models\\Facility uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Facility.php
+
+		-
+			message: '#^Method App\\Models\\Facility\:\:batches\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Facility.php
+
+		-
+			message: '#^Method App\\Models\\Facility\:\:incomingTransfers\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Facility.php
+
+		-
+			message: '#^Method App\\Models\\Facility\:\:outgoingTransfers\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Facility.php
+
+		-
+			message: '#^Method App\\Models\\Facility\:\:users\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Facility.php
+
+		-
+			message: '#^Class App\\Models\\Medicine uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Medicine.php
+
+		-
+			message: '#^Method App\\Models\\Medicine\:\:batches\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Medicine.php
+
+		-
+			message: '#^Class App\\Models\\Transfer uses generic trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory but does not specify its types\: TFactory$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Transfer.php
+
+		-
+			message: '#^Method App\\Models\\Transfer\:\:acceptedByUser\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Transfer.php
+
+		-
+			message: '#^Method App\\Models\\Transfer\:\:approvedByUser\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Transfer.php
+
+		-
+			message: '#^Method App\\Models\\Transfer\:\:auditLogs\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\HasMany does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Transfer.php
+
+		-
+			message: '#^Method App\\Models\\Transfer\:\:batch\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Transfer.php
+
+		-
+			message: '#^Method App\\Models\\Transfer\:\:completedByUser\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Transfer.php
+
+		-
+			message: '#^Method App\\Models\\Transfer\:\:donorFacility\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Transfer.php
+
+		-
+			message: '#^Method App\\Models\\Transfer\:\:proposedByUser\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Transfer.php
+
+		-
+			message: '#^Method App\\Models\\Transfer\:\:recipientFacility\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/Transfer.php
+
+		-
+			message: '#^Method App\\Models\\User\:\:facility\(\) return type with generic class Illuminate\\Database\\Eloquent\\Relations\\BelongsTo does not specify its types\: TRelatedModel, TDeclaringModel$#'
+			identifier: missingType.generics
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/RedistributionEngine.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$latitude\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/RedistributionEngine.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$longitude\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/RedistributionEngine.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/RedistributionEngine.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$requires_cold_chain\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/RedistributionEngine.php
+
+		-
+			message: '#^Comparison operation "\>" between int\<1, max\> and 0 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: app/Services/RedistributionEngine.php
+
+		-
+			message: '#^Result of \|\| is always true\.$#'
+			identifier: booleanOr.alwaysTrue
+			count: 1
+			path: app/Services/RedistributionEngine.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 1
+			path: app/Services/RedistributionEngine.php
