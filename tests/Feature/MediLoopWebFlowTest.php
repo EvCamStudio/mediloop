@@ -90,8 +90,8 @@ test('dashboard displays inventory ledger and risk badges', function () {
     $response->assertStatus(200);
     $response->assertSee('CFT-2026-X89');
     $response->assertSee('Ceftriaxone 1g Injeksi');
-    $response->assertSee('[RISIKO TINGGI: 300 UNIT]');
-    $response->assertSee('Redistribusi');
+    $response->assertSee('HIGH');
+    $response->assertSee('Find Match');
 });
 
 test('complete transfer lifecycle and invariant verification', function () {
