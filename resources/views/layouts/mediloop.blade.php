@@ -620,23 +620,19 @@
     <nav class="ml-sidebar-nav">
         <a href="{{ route('dashboard') }}" class="ml-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-            Overview
+            Dashboard
         </a>
-        <a href="#" class="ml-nav-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            Expiry Forecast
+        <a href="{{ route('batches.index') }}" class="ml-nav-item {{ request()->routeIs('batches.*') ? 'active' : '' }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            Stok &amp; Batch Obat
         </a>
-        <a href="#" class="ml-nav-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            Network Map
-        </a>
-        <a href="#" class="ml-nav-item">
+        <a href="{{ route('transfers.index') }}" class="ml-nav-item {{ request()->routeIs('transfers.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
-            Transfers & Approvals
+            Transfers &amp; Alokasi
         </a>
-        <a href="#" class="ml-nav-item">
+        <a href="{{ route('audit.index') }}" class="ml-nav-item {{ request()->routeIs('audit.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg>
-            Impact & Reports
+            Pengawasan &amp; Audit
         </a>
 
         {{-- SETTINGS MENU WITH DROPDOWN --}}
@@ -707,14 +703,14 @@
                             @auth
                                 {{ auth()->user()->facility?->name ?? auth()->user()->name }}
                             @else
-                                Puskesmas Simpang
+                                Faskes Pengguna
                             @endauth
                         </div>
                         <div class="ml-user-role">
                             @auth
-                                ({{ ucfirst(auth()->user()->role ?? 'Pharmacist') }})
+                                ({{ ucfirst(auth()->user()->role ?? 'Staff') }})
                             @else
-                                (Pharmacist)
+                                (Farmasi)
                             @endauth
                         </div>
                     </div>
@@ -736,21 +732,21 @@
                                 @auth
                                     {{ auth()->user()->name }}
                                 @else
-                                    Puskesmas Simpang
+                                    Tenaga Kefarmasian
                                 @endauth
                             </div>
                             <div class="ml-profile-email">
                                 @auth
                                     {{ auth()->user()->email }}
                                 @else
-                                    apoteker@simpang.puskesmas.go.id
+                                    farmasi@faskes.id
                                 @endauth
                             </div>
                             <span class="ml-role-badge">
                                 @auth
-                                    {{ strtoupper(auth()->user()->role ?? 'Pharmacist') }}
+                                    {{ strtoupper(auth()->user()->role ?? 'Staff') }}
                                 @else
-                                    PHARMACIST
+                                    FARMASI
                                 @endauth
                             </span>
                         </div>

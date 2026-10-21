@@ -79,18 +79,6 @@ parameters:
 			path: app/Http/Controllers/TransferController.php
 
 		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$latitude\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/TransferController.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$longitude\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Http/Controllers/TransferController.php
-
-		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
 			identifier: property.notFound
 			count: 1
@@ -245,36 +233,6 @@ parameters:
 			identifier: missingType.generics
 			count: 1
 			path: app/Models/User.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
-			identifier: property.notFound
-			count: 2
-			path: app/Services/RedistributionEngine.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$latitude\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/RedistributionEngine.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$longitude\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/RedistributionEngine.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/RedistributionEngine.php
-
-		-
-			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$requires_cold_chain\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/Services/RedistributionEngine.php
 
 		-
 			message: '#^Comparison operation "\>" between int\<1, max\> and 0 is always true\.$#'

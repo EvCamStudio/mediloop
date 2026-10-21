@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuditController;
+use App\Http\Controllers\BatchController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemoController;
 use App\Http\Controllers\TransferController;
@@ -15,6 +16,14 @@ Route::get('/demo/{role}', [DemoController::class, 'switchRole'])->name('demo.sw
 // Protected Healthcare Decision-Support Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Pharmaceutical Inventory & Batch Data Management
+    Route::get('/batches', [BatchController::class, 'index'])->name('batches.index');
+    Route::get('/batches/create', [BatchController::class, 'create'])->name('batches.create');
+    Route::post('/batches', [BatchController::class, 'store'])->name('batches.store');
+    Route::get('/batches/{batch}/edit', [BatchController::class, 'edit'])->name('batches.edit');
+    Route::put('/batches/{batch}', [BatchController::class, 'update'])->name('batches.update');
+    Route::delete('/batches/{batch}', [BatchController::class, 'destroy'])->name('batches.destroy');
 
     // Transfer Decision-Support & State Machine
     Route::get('/transfers', [TransferController::class, 'index'])->name('transfers.index');
