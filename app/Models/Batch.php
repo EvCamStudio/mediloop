@@ -9,6 +9,20 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property int $facility_id
+ * @property int $medicine_id
+ * @property string $batch_number
+ * @property int $current_stock
+ * @property float $daily_burn_rate
+ * @property \Illuminate\Support\Carbon $expiry_date
+ * @property string $unit_price_idr
+ * @property string|null $storage_location
+ * @property string $status
+ * @property-read Medicine|null $medicine
+ * @property-read Facility|null $facility
+ */
 class Batch extends Model
 {
     use HasFactory;

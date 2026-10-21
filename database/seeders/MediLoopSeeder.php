@@ -45,6 +45,48 @@ class MediLoopSeeder extends Seeder
             'phone' => '021-3501234',
         ]);
 
+        $rsudTanahAbang = Facility::create([
+            'name' => 'RSUD Tanah Abang',
+            'code' => 'FSK-RSUD-TNA',
+            'type' => 'RSUD',
+            'license_number' => '445/002/RSUD-DKI/2023',
+            'address' => 'Jl. KH. Mas Mansyur No. 30, Kebon Kacang',
+            'city' => 'Jakarta Pusat',
+            'latitude' => -6.1912000,
+            'longitude' => 106.8164000,
+            'cold_chain_ready' => true,
+            'contact_person' => 'Apt. Firman Syahputra, S.Farm',
+            'phone' => '021-3154821',
+        ]);
+
+        $puskesmasSawahBesar = Facility::create([
+            'name' => 'Puskesmas Kecamatan Sawah Besar',
+            'code' => 'FSK-PKM-SWB',
+            'type' => 'PUSKESMAS',
+            'license_number' => '440/015/PKM-JP/2023',
+            'address' => 'Jl. Mangga Dua Dalam No. 1, Mangga Dua Selatan',
+            'city' => 'Jakarta Pusat',
+            'latitude' => -6.1415000,
+            'longitude' => 106.8290000,
+            'cold_chain_ready' => true,
+            'contact_person' => 'Apt. Ratna Sari, S.Farm',
+            'phone' => '021-6258901',
+        ]);
+
+        $puskesmasTanahAbang = Facility::create([
+            'name' => 'Puskesmas Kecamatan Tanah Abang',
+            'code' => 'FSK-PKM-TNA',
+            'type' => 'PUSKESMAS',
+            'license_number' => '440/018/PKM-JP/2023',
+            'address' => 'Jl. Danau Toba No. 5, Bendungan Hilir',
+            'city' => 'Jakarta Pusat',
+            'latitude' => -6.2085000,
+            'longitude' => 106.8145000,
+            'cold_chain_ready' => true,
+            'contact_person' => 'dr. Lukman Hakim',
+            'phone' => '021-5743210',
+        ]);
+
         $klinikHarmoni = Facility::create([
             'name' => 'Klinik Pratama Harmoni Medika',
             'code' => 'FSK-KLN-HRM',
@@ -57,6 +99,20 @@ class MediLoopSeeder extends Seeder
             'cold_chain_ready' => false,
             'contact_person' => 'dr. Rian Pratama',
             'phone' => '021-6387890',
+        ]);
+
+        $rsPgiCikini = Facility::create([
+            'name' => 'RS PGI Cikini',
+            'code' => 'FSK-RS-CKN',
+            'type' => 'RS_SWASTA',
+            'license_number' => '445/019/RS-SWASTA/2021',
+            'address' => 'Jl. Raden Saleh Raya No. 40, Cikini',
+            'city' => 'Jakarta Pusat',
+            'latitude' => -6.1917000,
+            'longitude' => 106.8423000,
+            'cold_chain_ready' => true,
+            'contact_person' => 'Apt. Natalia Kristiani, M.Farm',
+            'phone' => '021-3899777',
         ]);
 
         $dinkesDki = Facility::create([
@@ -191,6 +247,56 @@ class MediLoopSeeder extends Seeder
             'unit' => 'Sachet',
             'unit_price_idr' => 1500,
             'requires_cold_chain' => false,
+        ]);
+
+        $metformin = Medicine::create([
+            'name' => 'Metformin HCl 500mg Tablet',
+            'generic_name' => 'Metformin Hydrochloride 500mg',
+            'sku' => 'GKL0305033410A1',
+            'category' => 'Endocrine',
+            'dosage_form' => 'Tablet Salut',
+            'unit' => 'Box (100 Tablet)',
+            'unit_price_idr' => 32000,
+            'requires_cold_chain' => false,
+            'handling_instructions' => 'Simpan pada suhu kamar (15-30°C), terlindung dari kelembaban.',
+        ]);
+
+        $amlodipine = Medicine::create([
+            'name' => 'Amlodipine Besilate 10mg Tablet',
+            'generic_name' => 'Amlodipine Besylate 10mg',
+            'sku' => 'GKL0705041910B1',
+            'category' => 'Cardiovascular',
+            'dosage_form' => 'Tablet',
+            'unit' => 'Box (30 Tablet)',
+            'unit_price_idr' => 24000,
+            'requires_cold_chain' => false,
+            'handling_instructions' => 'Simpan di tempat kering dan sejuk.',
+        ]);
+
+        $oxytocin = Medicine::create([
+            'name' => 'Oxytocin 10 IU/ml Injeksi',
+            'generic_name' => 'Oxytocin Synthetic Injection',
+            'sku' => 'GKL9206307843A1',
+            'category' => 'Emergency',
+            'dosage_form' => 'Ampul 1ml',
+            'unit' => 'Ampul',
+            'unit_price_idr' => 18500,
+            'requires_cold_chain' => true,
+            'storage_min_temp' => 2.0,
+            'storage_max_temp' => 8.0,
+            'handling_instructions' => 'Wajib rantai dingin 2°C - 8°C. Untuk penanganan kegawatdaruratan kebidanan.',
+        ]);
+
+        $azithromycin = Medicine::create([
+            'name' => 'Azithromycin 500mg Kaplet',
+            'generic_name' => 'Azithromycin Dihydrate 500mg',
+            'sku' => 'GKL1105044817A1',
+            'category' => 'Antibiotic',
+            'dosage_form' => 'Kaplet Salut Selaput',
+            'unit' => 'Box (20 Kaplet)',
+            'unit_price_idr' => 88000,
+            'requires_cold_chain' => false,
+            'handling_instructions' => 'Simpan di bawah suhu 30°C.',
         ]);
 
         // 4. Seed Batches at RSUD Tarakan (Donor)

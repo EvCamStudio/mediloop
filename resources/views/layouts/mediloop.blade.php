@@ -606,37 +606,237 @@
         .ml-match-info { flex: 1; }
         .ml-match-name { font-size: 13px; font-weight: 600; color: var(--ml-text); }
         .ml-match-meta { font-size: 11px; color: var(--ml-muted); }
+
+        /* ============================================================ */
+        /* MOBILE & ANDROID RESPONSIVE DESIGN                           */
+        /* ============================================================ */
+        .ml-sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(11, 31, 75, 0.6);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            z-index: 45;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .ml-sidebar-backdrop.is-active {
+            display: block;
+            opacity: 1;
+        }
+        .ml-sidebar-close {
+            display: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.12);
+            border: none;
+            color: #fff;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .ml-sidebar-close:hover {
+            background: rgba(255,255,255,0.22);
+        }
+        .ml-hamburger-btn {
+            display: none;
+            flex-shrink: 0;
+        }
+        .ml-topbar-brand {
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+        .ml-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #FFFFFF;
+            border-top: 1px solid var(--ml-border);
+            z-index: 50;
+            box-shadow: 0 -4px 16px rgba(11, 31, 75, 0.08);
+            padding: 0 4px env(safe-area-inset-bottom, 0px);
+        }
+        .ml-bottom-nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            height: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .ml-bottom-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            flex: 1;
+            height: 100%;
+            min-height: 48px;
+            color: var(--ml-muted);
+            text-decoration: none;
+            font-size: 10.5px;
+            font-weight: 600;
+            font-family: var(--font-body);
+            transition: all 0.15s ease;
+            position: relative;
+        }
+        .ml-bottom-item svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.15s ease;
+        }
+        .ml-bottom-item:active svg {
+            transform: scale(0.9);
+        }
+        .ml-bottom-item.active {
+            color: var(--ml-primary);
+        }
+        .ml-bottom-item.active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: var(--ml-primary);
+            border-radius: 0 0 3px 3px;
+        }
+        .ml-table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1023px) {
+            .ml-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                width: 260px;
+                box-shadow: 8px 0 28px rgba(0,0,0,0.3);
+                z-index: 50;
+            }
+            .ml-sidebar.is-open {
+                transform: translateX(0);
+            }
+            .ml-sidebar-close {
+                display: flex;
+            }
+            .ml-main {
+                margin-left: 0;
+                padding-bottom: 74px; /* Room for bottom navigation bar */
+            }
+            .ml-hamburger-btn {
+                display: flex;
+            }
+            .ml-topbar-brand {
+                display: flex;
+            }
+            .ml-bottom-nav {
+                display: block;
+            }
+            .ml-two-col {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .ml-stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .ml-topbar {
+                padding: 10px 14px;
+                gap: 10px;
+            }
+            .ml-search {
+                display: none;
+            }
+            .ml-content {
+                padding: 16px 12px;
+            }
+            .ml-stat-value {
+                font-size: 22px;
+            }
+            .ml-stat-badge, .ml-stat-badge-blue {
+                font-size: 14px;
+                padding: 3px 8px;
+            }
+            .ml-user-chip {
+                padding: 4px;
+            }
+            .ml-user-chip .ml-user-info,
+            .ml-user-chip svg {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .ml-stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .ml-stat-card {
+                padding: 12px 10px;
+            }
+            .ml-stat-label {
+                font-size: 11px;
+                margin-bottom: 4px;
+            }
+            .ml-stat-value {
+                font-size: 18px;
+            }
+            .ml-stat-sub {
+                font-size: 10px;
+            }
+            .ml-section-header {
+                padding: 12px 14px;
+            }
+        }
     </style>
 </head>
 <body>
 
 {{-- ============================================================ --}}
+{{-- BACKDROP FOR MOBILE DRAWER --}}
+{{-- ============================================================ --}}
+<div id="ml-sidebar-backdrop" class="ml-sidebar-backdrop" aria-hidden="true"></div>
+
+{{-- ============================================================ --}}
 {{-- SIDEBAR --}}
 {{-- ============================================================ --}}
-<aside class="ml-sidebar">
-    <div class="ml-sidebar-logo">
+<aside class="ml-sidebar" id="ml-sidebar" role="dialog" aria-modal="true" aria-label="Menu Navigasi">
+    <div class="ml-sidebar-logo" style="display: flex; align-items: center; justify-content: space-between;">
         <span>MediLoop</span>
+        <button type="button" class="ml-sidebar-close" id="ml-sidebar-close" aria-label="Tutup Menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
     </div>
     <nav class="ml-sidebar-nav">
         <a href="{{ route('dashboard') }}" class="ml-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-            Overview
+            Dashboard
         </a>
-        <a href="#" class="ml-nav-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            Expiry Forecast
+        <a href="{{ route('batches.index') }}" class="ml-nav-item {{ request()->routeIs('batches.*') ? 'active' : '' }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            Stok &amp; Batch Obat
         </a>
-        <a href="#" class="ml-nav-item">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            Network Map
-        </a>
-        <a href="#" class="ml-nav-item">
+        <a href="{{ route('transfers.index') }}" class="ml-nav-item {{ request()->routeIs('transfers.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
-            Transfers & Approvals
+            Transfers &amp; Alokasi
         </a>
-        <a href="#" class="ml-nav-item">
+        <a href="{{ route('audit.index') }}" class="ml-nav-item {{ request()->routeIs('audit.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg>
-            Impact & Reports
+            Pengawasan &amp; Audit
         </a>
 
         {{-- SETTINGS MENU WITH DROPDOWN --}}
@@ -681,6 +881,16 @@
 <div class="ml-main">
     {{-- TOPBAR --}}
     <header class="ml-topbar">
+        {{-- MOBILE HAMBURGER TOGGLE --}}
+        <button type="button" class="ml-icon-btn ml-hamburger-btn" id="ml-hamburger-btn" aria-label="Buka Menu Navigasi" aria-expanded="false" aria-controls="ml-sidebar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+
+        {{-- MOBILE BRAND --}}
+        <div class="ml-topbar-brand">
+            <span style="font-family: var(--font-heading); font-weight: 800; font-size: 18px; color: var(--ml-navy); letter-spacing: -0.02em;">MediLoop</span>
+        </div>
+
         <div class="ml-search">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input type="text" placeholder="Search">
@@ -707,14 +917,14 @@
                             @auth
                                 {{ auth()->user()->facility?->name ?? auth()->user()->name }}
                             @else
-                                Puskesmas Simpang
+                                Faskes Pengguna
                             @endauth
                         </div>
                         <div class="ml-user-role">
                             @auth
-                                ({{ ucfirst(auth()->user()->role ?? 'Pharmacist') }})
+                                ({{ ucfirst(auth()->user()->role ?? 'Staff') }})
                             @else
-                                (Pharmacist)
+                                (Farmasi)
                             @endauth
                         </div>
                     </div>
@@ -736,21 +946,21 @@
                                 @auth
                                     {{ auth()->user()->name }}
                                 @else
-                                    Puskesmas Simpang
+                                    Tenaga Kefarmasian
                                 @endauth
                             </div>
                             <div class="ml-profile-email">
                                 @auth
                                     {{ auth()->user()->email }}
                                 @else
-                                    apoteker@simpang.puskesmas.go.id
+                                    farmasi@faskes.id
                                 @endauth
                             </div>
                             <span class="ml-role-badge">
                                 @auth
-                                    {{ strtoupper(auth()->user()->role ?? 'Pharmacist') }}
+                                    {{ strtoupper(auth()->user()->role ?? 'Staff') }}
                                 @else
-                                    PHARMACIST
+                                    FARMASI
                                 @endauth
                             </span>
                         </div>
@@ -783,13 +993,87 @@
     </main>
 </div>
 
-{{-- Vanilla JS Dropdown Interactions --}}
+{{-- BOTTOM NAVIGATION (Android / Mobile Native-Feel App Bar) --}}
+<nav class="ml-bottom-nav" aria-label="Navigasi Bawah">
+    <div class="ml-bottom-nav-inner">
+        <a href="{{ route('dashboard') }}" class="ml-bottom-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="{{ request()->routeIs('dashboard') ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="{{ request()->routeIs('dashboard') ? '0' : '2' }}">
+                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+            </svg>
+            <span>Dashboard</span>
+        </a>
+        <a href="{{ route('batches.index') }}" class="ml-bottom-item {{ request()->routeIs('batches.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
+            <span>Stok Obat</span>
+        </a>
+        <a href="{{ route('transfers.index') }}" class="ml-bottom-item {{ request()->routeIs('transfers.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/>
+            </svg>
+            <span>Redistribusi</span>
+        </a>
+        <a href="{{ route('audit.index') }}" class="ml-bottom-item {{ request()->routeIs('audit.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/>
+            </svg>
+            <span>Audit</span>
+        </a>
+    </div>
+</nav>
+
+{{-- Vanilla JS Dropdown & Mobile Drawer Interactions --}}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const settingsBtn = document.getElementById('ml-settings-btn');
         const settingsDropdown = document.getElementById('ml-settings-dropdown');
         const profileBtn = document.getElementById('ml-profile-btn');
         const profileDropdown = document.getElementById('ml-profile-dropdown');
+
+        // Mobile Sidebar Drawer Elements
+        const hamburgerBtn = document.getElementById('ml-hamburger-btn');
+        const sidebar = document.getElementById('ml-sidebar');
+        const sidebarCloseBtn = document.getElementById('ml-sidebar-close');
+        const sidebarBackdrop = document.getElementById('ml-sidebar-backdrop');
+
+        function openMobileSidebar() {
+            if (sidebar && sidebarBackdrop) {
+                sidebar.classList.add('is-open');
+                sidebarBackdrop.classList.add('is-active');
+                hamburgerBtn?.setAttribute('aria-expanded', 'true');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeMobileSidebar() {
+            if (sidebar && sidebarBackdrop) {
+                sidebar.classList.remove('is-open');
+                sidebarBackdrop.classList.remove('is-active');
+                hamburgerBtn?.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            }
+        }
+
+        if (hamburgerBtn) {
+            hamburgerBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                openMobileSidebar();
+            });
+        }
+
+        if (sidebarCloseBtn) {
+            sidebarCloseBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                closeMobileSidebar();
+            });
+        }
+
+        if (sidebarBackdrop) {
+            sidebarBackdrop.addEventListener('click', function () {
+                closeMobileSidebar();
+            });
+        }
 
         function closeAllDropdowns() {
             if (settingsDropdown) {
@@ -845,6 +1129,7 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 closeAllDropdowns();
+                closeMobileSidebar();
             }
         });
     });

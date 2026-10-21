@@ -1,7 +1,37 @@
-﻿@extends('layouts.mediloop', ['title' => 'Overview Dashboard - MediLoop'])
+@extends('layouts.mediloop', ['title' => 'Overview Dashboard - MediLoop'])
 
 @section('content')
 <div>
+
+    <!-- Header & Action Row -->
+    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--ml-border);">
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <h1 style="font-size: 22px; font-weight: 800; color: var(--ml-text); margin: 0;">
+                    Ringkasan Logistik &amp; Prediksi Kedaluwarsa
+                </h1>
+                <span style="display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; background: #EFF6FF; color: var(--ml-primary); border: 1px solid #BFDBFE;">
+                    {{ $facility?->name ?? 'Fasilitas Kesehatan' }}
+                </span>
+            </div>
+            <p style="font-size: 12.5px; color: var(--ml-muted); margin: 4px 0 0;">
+                Sistem pendukung keputusan pemantauan stok farmasi dan redistribusi antarfaskes.
+            </p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <a href="{{ route('batches.index') }}" class="ml-btn-ghost" style="padding: 8px 14px; font-size: 12px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                <span>Kelola Semua Stok</span>
+            </a>
+            @if(! $user->isDinkesAuditor())
+                <a href="{{ route('batches.create') }}" class="ml-btn-primary" style="padding: 8px 16px; font-size: 12px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
+                    <span>Input Stok Obat Baru</span>
+                </a>
+            @endif
+        </div>
+    </div>
 
     {{-- ============================================================ --}}
     {{-- 4 STAT CARDS --}}
@@ -58,17 +88,28 @@
 
         {{-- LEFT: Forecast Table --}}
         <div class="ml-section">
-            <div class="ml-section-header">
-                <h2 class="ml-section-title">At-Risk Expiry Forecast &amp; Match Recommendation</h2>
+            <div class="ml-section-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h2 class="ml-section-title">Prediksi Risiko Kedaluwarsa &amp; Rekomendasi Match</h2>
+                    <p style="font-size: 11.5px; color: var(--ml-muted); margin: 2px 0 0;">
+                        Dihitung otomatis: Hari hingga kedaluwarsa vs Laju pemakaian harian faskes.
+                    </p>
+                </div>
+                @if(! $user->isDinkesAuditor())
+                    <a href="{{ route('batches.create') }}" class="ml-btn-primary" style="font-size: 11.5px; padding: 5px 10px;">
+                        Tambah Batch
+                    </a>
+                @endif
             </div>
-            <table class="ml-table">
+            <div class="ml-table-responsive">
+                <table class="ml-table">
                 <thead>
                     <tr>
-                        <th>Medicine Name</th>
-                        <th>Batch #</th>
-                        <th>Stock</th>
-                        <th>Days to Deplete vs Expiry</th>
-                        <th style="text-align: right;">Action</th>
+                        <th>Nama Obat &amp; Sediaan</th>
+                        <th>No. Batch</th>
+                        <th>Stok Fisik</th>
+                        <th>Hari Kedaluwarsa vs Habis</th>
+                        <th style="text-align: right;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,107 +117,94 @@
                         <tr>
                             <td>
                                 <div style="font-weight: 700; color: var(--ml-text); font-size: 13.5px;">
-                                    {{ $batch->medicine->name ?? 'Amoxicillin 500mg' }}
+                                    {{ $batch->medicine->name }}
                                 </div>
-                                @if(isset($batch->medicine->dosage_form))
-                                    <div style="font-size: 11px; color: var(--ml-muted); margin-top: 2px;">
-                                        {{ $batch->medicine->dosage_form }}
-                                    </div>
-                                @endif
+                                <div style="font-size: 11px; color: var(--ml-muted); margin-top: 2px;">
+                                    {{ $batch->medicine->dosage_form }} • {{ $batch->medicine->category }}
+                                    @if($batch->medicine->requires_cold_chain)
+                                        <span style="display: inline-block; margin-left: 4px; padding: 1px 4px; font-size: 9px; font-weight: 700; background: #E0F2FE; color: #0369A1; border-radius: 4px;">Rantai Dingin</span>
+                                    @endif
+                                </div>
                             </td>
                             <td>
-                                <span style="font-family: monospace; font-weight: 600; color: var(--ml-text);">
-                                    {{ $batch->batch_number ?? 'AMX-09' }}
+                                <span style="font-family: monospace; font-weight: 600; color: var(--ml-text); background: #F1F5F9; padding: 2px 6px; border-radius: 4px;">
+                                    {{ $batch->batch_number }}
                                 </span>
+                                <div style="font-size: 10px; color: var(--ml-muted); margin-top: 2px;">
+                                    Exp: {{ $batch->expiry_date->format('d/m/Y') }}
+                                </div>
                             </td>
                             <td>
-                                <span style="color: var(--ml-muted); font-size: 12.5px;">
-                                    Stock:<br>
+                                <span style="color: var(--ml-muted); font-size: 12px;">
+                                    Stok:<br>
                                     <span style="font-weight: 700; color: var(--ml-text); font-size: 13.5px;">
-                                        {{ number_format($batch->current_stock ?? 480) }} boxes
+                                        {{ number_format($batch->current_stock) }} {{ $batch->medicine->unit }}
                                     </span>
                                 </span>
                             </td>
                             <td>
                                 <div class="ml-days-wrap">
                                     <span class="ml-days-pill ml-days-expiry">
-                                        {{ $batch->days_to_expiry ?? 45 }} Days<br>
-                                        <span style="font-size: 9.5px; font-weight:400;">to Expiry</span>
+                                        {{ $batch->days_to_expiry }} Hari<br>
+                                        <span style="font-size: 9.5px; font-weight:400;">Kedaluwarsa</span>
                                     </span>
                                     <span class="ml-days-vs">vs</span>
                                     <span class="ml-days-pill ml-days-deplete">
-                                        {{ $batch->days_to_deplete ?? 120 }} Days<br>
-                                        <span style="font-size: 9.5px; font-weight:400;">to Deplete</span>
+                                        {{ is_finite($batch->days_to_deplete) ? $batch->days_to_deplete : '∞' }} Hari<br>
+                                        <span style="font-size: 9.5px; font-weight:400;">Habis Stok</span>
                                     </span>
                                 </div>
                             </td>
                             <td style="text-align: right;">
                                 <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-                                    @php $risk = $batch->risk_level ?? 'HIGH'; @endphp
-                                    @if($risk === 'HIGH' || $risk === 'CRITICAL')
-                                        <span class="ml-risk-high">HIGH<br>RISK</span>
+                                    @php $risk = $batch->risk_level; @endphp
+                                    @if($risk === 'CRITICAL')
+                                        <span class="ml-risk-high" style="background:#FEE2E2; color:#991B1B; border-color:#FCA5A5;">CRITICAL</span>
+                                    @elseif($risk === 'HIGH')
+                                        <span class="ml-risk-high">HIGH</span>
                                     @elseif($risk === 'MEDIUM')
-                                        <span class="ml-risk-medium">MEDIUM<br>RISK</span>
+                                        <span class="ml-risk-medium">MEDIUM</span>
+                                    @else
+                                        <span style="display: inline-flex; align-items: center; padding: 4px 8px; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; border-radius: 8px; font-size: 11px; font-weight: 700;">LOW</span>
                                     @endif
-                                    <a href="#" class="ml-btn-primary">Find Match</a>
+
+                                    @if(! $user->isDinkesAuditor() && $batch->projected_waste > 0 && $batch->current_stock > 0)
+                                        <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-primary">
+                                            Find Match
+                                        </a>
+                                    @else
+                                        <a href="{{ route('batches.edit', $batch) }}" class="ml-btn-ghost" style="padding: 5px 10px; font-size: 11.5px;">
+                                            Detail
+                                        </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
-                        {{-- Demo rows when no data --}}
                         <tr>
-                            <td>
-                                <div style="font-weight: 700; color: var(--ml-text); font-size: 13.5px;">Amoxicillin 500mg</div>
-                                <div style="font-size: 11px; color: var(--ml-muted); margin-top: 2px;">Tablet</div>
-                            </td>
-                            <td><span style="font-family: monospace; font-weight: 600; color: var(--ml-text);">AMX-09</span></td>
-                            <td>
-                                <span style="color: var(--ml-muted); font-size: 12px;">Stock:<br>
-                                    <span style="font-weight: 700; color: var(--ml-text);">480 boxes</span>
-                                </span>
-                            </td>
-                            <td>
-                                <div class="ml-days-wrap">
-                                    <span class="ml-days-pill ml-days-expiry">45 Days<br><span style="font-size: 9.5px; font-weight:400;">to Expiry</span></span>
-                                    <span class="ml-days-vs">vs</span>
-                                    <span class="ml-days-pill ml-days-deplete">120 Days<br><span style="font-size: 9.5px; font-weight:400;">to Deplete</span></span>
-                                </div>
-                            </td>
-                            <td style="text-align: right;">
-                                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-                                    <span class="ml-risk-high" style="text-align:center; line-height:1.2;">HIGH<br>RISK</span>
-                                    <a href="#" class="ml-btn-primary">Find Match</a>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div style="font-weight: 700; color: var(--ml-text); font-size: 13.5px;">Paracetamol Syrup</div>
-                                <div style="font-size: 11px; color: var(--ml-muted); margin-top: 2px;">Syrup</div>
-                            </td>
-                            <td><span style="font-family: monospace; font-weight: 600; color: var(--ml-text);">PCT-44</span></td>
-                            <td>
-                                <span style="color: var(--ml-muted); font-size: 12px;">Stock:<br>
-                                    <span style="font-weight: 700; color: var(--ml-text);">120 boxes</span>
-                                </span>
-                            </td>
-                            <td>
-                                <div class="ml-days-wrap">
-                                    <span class="ml-days-pill ml-days-expiry">30 Days<br><span style="font-size: 9.5px; font-weight:400;">to Expiry</span></span>
-                                    <span class="ml-days-vs">vs</span>
-                                    <span class="ml-days-pill ml-days-deplete">40 Days<br><span style="font-size: 9.5px; font-weight:400;">to Deplete</span></span>
-                                </div>
-                            </td>
-                            <td style="text-align: right;">
-                                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
-                                    <span class="ml-risk-medium" style="text-align:center; line-height:1.2;">MEDIUM<br>RISK</span>
-                                    <a href="#" class="ml-btn-primary">Find Match</a>
+                            <td colspan="5" style="padding: 36px 20px; text-align: center; color: var(--ml-muted);">
+                                <div style="max-width: 380px; margin: 0 auto;">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin: 0 auto 10px; color: var(--ml-subtle);">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                    </svg>
+                                    <div style="font-weight: 700; color: var(--ml-text); font-size: 14px; margin-bottom: 4px;">
+                                        Belum Ada Data Stok di Fasilitas Ini
+                                    </div>
+                                    <p style="font-size: 12px; line-height: 1.5; margin-bottom: 16px;">
+                                        Data obat yang Anda input akan langsung dianalisis oleh mesin prediksi untuk mendeteksi risiko limbah kedaluwarsa.
+                                    </p>
+                                    @if(! $user->isDinkesAuditor())
+                                        <a href="{{ route('batches.create') }}" class="ml-btn-primary">
+                                            Input Stok Obat Sekarang
+                                        </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
 
         {{-- RIGHT: Map + Match Suggestions --}}
@@ -184,75 +212,115 @@
 
             {{-- Network Map --}}
             <div class="ml-section">
-                <div class="ml-section-header">
-                    <h3 class="ml-section-title">Interactive Network Map</h3>
+                <div class="ml-section-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <h3 class="ml-section-title">Peta Jejaring Faskes</h3>
+                    <span style="font-size: 11px; font-weight: 600; color: var(--ml-primary);">
+                        Radius &le; 50 km
+                    </span>
                 </div>
                 <div class="ml-map-container">
-                    {{-- Simulated map background --}}
+                    {{-- Vector grid simulating healthcare redistribution network --}}
                     <svg width="100%" height="100%" viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" style="position:absolute;inset:0;">
-                        {{-- Road lines simulating map --}}
                         <rect width="340" height="200" fill="#E8EDF5"/>
-                        {{-- Streets --}}
-                        <line x1="0" y1="80" x2="340" y2="80" stroke="#D1DCF0" stroke-width="6"/>
+                        <line x1="0" y1="80" x2="340" y2="80" stroke="#D1DCF0" stroke-width="5"/>
                         <line x1="0" y1="130" x2="340" y2="130" stroke="#D1DCF0" stroke-width="4"/>
                         <line x1="80" y1="0" x2="80" y2="200" stroke="#D1DCF0" stroke-width="4"/>
                         <line x1="200" y1="0" x2="200" y2="200" stroke="#D1DCF0" stroke-width="3"/>
                         <line x1="260" y1="0" x2="260" y2="200" stroke="#D1DCF0" stroke-width="2"/>
-                        {{-- District blocks --}}
                         <rect x="90" y="90" width="100" height="30" fill="#D8E5F2" rx="2"/>
                         <rect x="210" y="100" width="40" height="20" fill="#D8E5F2" rx="2"/>
-                        {{-- Dashed route line --}}
                         <line x1="68" y1="68" x2="270" y2="140" stroke="#93C5FD" stroke-width="2" stroke-dasharray="6 4"/>
-                        {{-- Distance labels --}}
-                        <text x="50" y="60" font-size="9" fill="#6B84B0" font-family="DM Sans, sans-serif">4.0 km</text>
-                        <text x="130" y="118" font-size="9" fill="#6B84B0" font-family="DM Sans, sans-serif">4.6 km</text>
-                        <text x="190" y="165" font-size="9" fill="#6B84B0" font-family="DM Sans, sans-serif">2.6 km</text>
-                        <text x="240" y="180" font-size="9" fill="#6B84B0" font-family="DM Sans, sans-serif">4.0 km</text>
+                        @if(isset($partnerFacilities) && count($partnerFacilities) > 0)
+                            <text x="130" y="118" font-size="9" fill="#1D4ED8" font-weight="700" font-family="DM Sans, sans-serif">
+                                {{ $partnerFacilities[0]['distance_km'] ?? '1.8' }} km
+                            </text>
+                        @endif
                     </svg>
 
-                    {{-- Source facility pin --}}
-                    <div class="ml-map-pin" style="top: 48px; left: 44px;">
+                    {{-- Source facility pin (User's real facility) --}}
+                    <div class="ml-map-pin" style="top: 40px; left: 24px;">
                         <div class="ml-pin-dot" style="background: var(--ml-orange);"></div>
                         <div class="ml-pin-label">
-                            Puskesmas Simpang
-                            <small>Puskesmas Simpang</small>
-                            <span style="display:inline-block; margin-top:1px; background: var(--ml-orange); color:#fff; font-size:8px; font-weight:700; padding:1px 5px; border-radius:4px;">RISK</span>
+                            {{ $facility?->name ?? 'Fasilitas Donor' }}
+                            <small>{{ $facility?->city ?? 'DKI Jakarta' }}</small>
+                            @if(($atRiskCount ?? 0) > 0)
+                                <span style="display:inline-block; margin-top:1px; background: var(--ml-orange); color:#fff; font-size:8px; font-weight:700; padding:1px 5px; border-radius:4px;">SURPLUS</span>
+                            @endif
                         </div>
                     </div>
 
-                    {{-- Destination facility pin --}}
-                    <div class="ml-map-pin" style="bottom: 36px; right: 16px;">
-                        <div class="ml-pin-dot" style="background: var(--ml-primary);"></div>
-                        <div class="ml-pin-label">
-                            Puskesmas Medan Baru
-                            <small>Puskesmas Medan Baru</small>
+                    {{-- Destination facility pin (Real Nearest Partner) --}}
+                    @if(isset($partnerFacilities) && count($partnerFacilities) > 0)
+                        <div class="ml-map-pin" style="bottom: 30px; right: 16px;">
+                            <div class="ml-pin-dot" style="background: var(--ml-primary);"></div>
+                            <div class="ml-pin-label">
+                                {{ $partnerFacilities[0]['facility']->name }}
+                                <small>{{ $partnerFacilities[0]['distance_km'] }} km &bull; {{ $partnerFacilities[0]['facility']->type }}</small>
+                            </div>
                         </div>
+                    @endif
+                </div>
+
+                {{-- Partner Facilities List Summary --}}
+                <div style="padding: 0 16px 12px;">
+                    <div style="font-size: 11.5px; font-weight: 700; color: var(--ml-muted); text-transform: uppercase; margin-bottom: 6px;">
+                        Faskes Terdekat dalam Jejaring:
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        @forelse(array_slice($partnerFacilities ?? [], 0, 3) as $p)
+                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding: 4px 0; border-bottom: 1px dashed var(--ml-border);">
+                                <span style="font-weight: 600; color: var(--ml-text);">
+                                    {{ $p['facility']->name }}
+                                </span>
+                                <span style="font-family: monospace; font-weight: 700; color: var(--ml-primary); font-size: 11px;">
+                                    {{ $p['distance_km'] }} km
+                                </span>
+                            </div>
+                        @empty
+                            <div style="font-size: 11.5px; color: var(--ml-muted);">
+                                Tidak ada data faskes terdekat.
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 
                 {{-- Match Suggestions --}}
-                <div style="padding: 0 16px 4px;">
-                    <div style="font-size: 13.5px; font-weight: 700; color: var(--ml-text); font-family: var(--font-heading); padding-bottom: 10px; border-bottom: 1px solid var(--ml-border);">
-                        Match Suggestions
+                <div style="padding: 10px 16px 4px; border-top: 1px solid var(--ml-border);">
+                    <div style="font-size: 13.5px; font-weight: 700; color: var(--ml-text); font-family: var(--font-heading); padding-bottom: 6px;">
+                        Rekomendasi Match Redistribusi
                     </div>
+                    @if(isset($topRiskBatch))
+                        <div style="font-size: 11px; color: var(--ml-muted); margin-bottom: 8px;">
+                            Untuk batch berisiko: <strong>{{ $topRiskBatch->medicine->name }}</strong> (No. {{ $topRiskBatch->batch_number }})
+                        </div>
+                    @endif
                 </div>
+
                 <div class="ml-match-list">
-                    <div class="ml-match-item">
-                        <div class="ml-match-rank">1</div>
-                        <div class="ml-match-info">
-                            <div class="ml-match-name">Puskesmas Medan Baru</div>
-                            <div class="ml-match-meta">Score 92% · Needs 200 boxes</div>
+                    @forelse($matchCandidates ?? [] as $index => $candidate)
+                        <div class="ml-match-item">
+                            <div class="ml-match-rank">{{ $index + 1 }}</div>
+                            <div class="ml-match-info">
+                                <div class="ml-match-name">{{ $candidate['facility']->name }}</div>
+                                <div class="ml-match-meta">
+                                    Score {{ $candidate['match_score'] }}% &bull; Jarak {{ $candidate['distance_km'] }} km &bull; Kapasitas {{ $candidate['recipient_intake_cap'] }} unit
+                                </div>
+                            </div>
+                            @if(isset($topRiskBatch) && ! $user->isDinkesAuditor())
+                                <a href="{{ route('transfers.propose', $topRiskBatch) }}" class="ml-btn-primary" style="font-size: 11px; padding: 5px 10px; white-space: nowrap;">
+                                    Ajukan Transfer
+                                </a>
+                            @endif
                         </div>
-                        <a href="#" class="ml-btn-primary" style="font-size: 11.5px; padding: 6px 12px;">Create Transfer</a>
-                    </div>
-                    <div class="ml-match-item">
-                        <div class="ml-match-rank">2</div>
-                        <div class="ml-match-info">
-                            <div class="ml-match-name">Klinik Sentosa</div>
-                            <div class="ml-match-meta">Score 81% · Needs 100 boxes</div>
+                    @empty
+                        <div style="padding: 14px 0; text-align: center; color: var(--ml-muted); font-size: 12px;">
+                            @if(isset($topRiskBatch))
+                                Belum ada kandidat faskes penerima yang memenuhi syarat cold chain / jarak.
+                            @else
+                                Belum ada batch berisiko kedaluwarsa. Tambahkan stok batch untuk mendapatkan rekomendasi transfer otomatis.
+                            @endif
                         </div>
-                        <a href="#" class="ml-btn-ghost" style="font-size: 11.5px; padding: 6px 12px;">Route Map</a>
-                    </div>
+                    @endforelse
                 </div>
             </div>
 
