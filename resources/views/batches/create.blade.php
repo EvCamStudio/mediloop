@@ -77,7 +77,7 @@
 
                 <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#1D4ED8]">
                     <input type="checkbox" id="toggleNewMedicine" name="is_new_medicine" value="1" {{ old('is_new_medicine') ? 'checked' : '' }} class="rounded border-[#DBE5F5] text-[#1D4ED8] focus:ring-[#1D4ED8]">
-                    <span>+ Obat Belum Terdaftar di Master?</span>
+                    <span>Obat Belum Terdaftar di Master?</span>
                 </label>
             </div>
 
@@ -99,7 +99,7 @@
                     @endforeach
                 </select>
                 <span class="text-[11px] text-[#52627F] block mt-1">
-                    Jika nama obat belum tersedia di daftar di atas, centang opsi <em>"+ Obat Belum Terdaftar di Master?"</em> untuk menambahkan jenis obat baru.
+                    Jika nama obat belum tersedia di daftar di atas, centang opsi <em>"Obat Belum Terdaftar di Master?"</em> untuk menambahkan jenis obat baru.
                 </span>
             </div>
 

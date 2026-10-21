@@ -44,7 +44,7 @@
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                <span>+ Input Stok Obat Baru</span>
+                <span>Input Stok Obat Baru</span>
             </a>
         @endif
     </div>
@@ -247,7 +247,7 @@
                                     </p>
                                     @if(! $user->isDinkesAuditor())
                                         <a href="{{ route('batches.create') }}" class="inline-flex items-center gap-1 px-4 py-2 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
-                                            + Input Stok Obat Baru
+                                            Input Stok Obat Baru
                                         </a>
                                     @endif
                                 </div>

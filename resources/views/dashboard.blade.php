@@ -27,7 +27,7 @@
             @if(! $user->isDinkesAuditor())
                 <a href="{{ route('batches.create') }}" class="ml-btn-primary" style="padding: 8px 16px; font-size: 12px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
-                    <span>+ Input Stok Obat Baru</span>
+                    <span>Input Stok Obat Baru</span>
                 </a>
             @endif
         </div>
@@ -97,11 +97,12 @@
                 </div>
                 @if(! $user->isDinkesAuditor())
                     <a href="{{ route('batches.create') }}" class="ml-btn-primary" style="font-size: 11.5px; padding: 5px 10px;">
-                        + Tambah Batch
+                        Tambah Batch
                     </a>
                 @endif
             </div>
-            <table class="ml-table">
+            <div class="ml-table-responsive">
+                <table class="ml-table">
                 <thead>
                     <tr>
                         <th>Nama Obat &amp; Sediaan</th>
@@ -194,7 +195,7 @@
                                     </p>
                                     @if(! $user->isDinkesAuditor())
                                         <a href="{{ route('batches.create') }}" class="ml-btn-primary">
-                                            + Input Stok Obat Sekarang
+                                            Input Stok Obat Sekarang
                                         </a>
                                     @endif
                                 </div>
@@ -203,6 +204,7 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
         </div>
 
         {{-- RIGHT: Map + Match Suggestions --}}
