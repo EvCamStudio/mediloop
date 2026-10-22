@@ -15,19 +15,39 @@
             </p>
         </div>
 
-        <div class="ml-page-actions">
-            <a href="{{ route('batches.index') }}" class="ml-btn-quiet">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
-                <span>Kelola Semua Stok</span>
-            </a>
-            @if(! $user->isDinkesAuditor())
-                <a href="{{ route('batches.create') }}" class="ml-btn-primary">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v16m8-8H4"/></svg>
-                    <span>Input Stok Obat Baru</span>
+        @if (! ($facilityMissing ?? false))
+            <div class="ml-page-actions">
+                <a href="{{ route('batches.index') }}" class="ml-btn-quiet">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                    <span>Kelola Semua Stok</span>
                 </a>
-            @endif
-        </div>
+                @if(! $user->isDinkesAuditor())
+                    <a href="{{ route('batches.create') }}" class="ml-btn-primary">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v16m8-8H4"/></svg>
+                        <span>Input Stok Obat Baru</span>
+                    </a>
+                @endif
+            </div>
+        @endif
     </header>
+
+    @if ($facilityMissing ?? false)
+        <section class="ml-section" role="status"
+            style="padding: 20px 24px; border-left: 4px solid #B7791F; background: #FFFBEB; margin-bottom: 20px;">
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+                <div style="flex: 0 0 auto; width: 36px; height: 36px; border-radius: 9px; background: #FEF3C7; color: #92400E; display: flex; align-items: center; justify-content: center;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                </div>
+                <div>
+                    <h2 class="ml-section-title" style="margin: 0 0 4px;">Akun Belum Terhubung ke Fasilitas</h2>
+                    <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #78350F;">
+                        Data stok antar-faskes tidak ditampilkan sampai akun Anda dihubungkan ke fasilitas kesehatan
+                        terverifikasi. Hubungi administrator platform untuk menyelesaikan verifikasi.
+                    </p>
+                </div>
+            </div>
+        </section>
+    @endif
 
     {{-- 4 STAT CARDS --}}
     <div class="ml-stat-grid">

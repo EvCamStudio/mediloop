@@ -20,30 +20,16 @@ test('public landing page renders with clinical decision-support content and sim
     $response->assertSee('Benchmark PRD: Ceftriaxone');
 });
 
-test('1-click demo role switcher logs in user and redirects to dashboard', function () {
-    $facility = Facility::create([
-        'name' => 'RSUD Tarakan Jakarta',
-        'code' => 'FSK-RSUD-TRK',
-        'type' => 'RSUD',
-        'address' => 'Jl. Kyai Caringin No. 7',
-        'city' => 'Jakarta Pusat',
-        'latitude' => -6.1729000,
-        'longitude' => 106.8122000,
-        'cold_chain_ready' => true,
-        'contact_person' => 'Apt. Hendra Wijaya',
-        'phone' => '021-3842934',
-    ]);
+test('landing call-to-action sends guests to login and demo shortcut is removed', function () {
+    $response = $this->get('/');
 
-    $user = User::factory()->create([
-        'email' => 'donor@mediloop.test',
-        'facility_id' => $facility->id,
-        'role' => 'DONOR_STAFF',
-    ]);
+    $response->assertOk();
+    $response->assertSee('Buka Dashboard');
+    $response->assertSee('Mulai Simulasi');
+    $response->assertSee('href="'.route('login').'"', false);
+    $response->assertDontSee('/demo/donor-staff', false);
 
-    $response = $this->get('/demo/donor-staff');
-
-    $response->assertRedirect('/dashboard');
-    $this->assertAuthenticatedAs($user);
+    $this->get('/demo/donor-staff')->assertNotFound();
 });
 
 test('dashboard displays inventory ledger and risk badges', function () {

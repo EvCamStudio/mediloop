@@ -3,15 +3,11 @@
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DemoController;
 use App\Http\Controllers\TransferController;
 use Illuminate\Support\Facades\Route;
 
 // Public Landing Page
 Route::view('/', 'welcome')->name('home');
-
-// 1-Click Demo Role Switcher (For Evaluation & Jury Testing)
-Route::get('/demo/{role}', [DemoController::class, 'switchRole'])->name('demo.switch');
 
 // Protected Healthcare Decision-Support Routes
 Route::middleware(['auth'])->group(function () {

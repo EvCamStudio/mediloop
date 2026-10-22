@@ -62,7 +62,7 @@
                     class="hidden sm:inline-block text-xs font-semibold text-[#52627F] hover:text-[#0B1F4B] px-3 py-2">
                     Prinsip Sistem
                 </a>
-                <a href="{{ route('demo.switch', 'donor-staff') }}"
+                <a href="{{ route('login') }}"
                     class="px-4 py-2 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
                     Buka Dashboard
                 </a>
@@ -94,9 +94,9 @@
                     </p>
 
                     <div class="flex flex-wrap items-center gap-4">
-                        <a href="{{ route('demo.switch', 'donor-staff') }}"
+                        <a href="{{ route('login') }}"
                             class="px-5 py-3 text-sm font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition inline-flex items-center gap-2">
-                            <span>Mulai Simulasi Demo</span>
+                            <span>Mulai Simulasi</span>
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -386,17 +386,17 @@
                 Siap Menguji Alur Redistribusi Obat Secara Lengkap?
             </h2>
             <p class="text-sm text-blue-200/90 max-w-2xl mx-auto mb-8">
-                Gunakan akun demo pra-konfigurasi untuk menguji alur pengusulan dari RSUD Tarakan, persetujuan Kepala
-                Farmasi, penerimaan Puskesmas Gambir, hingga audit pengawasan Dinkes DKI Jakarta.
+                Masuk dengan akun fasilitas kesehatan Anda untuk menguji alur pengusulan, persetujuan, penerimaan,
+                hingga audit pengawasan. Belum terdaftar? Daftarkan fasilitas Anda terlebih dahulu.
             </p>
             <div class="flex flex-wrap justify-center gap-4">
-                <a href="{{ route('demo.switch', 'donor-staff') }}"
+                <a href="{{ route('login') }}"
                     class="px-6 py-3 rounded-lg bg-[#1D4ED8] hover:bg-blue-600 font-bold text-sm text-white shadow-lg transition">
-                    Masuk Sebagai Staf RSUD Tarakan (Donor)
+                    Masuk ke Dashboard
                 </a>
-                <a href="{{ route('demo.switch', 'auditor') }}"
+                <a href="{{ route('register') }}"
                     class="px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 font-semibold text-sm text-white border border-white/20 transition">
-                    Masuk Sebagai Pengawas Dinkes DKI
+                    Daftar Akun Faskes
                 </a>
             </div>
         </div>
