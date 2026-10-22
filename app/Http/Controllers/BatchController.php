@@ -38,6 +38,49 @@ class BatchController extends Controller
             $query->where('facility_id', $request->get('facility_id'));
         }
 
+        // Base query for quick tab counts (scoped to current facility)
+        $baseFacilityQuery = clone $query;
+        $countAll = (clone $baseFacilityQuery)->count();
+        $countRisk = (clone $baseFacilityQuery)
+            ->whereRaw("current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))")
+            ->where(function ($sub) {
+                $sub->whereRaw("DATEDIFF(expiry_date, CURDATE()) <= 60")
+                    ->orWhereRaw("(current_stock - FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))) / current_stock >= 0.25");
+            })->count();
+        $countExpiring = (clone $baseFacilityQuery)
+            ->whereDate('expiry_date', '<=', now()->addDays(60))
+            ->count();
+        $countColdChain = (clone $baseFacilityQuery)
+            ->whereHas('medicine', fn ($mq) => $mq->where('requires_cold_chain', true))
+            ->count();
+
+        // 1. Quick Tab Filtering
+        $currentTab = $request->get('tab', 'all');
+        if ($currentTab === 'risk') {
+            $query->whereRaw("current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))")
+                ->where(function ($sub) {
+                    $sub->whereRaw("DATEDIFF(expiry_date, CURDATE()) <= 60")
+                        ->orWhereRaw("(current_stock - FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))) / current_stock >= 0.25");
+                });
+        } elseif ($currentTab === 'expiring') {
+            $query->whereDate('expiry_date', '<=', now()->addDays(60));
+        } elseif ($currentTab === 'cold_chain') {
+            $query->whereHas('medicine', fn ($mq) => $mq->where('requires_cold_chain', true));
+        }
+
+        // 2. Risk Level Filter (Dropdown)
+        $currentRisk = $request->get('risk', '');
+        if ($currentRisk === 'CRITICAL') {
+            $query->whereRaw("current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))) AND DATEDIFF(expiry_date, CURDATE()) <= 30");
+        } elseif ($currentRisk === 'HIGH') {
+            $query->whereRaw("current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))) AND (DATEDIFF(expiry_date, CURDATE()) BETWEEN 31 AND 60 OR (current_stock > 0 AND (current_stock - FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))) / current_stock >= 0.25))");
+        } elseif ($currentRisk === 'MEDIUM') {
+            $query->whereRaw("current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))) AND (DATEDIFF(expiry_date, CURDATE()) BETWEEN 61 AND 90 OR current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))))");
+        } elseif ($currentRisk === 'LOW') {
+            $query->whereRaw("current_stock <= FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))");
+        }
+
+        // 3. Search Query
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
@@ -51,11 +94,33 @@ class BatchController extends Controller
             });
         }
 
+        // 4. Status Filter
         if ($request->filled('status')) {
             $query->where('status', $request->get('status'));
         }
 
-        $batches = $query->orderBy('expiry_date', 'asc')->paginate(15)->withQueryString();
+        // 5. Sorting
+        $currentSort = $request->get('sort', 'expiry_asc');
+        switch ($currentSort) {
+            case 'expiry_desc':
+                $query->orderBy('expiry_date', 'desc');
+                break;
+            case 'stock_desc':
+                $query->orderBy('current_stock', 'desc');
+                break;
+            case 'stock_asc':
+                $query->orderBy('current_stock', 'asc');
+                break;
+            case 'burn_rate_desc':
+                $query->orderBy('daily_burn_rate', 'desc');
+                break;
+            case 'expiry_asc':
+            default:
+                $query->orderBy('expiry_date', 'asc');
+                break;
+        }
+
+        $batches = $query->paginate(15)->withQueryString();
 
         $facilitiesList = Facility::where('type', '!=', 'DINKES')->get();
 
@@ -66,6 +131,15 @@ class BatchController extends Controller
             'user' => $user,
             'currentSearch' => $request->get('search', ''),
             'currentStatus' => $request->get('status', ''),
+            'currentTab' => $currentTab,
+            'currentRisk' => $currentRisk,
+            'currentSort' => $currentSort,
+            'counts' => [
+                'all' => $countAll,
+                'risk' => $countRisk,
+                'expiring' => $countExpiring,
+                'cold_chain' => $countColdChain,
+            ],
         ]);
     }
 

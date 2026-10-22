@@ -57,11 +57,56 @@
         @endif
     </div>
 
-    <!-- Search & Filter Bar -->
+    <!-- Quick Filter Tabs (Saran Claude & Standar Sistem Informasi Farmasi) -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+        <!-- Tab: Semua -->
+        <a href="{{ request()->fullUrlWithQuery(['tab' => 'all', 'page' => 1]) }}"
+           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0 {{ ($currentTab === 'all' || !$currentTab) ? 'bg-[#1D4ED8] text-white border-[#1D4ED8] shadow-xs' : 'bg-white text-slate-700 hover:bg-slate-50 border-[#DBE5F5]' }}">
+            <span>Semua Batch</span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ ($currentTab === 'all' || !$currentTab) ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600' }}">
+                {{ $counts['all'] }}
+            </span>
+        </a>
+
+        <!-- Tab: Berisiko Kritis & Tinggi -->
+        <a href="{{ request()->fullUrlWithQuery(['tab' => 'risk', 'page' => 1]) }}"
+           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0 {{ $currentTab === 'risk' ? 'bg-[#D9480F] text-white border-[#D9480F] shadow-xs' : 'bg-white text-slate-700 hover:bg-orange-50/50 border-[#DBE5F5]' }}">
+            <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                <span>🚨 Berisiko Kritis &amp; Tinggi</span>
+            </span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ $currentTab === 'risk' ? 'bg-white/25 text-white' : 'bg-orange-100 text-[#D9480F]' }}">
+                {{ $counts['risk'] }}
+            </span>
+        </a>
+
+        <!-- Tab: Expired <= 60 Hari -->
+        <a href="{{ request()->fullUrlWithQuery(['tab' => 'expiring', 'page' => 1]) }}"
+           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0 {{ $currentTab === 'expiring' ? 'bg-amber-600 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 hover:bg-amber-50/50 border-[#DBE5F5]' }}">
+            <span>⏳ Expired &le; 60 Hari</span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ $currentTab === 'expiring' ? 'bg-white/25 text-white' : 'bg-amber-100 text-amber-800' }}">
+                {{ $counts['expiring'] }}
+            </span>
+        </a>
+
+        <!-- Tab: Rantai Dingin (Cold Chain) -->
+        <a href="{{ request()->fullUrlWithQuery(['tab' => 'cold_chain', 'page' => 1]) }}"
+           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0 {{ $currentTab === 'cold_chain' ? 'bg-cyan-700 text-white border-cyan-700 shadow-xs' : 'bg-white text-slate-700 hover:bg-cyan-50/50 border-[#DBE5F5]' }}">
+            <span>❄️ Rantai Dingin</span>
+            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ $currentTab === 'cold_chain' ? 'bg-white/25 text-white' : 'bg-cyan-100 text-cyan-800' }}">
+                {{ $counts['cold_chain'] }}
+            </span>
+        </a>
+    </div>
+
+    <!-- Search, Risk, Status & Sort Filter Bar -->
     <div class="bg-white p-4 rounded-xl border border-[#DBE5F5] shadow-xs">
-        <form method="GET" action="{{ route('batches.index') }}" class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+        <form method="GET" action="{{ route('batches.index') }}" class="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-center">
+            <!-- Retain current tab -->
+            <input type="hidden" name="tab" value="{{ $currentTab }}">
+
             @if(($user->isDinkesAuditor() || $user->role === 'SYSADMIN') && isset($facilitiesList))
-                <div class="md:col-span-3">
+                <div class="md:col-span-12 lg:col-span-3">
                     <select name="facility_id" onchange="this.form.submit()" class="w-full px-3 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
                         <option value="">Semua Fasilitas Kesehatan</option>
                         @foreach($facilitiesList as $f)
@@ -73,17 +118,30 @@
                 </div>
             @endif
 
-            <div class="{{ ($user->isDinkesAuditor() || $user->role === 'SYSADMIN') ? 'md:col-span-6' : 'md:col-span-9' }}">
+            <!-- Search input -->
+            <div class="{{ ($user->isDinkesAuditor() || $user->role === 'SYSADMIN') ? 'md:col-span-12 lg:col-span-3' : 'md:col-span-12 lg:col-span-4' }}">
                 <div class="relative">
-                    <input type="text" name="search" value="{{ $currentSearch }}" placeholder="Cari nama obat, kandungan generik, nomor batch, atau lokasi rak..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
+                    <input type="text" name="search" value="{{ $currentSearch }}" placeholder="Cari obat, generik, batch, rak..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
                     <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
             </div>
 
-            <div class="md:col-span-2">
-                <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
+            <!-- Risk Level Filter -->
+            <div class="md:col-span-4 lg:col-span-2">
+                <select name="risk" onchange="this.form.submit()" class="w-full px-2.5 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
+                    <option value="">Risiko: Semua</option>
+                    <option value="CRITICAL" {{ $currentRisk === 'CRITICAL' ? 'selected' : '' }}>🔴 Kritis</option>
+                    <option value="HIGH" {{ $currentRisk === 'HIGH' ? 'selected' : '' }}>🟠 Tinggi</option>
+                    <option value="MEDIUM" {{ $currentRisk === 'MEDIUM' ? 'selected' : '' }}>🟡 Sedang</option>
+                    <option value="LOW" {{ $currentRisk === 'LOW' ? 'selected' : '' }}>🟢 Rendah</option>
+                </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="md:col-span-4 lg:col-span-2">
+                <select name="status" onchange="this.form.submit()" class="w-full px-2.5 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
                     <option value="">Status: Semua</option>
                     <option value="ACTIVE" {{ $currentStatus === 'ACTIVE' ? 'selected' : '' }}>ACTIVE</option>
                     <option value="RESERVED" {{ $currentStatus === 'RESERVED' ? 'selected' : '' }}>RESERVED</option>
@@ -92,28 +150,45 @@
                 </select>
             </div>
 
-            <div class="md:col-span-1 flex gap-2">
-                <button type="submit" class="w-full px-3 py-2 bg-slate-100 hover:bg-slate-200 text-[#0B1F4B] text-xs font-semibold rounded-lg border border-[#DBE5F5] transition text-center">
-                    Cari
+            <!-- Sorting Filter -->
+            <div class="md:col-span-4 lg:col-span-2">
+                <select name="sort" onchange="this.form.submit()" class="w-full px-2.5 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
+                    <option value="expiry_asc" {{ $currentSort === 'expiry_asc' ? 'selected' : '' }}>Sort: Expired Terdekat (FEFO)</option>
+                    <option value="expiry_desc" {{ $currentSort === 'expiry_desc' ? 'selected' : '' }}>Sort: Expired Terjauh</option>
+                    <option value="stock_desc" {{ $currentSort === 'stock_desc' ? 'selected' : '' }}>Sort: Stok Terbanyak</option>
+                    <option value="stock_asc" {{ $currentSort === 'stock_asc' ? 'selected' : '' }}>Sort: Stok Tersedikit</option>
+                    <option value="burn_rate_desc" {{ $currentSort === 'burn_rate_desc' ? 'selected' : '' }}>Sort: Laju Pakai Tertinggi</option>
+                </select>
+            </div>
+
+            <!-- Action Buttons: Cari & Reset -->
+            <div class="md:col-span-12 lg:col-span-2 flex items-center gap-1.5">
+                <button type="submit" class="w-full px-3 py-2 bg-[#1D4ED8] hover:bg-blue-800 text-white text-xs font-semibold rounded-lg shadow-2xs transition text-center">
+                    Terapkan
                 </button>
+                @if(request()->filled('search') || request()->filled('status') || request()->filled('risk') || ($currentTab && $currentTab !== 'all') || ($currentSort && $currentSort !== 'expiry_asc'))
+                    <a href="{{ route('batches.index') }}" title="Reset Semua Filter" class="px-3 py-2 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-700 text-xs font-bold rounded-lg border border-[#DBE5F5] transition text-center shrink-0">
+                        Reset
+                    </a>
+                @endif
             </div>
         </form>
     </div>
 
-    <!-- Inventory Batches Table -->
+    <!-- Inventory Batches Table (With Sticky Header & Max Height Scrolling) -->
     <div class="bg-white rounded-xl border border-[#DBE5F5] shadow-xs overflow-hidden">
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto max-h-[640px] relative">
             <table class="w-full text-left text-xs border-collapse">
-                <thead>
-                    <tr class="bg-slate-50 border-b border-[#DBE5F5] text-[#52627F] uppercase tracking-wider text-[11px]">
-                        <th class="py-3.5 px-4">Nama Obat &amp; Bentuk Sediaan</th>
-                        <th class="py-3.5 px-4 font-mono">No. Batch</th>
-                        <th class="py-3.5 px-4 text-right">Stok Aktif</th>
-                        <th class="py-3.5 px-4 text-center">Laju Pakai / Hari</th>
-                        <th class="py-3.5 px-4 text-center">Sisa Waktu vs Habis Stok</th>
-                        <th class="py-3.5 px-4 text-right font-mono">Proyeksi Limbah</th>
-                        <th class="py-3.5 px-4 text-center">Tingkat Risiko</th>
-                        <th class="py-3.5 px-4 text-right">Aksi</th>
+                <thead class="sticky top-0 z-10 bg-slate-100/95 backdrop-blur-xs border-b border-[#DBE5F5] shadow-2xs">
+                    <tr class="text-[#52627F] uppercase tracking-wider text-[11px]">
+                        <th class="py-3.5 px-4 font-bold">Nama Obat &amp; Bentuk Sediaan</th>
+                        <th class="py-3.5 px-4 font-mono font-bold">No. Batch</th>
+                        <th class="py-3.5 px-4 text-right font-bold">Stok Aktif</th>
+                        <th class="py-3.5 px-4 text-center font-bold">Laju Pakai / Hari</th>
+                        <th class="py-3.5 px-4 text-center font-bold">Sisa Waktu vs Habis Stok</th>
+                        <th class="py-3.5 px-4 text-right font-mono font-bold">Proyeksi Limbah</th>
+                        <th class="py-3.5 px-4 text-center font-bold">Tingkat Risiko</th>
+                        <th class="py-3.5 px-4 text-right font-bold">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#DBE5F5]">
