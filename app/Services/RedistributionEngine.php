@@ -226,6 +226,7 @@ class RedistributionEngine
                 'match_score' => $matchScore,
                 'recipient_daily_burn_rate' => $recipientBurnRate,
                 'recipient_intake_cap' => $intakeCap,
+                'intake_cap' => $intakeCap,
                 'recommended_quantity' => $intakeCap > 0 ? $intakeCap : min($projectedWaste, 100),
             ];
         }

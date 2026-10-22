@@ -331,3 +331,62 @@ test('staff cannot delete batch with active transfer', function () {
 
     expect(Batch::find($batch->id))->not->toBeNull();
 });
+
+test('batches index renders top risk candidates recommendations without errors', function () {
+    $donor = Facility::create([
+        'name' => 'RSUD Tarakan Jakarta',
+        'code' => 'FSK-RSUD-TRK',
+        'type' => 'RSUD',
+        'address' => 'Jl. Kyai Caringin No. 7',
+        'city' => 'Jakarta Pusat',
+        'latitude' => -6.1729000,
+        'longitude' => 106.8122000,
+        'cold_chain_ready' => true,
+        'contact_person' => 'Apt. Hendra Wijaya',
+        'phone' => '021-3842934',
+    ]);
+
+    $recipient = Facility::create([
+        'name' => 'Puskesmas Gambir',
+        'code' => 'FSK-PUSK-GMB',
+        'type' => 'PUSKESMAS',
+        'address' => 'Jl. Tanah Abang II No. 33',
+        'city' => 'Jakarta Pusat',
+        'latitude' => -6.1754000,
+        'longitude' => 106.8190000,
+        'cold_chain_ready' => true,
+        'contact_person' => 'drg. Maya',
+        'phone' => '021-3456789',
+    ]);
+
+    $user = User::factory()->create([
+        'facility_id' => $donor->id,
+        'role' => 'DONOR_STAFF',
+    ]);
+
+    $medicine = Medicine::create([
+        'name' => 'Amoxicillin 500mg',
+        'generic_name' => 'Amoxicillin',
+        'sku' => 'MED-AMX-001',
+        'category' => 'Antibiotic',
+        'dosage_form' => 'Kapsul',
+        'unit' => 'Kapsul',
+        'unit_price_idr' => 1200,
+    ]);
+
+    Batch::create([
+        'facility_id' => $donor->id,
+        'medicine_id' => $medicine->id,
+        'batch_number' => 'AMX-RISK-01',
+        'current_stock' => 1000,
+        'daily_burn_rate' => 2.0,
+        'expiry_date' => Carbon::today()->addDays(20)->toDateString(),
+        'status' => 'ACTIVE',
+    ]);
+
+    $response = $this->actingAs($user)->get('/batches');
+    $response->assertStatus(200);
+    $response->assertSee('REKOMENDASI MATCH UTAMA');
+    $response->assertSee('Puskesmas Gambir');
+    $response->assertSee('Batas Alokasi:');
+});

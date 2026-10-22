@@ -74,26 +74,26 @@
         </div>
 
         {{-- Urgent Risk Expiry Batches --}}
-        <div class="ml-stat-card" style="padding: 22px 24px; border-left: 4px solid #DC2626;">
+        <div class="ml-stat-card" style="padding: 22px 24px;">
             <div class="ml-stat-label" style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="color: #991B1B; font-weight: 700;">Batch Berisiko Kedaluwarsa</span>
+                <span>Batch Berisiko Kedaluwarsa</span>
                 <span style="font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: #FEE2E2; color: #991B1B;">PRIORITAS</span>
             </div>
-            <div style="font-size: 26px; font-weight: 800; color: #DC2626; margin: 8px 0 4px; font-family: var(--font-heading);">
+            <div style="font-size: 26px; font-weight: 800; color: #0B1F4B; margin: 8px 0 4px; font-family: var(--font-heading);">
                 {{ number_format($atRiskCount ?? 0) }} <span style="font-size: 14px; font-weight: 500; color: var(--ml-muted);">batch</span>
             </div>
-            <div class="ml-stat-sub" style="font-size: 12px; color: #9A3412;">
+            <div class="ml-stat-sub" style="font-size: 12px; color: var(--ml-muted);">
                 Status <strong>Kritis (&le; 30h)</strong> atau <strong>Tinggi (&le; 60h)</strong>
             </div>
         </div>
 
         {{-- Projected Waste Value Saved --}}
-        <div class="ml-stat-card" style="padding: 22px 24px; border-left: 4px solid #0284C7;">
+        <div class="ml-stat-card" style="padding: 22px 24px;">
             <div class="ml-stat-label" style="display: flex; align-items: center; justify-content: space-between;">
                 <span>Nilai Surplus Terdeteksi</span>
                 <span style="font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: #E0F2FE; color: #0369A1;">POTENSI SELAMAT</span>
             </div>
-            <div style="font-size: 22px; font-weight: 800; color: #0369A1; margin: 8px 0 4px; font-family: var(--font-heading);">
+            <div style="font-size: 22px; font-weight: 800; color: #0B1F4B; margin: 8px 0 4px; font-family: var(--font-heading);">
                 Rp {{ number_format($totalWasteValue ?? 0, 0, ',', '.') }}
             </div>
             <div class="ml-stat-sub" style="font-size: 12px;">
@@ -102,12 +102,12 @@
         </div>
 
         {{-- SDG 12 & Environmental Footprint --}}
-        <div class="ml-stat-card" style="padding: 22px 24px; border-left: 4px solid #16A34A;">
+        <div class="ml-stat-card" style="padding: 22px 24px;">
             <div class="ml-stat-label" style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="color: #166534; font-weight: 700;">Dampak Lingkungan (SDG 12)</span>
+                <span>Dampak Lingkungan (SDG 12)</span>
                 <span style="font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: #DCFCE7; color: #166534;">ANTI LIMBAH B3</span>
             </div>
-            <div style="font-size: 24px; font-weight: 800; color: #166534; margin: 8px 0 4px; font-family: var(--font-heading);">
+            <div style="font-size: 24px; font-weight: 800; color: #0B1F4B; margin: 8px 0 4px; font-family: var(--font-heading);">
                 ~{{ $estimatedWasteKg }} <span style="font-size: 14px; font-weight: 500; color: var(--ml-muted);">kg</span>
             </div>
             <div class="ml-stat-sub" style="font-size: 12px;">
@@ -118,10 +118,10 @@
 
     {{-- Highlight Spotlight: Tri-Factor Candidate Recommendation --}}
     @if(isset($topRiskBatch) && count($topCandidates) > 0)
-        <section class="ml-section" style="margin-bottom: 26px; border: 1.5px solid #BFDBFE; background: #F8FBFF;">
-            <div style="padding: 20px 24px; border-bottom: 1px solid #DBE5F5; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+        <section class="ml-section" style="margin-bottom: 26px; border: 1px solid var(--ml-border); background: #FFFFFF;">
+            <div style="padding: 20px 24px; border-bottom: 1px solid var(--ml-border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 38px; height: 38px; border-radius: 10px; background: #EFF6FF; border: 1px solid #BFDBFE; display: flex; align-items: center; justify-content: center; color: #1D4ED8;">
+                    <div style="width: 38px; height: 38px; border-radius: 10px; background: #F8FAFC; border: 1px solid var(--ml-border); display: flex; align-items: center; justify-content: center; color: var(--ml-primary);">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24M14.83 9.17l4.24-4.24M14.83 14.83l4.24 4.24M9.17 14.83l-4.24 4.24"/></svg>
                     </div>
                     <div>
@@ -144,7 +144,7 @@
 
             <div style="padding: 20px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
                 @foreach($topCandidates as $c)
-                    <div style="background: #fff; border: 1px solid #DBE5F5; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; box-shadow: 0 1px 3px rgba(11, 31, 75, 0.04);">
+                    <div style="background: #fff; border: 1px solid var(--ml-border); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px; box-shadow: 0 1px 3px rgba(11, 31, 75, 0.04);">
                         <div>
                             <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px;">
                                 <div>
@@ -166,14 +166,14 @@
                                 </div>
                                 <div>&bull;</div>
                                 <div>
-                                    <span style="color: var(--ml-subtle);">Batas Alokasi:</span> <strong>{{ number_format($c['intake_cap']) }} unit</strong>
+                                    <span style="color: var(--ml-subtle);">Batas Alokasi:</span> <strong>{{ number_format($c['recipient_intake_cap'] ?? $c['intake_cap'] ?? 0) }} unit</strong>
                                 </div>
                             </div>
                         </div>
 
                         @if(! $user->isDinkesAuditor())
                             <a href="{{ route('transfers.propose', $topRiskBatch) }}" class="ml-btn-primary ml-btn-sm" style="width: 100%; justify-content: center; padding: 8px 12px; font-size: 12.5px; font-weight: 700;">
-                                <span>Kirim Usulan Alokasi ({{ number_format($c['intake_cap']) }} unit)</span>
+                                <span>Kirim Usulan Alokasi ({{ number_format($c['recipient_intake_cap'] ?? $c['intake_cap'] ?? 0) }} unit)</span>
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                             </a>
                         @endif
