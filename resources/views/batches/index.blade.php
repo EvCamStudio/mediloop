@@ -40,12 +40,20 @@
         </div>
 
         @if(! $user->isDinkesAuditor())
-            <a href="{{ route('batches.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                <span>Input Stok Obat Baru</span>
-            </a>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="document.getElementById('ml-csv-modal').classList.remove('hidden')" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-bold text-[#1D4ED8] bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg shadow-xs transition">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <span>Import Stok (CSV)</span>
+                </button>
+                <a href="{{ route('batches.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span>Input Stok Manual</span>
+                </a>
+            </div>
         @endif
     </div>
 
@@ -263,6 +271,81 @@
                 {{ $batches->links() }}
             </div>
         @endif
+    </div>
+
+    <!-- CSV Import Modal -->
+    <div id="ml-csv-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-[#0B1F4B]/60 backdrop-blur-xs transition-opacity" onclick="document.getElementById('ml-csv-modal').classList.add('hidden')"></div>
+
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-[#DBE5F5]">
+                
+                <!-- Modal Header -->
+                <div class="bg-gradient-to-r from-blue-900 to-[#1D4ED8] p-5 text-white flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold" id="modal-title">Import Stok Batch via CSV</h3>
+                            <p class="text-xs text-blue-100">Unggah laporan inventaris obat dari SIMRS / SIMPUS</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="document.getElementById('ml-csv-modal').classList.add('hidden')" class="text-white/70 hover:text-white p-1 rounded-lg hover:bg-white/10">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <!-- Form -->
+                <form method="POST" action="{{ route('batches.importCsv') }}" enctype="multipart/form-data" class="p-6 space-y-4">
+                    @csrf
+
+                    <!-- Instructions & Template Box -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-3.5 flex items-start justify-between gap-3 text-xs">
+                        <div class="space-y-1">
+                            <p class="font-bold text-[#1D4ED8]">Format Kolom CSV yang Didukung:</p>
+                            <p class="text-slate-600 leading-relaxed text-[11.5px]">
+                                <code class="bg-white px-1.5 py-0.5 rounded text-blue-900 font-mono">nama_obat</code>, 
+                                <code class="bg-white px-1.5 py-0.5 rounded text-blue-900 font-mono">nomor_batch</code>, 
+                                <code class="bg-white px-1.5 py-0.5 rounded text-blue-900 font-mono">stok_saat_ini</code>, 
+                                <code class="bg-white px-1.5 py-0.5 rounded text-blue-900 font-mono">tanggal_kadaluwarsa</code>, 
+                                <code class="bg-white px-1.5 py-0.5 rounded text-blue-900 font-mono">laju_pemakaian_harian</code>
+                            </p>
+                        </div>
+                        <a href="{{ route('batches.csvTemplate') }}" class="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-blue-100/60 border border-blue-300 text-[#1D4ED8] font-bold rounded-lg text-[11px] shadow-2xs transition">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            <span>Unduh Template</span>
+                        </a>
+                    </div>
+
+                    <!-- Dropzone File Input -->
+                    <div class="border-2 border-dashed border-[#BFDBFE] hover:border-[#1D4ED8] bg-slate-50/70 hover:bg-blue-50/40 rounded-xl p-6 text-center transition cursor-pointer" onclick="document.getElementById('csv_file_input').click()">
+                        <svg class="w-10 h-10 mx-auto text-[#1D4ED8] mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p class="text-xs font-bold text-[#0B1F4B]">Pilih file CSV dari komputer Anda</p>
+                        <p class="text-[11px] text-[#52627F] mt-0.5">Mendukung file .csv atau .txt (Maksimal 5 MB)</p>
+                        <p id="selected-file-name" class="mt-2 text-xs font-semibold text-emerald-700 hidden"></p>
+                        <input type="file" name="csv_file" id="csv_file_input" accept=".csv,.txt" required class="hidden" onchange="if(this.files[0]) { document.getElementById('selected-file-name').textContent = 'File terpilih: ' + this.files[0].name; document.getElementById('selected-file-name').classList.remove('hidden'); }">
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center justify-end gap-2 pt-2">
+                        <button type="button" onclick="document.getElementById('ml-csv-modal').classList.add('hidden')" class="px-4 py-2 text-xs font-bold text-[#52627F] hover:bg-slate-100 rounded-lg transition">
+                            Batal
+                        </button>
+                        <button type="submit" class="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                            <span>Mulai Impor &amp; Kalkulasi</span>
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
     </div>
 
 </div>

@@ -81,6 +81,27 @@
         </div>
     </div>
 
+    {{-- Quick Analytics & Map Callout Banner --}}
+    <div style="background: linear-gradient(135deg, #0B1F4B 0%, #1D4ED8 100%); border-radius: 14px; padding: 14px 20px; color: #ffffff; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.15);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 18px; shrink: 0;">
+                📊
+            </div>
+            <div>
+                <div style="font-weight: 700; font-size: 13.5px; letter-spacing: -0.01em;">Pusat Visualisasi &amp; Analitik Prediktif Obat</div>
+                <div style="font-size: 11.5px; opacity: 0.85;">Lihat grafik distribusi risiko, horizon kedaluwarsa, dan estimasi limbah finansial.</div>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <a href="{{ route('map.index') }}" style="background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 700; text-decoration: none; transition: all 0.15s;">
+                🗺️ Buka Peta Logistik
+            </a>
+            <a href="{{ route('analytics.index') }}" style="background: #ffffff; color: #1D4ED8; padding: 6px 16px; border-radius: 8px; font-size: 11.5px; font-weight: 800; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.15s;">
+                Buka Analitik &amp; Grafik &rarr;
+            </a>
+        </div>
+    </div>
+
     {{-- ============================================================ --}}
     {{-- TWO-COLUMN: Table + Map Panel --}}
     {{-- ============================================================ --}}
@@ -213,10 +234,13 @@
             {{-- Network Map --}}
             <div class="ml-section">
                 <div class="ml-section-header" style="display: flex; align-items: center; justify-content: space-between;">
-                    <h3 class="ml-section-title">Peta Jejaring Faskes</h3>
-                    <span style="font-size: 11px; font-weight: 600; color: var(--ml-primary);">
-                        Radius &le; 50 km
-                    </span>
+                    <div>
+                        <h3 class="ml-section-title">Peta Jejaring Faskes</h3>
+                        <span style="font-size: 11px; color: var(--ml-muted);">Ringkasan radius antarfaskes</span>
+                    </div>
+                    <a href="{{ route('map.index') }}" class="ml-btn-ghost" style="padding: 4px 10px; font-size: 11px; text-decoration: none; font-weight: 700; color: var(--ml-primary); border: 1px solid #BFDBFE; background: #EFF6FF; border-radius: 6px;">
+                        Buka Peta Penuh &rarr;
+                    </a>
                 </div>
                 <div class="ml-map-container">
                     {{-- Vector grid simulating healthcare redistribution network --}}

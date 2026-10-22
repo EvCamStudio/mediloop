@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DemoController;
+use App\Http\Controllers\MapController;
 use App\Http\Controllers\TransferController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,10 +19,18 @@ Route::get('/demo/{role}', [DemoController::class, 'switchRole'])->name('demo.sw
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Advanced Data Science Analytics & Visualizations
+    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+
+    // Dedicated Geographic Network & Distribution Route Map
+    Route::get('/map', [MapController::class, 'index'])->name('map.index');
+
     // Pharmaceutical Inventory & Batch Data Management
     Route::get('/batches', [BatchController::class, 'index'])->name('batches.index');
     Route::get('/batches/create', [BatchController::class, 'create'])->name('batches.create');
     Route::post('/batches', [BatchController::class, 'store'])->name('batches.store');
+    Route::post('/batches/import-csv', [BatchController::class, 'importCsv'])->name('batches.importCsv');
+    Route::get('/batches/csv-template', [BatchController::class, 'downloadTemplate'])->name('batches.csvTemplate');
     Route::get('/batches/{batch}/edit', [BatchController::class, 'edit'])->name('batches.edit');
     Route::put('/batches/{batch}', [BatchController::class, 'update'])->name('batches.update');
     Route::delete('/batches/{batch}', [BatchController::class, 'destroy'])->name('batches.destroy');

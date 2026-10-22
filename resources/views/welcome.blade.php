@@ -25,6 +25,127 @@
             background-color: #F8FAFC;
             color: #0B1F4B;
         }
+        @keyframes floatBigCapsule {
+            0%, 100% {
+                transform: translateY(0px) rotate(-14deg);
+            }
+            50% {
+                transform: translateY(-22px) rotate(-9deg);
+            }
+        }
+        @keyframes shadowBigPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.32;
+            }
+            50% {
+                transform: scale(0.65);
+                opacity: 0.12;
+            }
+        }
+        @keyframes floatChip1 {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-11px);
+            }
+        }
+        @keyframes floatChip2 {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(13px);
+            }
+        }
+        @keyframes floatChip3 {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-9px);
+            }
+        }
+        @keyframes floatOrb1 {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-14px) rotate(22deg);
+            }
+        }
+        @keyframes floatOrb2 {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(12px) rotate(-18deg);
+            }
+        }
+        @keyframes pulseGlow {
+            0%, 100% {
+                transform: scale(0.92);
+                opacity: 0.35;
+            }
+            50% {
+                transform: scale(1.18);
+                opacity: 0.65;
+            }
+        }
+        @keyframes sparkle {
+            0%, 100% {
+                opacity: 0.25;
+                transform: scale(0.85);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.25);
+            }
+        }
+        @keyframes orbitRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .mediloop-big-capsule {
+            animation: floatBigCapsule 4.5s ease-in-out infinite;
+            transform-origin: center center;
+            will-change: transform;
+        }
+        .mediloop-big-shadow {
+            animation: shadowBigPulse 4.5s ease-in-out infinite;
+            transform-origin: center center;
+            will-change: transform, opacity;
+        }
+        .mediloop-chip-1 {
+            animation: floatChip1 3.8s ease-in-out infinite;
+            will-change: transform;
+        }
+        .mediloop-chip-2 {
+            animation: floatChip2 4.6s ease-in-out infinite;
+            will-change: transform;
+        }
+        .mediloop-chip-3 {
+            animation: floatChip3 4.1s ease-in-out infinite;
+            will-change: transform;
+        }
+        .mediloop-pill-float-1 {
+            animation: floatOrb1 3.6s ease-in-out infinite;
+            will-change: transform;
+        }
+        .mediloop-pill-float-2 {
+            animation: floatOrb2 4.2s ease-in-out infinite;
+            will-change: transform;
+        }
+        .mediloop-glow {
+            animation: pulseGlow 5s ease-in-out infinite;
+        }
+        .mediloop-sparkle {
+            animation: sparkle 2.6s ease-in-out infinite;
+        }
+        .mediloop-orbit-ring {
+            animation: orbitRotate 40s linear infinite;
+        }
     </style>
 </head>
 <body class="min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased selection:bg-blue-100 selection:text-blue-900">
@@ -107,55 +228,170 @@
                     </div>
                 </div>
 
-                <!-- Right: Visual Anchor (Pharmaceutical 3D Capsule & Ledger Stamp) -->
-                <div class="lg:col-span-5 flex justify-center">
-                    <div class="w-full max-w-md p-6 bg-white rounded-2xl border border-[#DBE5F5] shadow-lg relative">
-                        <div class="flex items-center justify-between pb-4 border-b border-[#DBE5F5]">
-                            <div>
-                                <span class="text-[11px] font-mono text-[#52627F]">KASUS BENCHMARK PRD</span>
-                                <h3 class="text-sm font-bold text-[#0B1F4B]">Ceftriaxone 1g Injeksi</h3>
+                <!-- Right: Free-Floating Giant 3D Medicine Hero Art with Floating Glass Metrics -->
+                <div class="lg:col-span-5 flex justify-center items-center relative py-6">
+                    <div class="relative w-full max-w-lg h-[460px] flex items-center justify-center select-none" id="hero-interactive-stage">
+                        
+                        <!-- Multi-Layer Radiant Ambient Glow -->
+                        <div class="absolute w-80 h-80 bg-gradient-to-tr from-blue-600/25 via-indigo-500/20 to-cyan-300/30 rounded-full blur-3xl pointer-events-none mediloop-glow"></div>
+                        <div class="absolute w-60 h-60 bg-blue-400/20 rounded-full blur-2xl pointer-events-none"></div>
+
+                        <!-- Faint Orbital Ring (Adds futuristic space/depth) -->
+                        <div class="absolute w-[360px] h-[360px] rounded-full border border-blue-200/40 border-dashed mediloop-orbit-ring pointer-events-none"></div>
+
+                        <!-- Sparkle Highlights -->
+                        <div class="absolute top-6 left-12 text-blue-500/80 mediloop-sparkle text-lg font-bold select-none">+</div>
+                        <div class="absolute bottom-16 right-8 text-cyan-400/90 mediloop-sparkle text-sm font-bold select-none" style="animation-delay: 1.5s;">✦</div>
+                        <div class="absolute top-12 right-12 text-indigo-400/70 mediloop-sparkle text-xs font-bold select-none" style="animation-delay: 0.8s;">+</div>
+
+                        <!-- FLOATING GLASS CHIP 1: Top Left (Redistribution Status & Batch Name) -->
+                        <div class="mediloop-chip-1 absolute top-2 left-0 sm:-left-4 z-30 bg-white/85 hover:bg-white backdrop-blur-md border border-white/70 shadow-lg rounded-2xl px-4 py-2.5 transition transform hover:scale-105 cursor-default">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center text-[#D9480F] font-bold text-xs shrink-0">
+                                    💊
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-extrabold text-[#0B1F4B]">Ceftriaxone 1g</span>
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                                    </div>
+                                    <div class="text-[10.5px] font-bold text-[#D9480F] flex items-center gap-1">
+                                        <span>Surplus 300 Unit</span>
+                                        <span class="text-slate-400">•</span>
+                                        <span class="text-slate-500 font-normal">Sisa 45 Hari</span>
+                                    </div>
+                                </div>
                             </div>
-                            <span class="px-2 py-0.5 text-xs font-bold text-[#D9480F] bg-orange-50 border border-orange-200 rounded">
-                                [RISIKO TINGGI: 300 UNIT]
-                            </span>
                         </div>
 
-                        <!-- Capsule & Ledger Graphic -->
-                        <div class="my-6 flex justify-center">
-                            <svg class="w-48 h-32" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="30" y="30" width="140" height="60" rx="30" fill="#EAF1FF" stroke="#1D4ED8" stroke-width="4"/>
-                                <path d="M100 30 C133 30 170 30 170 60 C170 90 133 90 100 90 Z" fill="#1D4ED8"/>
-                                <line x1="100" y1="30" x2="100" y2="90" stroke="#0B1F4B" stroke-width="3" stroke-dasharray="4 2"/>
-                                <circle cx="65" cy="60" r="12" fill="#DBE5F5"/>
-                                <circle cx="135" cy="60" r="12" fill="#93C5FD"/>
-                                <text x="45" y="108" font-family="monospace" font-size="9" fill="#52627F">BATCH: CFT-2026-X89</text>
+                        <!-- FLOATING ROUND SCORED TABLET (Top Right) -->
+                        <div class="mediloop-pill-float-1 absolute top-6 right-4 sm:right-6 z-20 cursor-pointer" title="Paracetamol / Scored Tablet">
+                            <svg width="62" height="62" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="filter drop-shadow-xl">
+                                <circle cx="30" cy="30" r="26" fill="url(#heroTabGrad)" stroke="#CBD5E1" stroke-width="2.5"/>
+                                <line x1="30" y1="10" x2="30" y2="50" stroke="#94A3B8" stroke-width="3" stroke-linecap="round"/>
+                                <circle cx="30" cy="30" r="23" fill="none" stroke="white" stroke-opacity="0.8" stroke-width="1.5"/>
+                                <defs>
+                                    <linearGradient id="heroTabGrad" x1="10" y1="10" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#FFFFFF"/>
+                                        <stop offset="55%" stop-color="#F8FAFC"/>
+                                        <stop offset="100%" stop-color="#C7D7F5"/>
+                                    </linearGradient>
+                                </defs>
                             </svg>
                         </div>
 
-                        <!-- Data Ledger Spec -->
-                        <div class="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-lg text-xs font-mono border border-slate-200">
-                            <div>
-                                <span class="text-[#52627F] block">Stok Aktif:</span>
-                                <span class="font-bold text-[#0B1F4B]">480 Vial</span>
-                            </div>
-                            <div>
-                                <span class="text-[#52627F] block">Laju Terpakai:</span>
-                                <span class="font-bold text-[#0B1F4B]">4.0 Unit/hari</span>
-                            </div>
-                            <div>
-                                <span class="text-[#52627F] block">Sisa Waktu:</span>
-                                <span class="font-bold text-[#0B1F4B]">45 Hari</span>
-                            </div>
-                            <div>
-                                <span class="text-[#52627F] block">Proyeksi Limbah:</span>
-                                <span class="font-bold text-[#D9480F]">300 Unit (62.5%)</span>
+                        <!-- FLOATING MINI AMBER VITAMIN CAPSULE (Mid-Left) -->
+                        <div class="mediloop-pill-float-2 absolute bottom-24 -left-2 sm:left-2 z-20 cursor-pointer" title="Kapsul Suplemen">
+                            <svg width="54" height="34" viewBox="0 0 52 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="filter drop-shadow-lg transform -rotate-25">
+                                <rect x="2" y="2" width="48" height="28" rx="14" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2.5"/>
+                                <path d="M26 2 L38 2 C44 2 48 8 48 16 C48 24 44 30 38 30 L26 30 Z" fill="#F59E0B"/>
+                                <line x1="26" y1="2" x2="26" y2="30" stroke="#B45309" stroke-width="2"/>
+                                <path d="M8 6 C5 9 5 13 5 16 C8 10 14 8 22 8 L36 8 C40 8 42 10 44 12 C42 8 36 6 30 6 L16 6 Z" fill="white" fill-opacity="0.6"/>
+                            </svg>
+                        </div>
+
+                        <!-- GIANT 3D HERO CAPSULE (Centerpiece Anchor) -->
+                        <div class="mediloop-big-capsule absolute z-20 cursor-pointer">
+                            <svg width="340" height="150" viewBox="0 0 340 150" fill="none" xmlns="http://www.w3.org/2000/svg" class="filter drop-shadow-2xl">
+                                <defs>
+                                    <!-- Shell Left Gradient: Pearl Frost White -->
+                                    <linearGradient id="bigCapLeft" x1="20" y1="20" x2="20" y2="130" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#FFFFFF"/>
+                                        <stop offset="35%" stop-color="#F8FAFC"/>
+                                        <stop offset="75%" stop-color="#E2E8F0"/>
+                                        <stop offset="100%" stop-color="#94A3B8"/>
+                                    </linearGradient>
+
+                                    <!-- Shell Right Gradient: Deep Royal Sapphire -->
+                                    <linearGradient id="bigCapRight" x1="170" y1="20" x2="170" y2="130" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#60A5FA"/>
+                                        <stop offset="25%" stop-color="#2563EB"/>
+                                        <stop offset="65%" stop-color="#1D4ED8"/>
+                                        <stop offset="100%" stop-color="#0B1F4B"/>
+                                    </linearGradient>
+
+                                    <!-- Cylindrical Glass Highlight -->
+                                    <linearGradient id="bigCapGloss" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+                                        <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+                                    </linearGradient>
+
+                                    <!-- Metallic Center Seam Band -->
+                                    <linearGradient id="bigCapBand" x1="167" y1="20" x2="173" y2="130" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0%" stop-color="#BFDBFE"/>
+                                        <stop offset="30%" stop-color="#FFFFFF"/>
+                                        <stop offset="70%" stop-color="#93C5FD"/>
+                                        <stop offset="100%" stop-color="#1D4ED8"/>
+                                    </linearGradient>
+
+                                    <!-- Soft Blue Ambient Light on Bottom Belly -->
+                                    <radialGradient id="bigCapBelly" cx="50%" cy="100%" r="60%">
+                                        <stop offset="0%" stop-color="#60A5FA" stop-opacity="0.4"/>
+                                        <stop offset="100%" stop-color="#60A5FA" stop-opacity="0"/>
+                                    </radialGradient>
+                                </defs>
+
+                                <g>
+                                    <!-- Left Shell (White Pearl) -->
+                                    <path d="M85 24 C38 24 22 48 22 75 C22 102 38 126 85 126 L170 126 L170 24 Z" fill="url(#bigCapLeft)" stroke="#94A3B8" stroke-width="2"/>
+
+                                    <!-- Right Shell (Royal Sapphire) -->
+                                    <path d="M170 24 L255 24 C302 24 318 48 318 75 C318 102 302 126 255 126 L170 126 Z" fill="url(#bigCapRight)" stroke="#1E40AF" stroke-width="2"/>
+
+                                    <!-- Ambient Belly Bounce Light -->
+                                    <rect x="22" y="24" width="296" height="102" rx="51" fill="url(#bigCapBelly)" style="mix-blend-mode: overlay;"/>
+
+                                    <!-- Middle Connection Seam Ring -->
+                                    <line x1="170" y1="23" x2="170" y2="127" stroke="url(#bigCapBand)" stroke-width="6.5" stroke-linecap="round"/>
+
+                                    <!-- Upper 3D Specular Curved Reflection (Glass Reflection) -->
+                                    <path d="M55 35 C40 43 32 54 32 68 C48 54 80 46 150 46 L255 46 C275 46 295 50 305 60 C300 45 282 35 255 35 Z" fill="url(#bigCapGloss)"/>
+
+                                    <!-- Subtle Embossed Cross Emblem on Blue Shell -->
+                                    <g opacity="0.85">
+                                        <rect x="232" y="69" width="26" height="11" rx="4" fill="#FFFFFF"/>
+                                        <rect x="239.5" y="61.5" width="11" height="26" rx="4" fill="#FFFFFF"/>
+                                    </g>
+
+                                    <!-- Subtle Embossed Cross Emblem on White Shell -->
+                                    <g opacity="0.65">
+                                        <rect x="74" y="69" width="26" height="11" rx="4" fill="#1D4ED8"/>
+                                        <rect x="81.5" y="61.5" width="11" height="26" rx="4" fill="#1D4ED8"/>
+                                    </g>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <!-- Dynamic Ground Floor Shadow -->
+                        <div class="mediloop-big-shadow absolute bottom-6 w-72 h-7 bg-blue-950/25 rounded-full blur-md"></div>
+
+                        <!-- FLOATING GLASS CHIP 2: Bottom Right (Nearest Matching Recommendation) -->
+                        <div class="mediloop-chip-2 absolute bottom-2 -right-2 sm:-right-4 z-30 bg-white/85 hover:bg-white backdrop-blur-md border border-white/70 shadow-lg rounded-2xl px-4 py-2.5 transition transform hover:scale-105 cursor-default">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-[#1D4ED8] font-bold text-xs shrink-0">
+                                    📍
+                                </div>
+                                <div>
+                                    <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Rekomendasi Match</div>
+                                    <div class="text-xs font-extrabold text-[#0B1F4B]">Puskesmas Gambir</div>
+                                    <div class="text-[10.5px] font-semibold text-blue-700 flex items-center gap-1">
+                                        <span>1.8 km</span>
+                                        <span class="text-slate-400">•</span>
+                                        <span class="text-cyan-700 font-bold">❄️ Cold-Chain Ready</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mt-4 pt-3 border-t border-[#DBE5F5] flex items-center justify-between text-xs">
-                            <span class="text-[#52627F]">Rekomendasi Matching:</span>
-                            <span class="font-semibold text-[#1D4ED8]">Puskesmas Gambir (1.8 km)</span>
+                        <!-- FLOATING GLASS CHIP 3: Bottom Left (Algorithm Score) -->
+                        <div class="mediloop-chip-3 absolute bottom-6 left-2 sm:-left-2 z-30 bg-white/85 hover:bg-white backdrop-blur-md border border-white/70 shadow-lg rounded-2xl px-3.5 py-2 transition transform hover:scale-105 cursor-default hidden sm:flex items-center gap-2">
+                            <span class="text-emerald-500 font-black text-sm">✓</span>
+                            <div>
+                                <div class="text-xs font-extrabold text-[#0B1F4B]">92% Match Score</div>
+                                <div class="text-[10px] text-slate-500 font-mono">BATCH: CFT-2026-X89</div>
+                            </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -405,6 +641,25 @@
                 action.className = 'text-xs font-bold text-[#B7791F]';
             }
         }
+
+        // Interactive 3D Tilt for Hero Medicine Card
+        document.addEventListener('DOMContentLoaded', function () {
+            const heroCard = document.querySelector('.card-tilt-hover');
+            const capsule = document.querySelector('.mediloop-capsule-float');
+            if (heroCard && capsule) {
+                heroCard.addEventListener('mousemove', function (e) {
+                    const rect = heroCard.getBoundingClientRect();
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    const rotateX = -(y / rect.height) * 15;
+                    const rotateY = (x / rect.width) * 15;
+                    capsule.style.transform = `translateY(-12px) perspective(600px) rotateX(${rotateX.toFixed(1)}deg) rotateY(${rotateY.toFixed(1)}deg) rotate(-8deg)`;
+                });
+                heroCard.addEventListener('mouseleave', function () {
+                    capsule.style.transform = '';
+                });
+            }
+        });
     </script>
 </body>
 </html>
