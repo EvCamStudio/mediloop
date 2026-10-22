@@ -4,43 +4,43 @@
 <div class="space-y-6 max-w-4xl mx-auto">
 
     <!-- Breadcrumb -->
-    <div class="flex items-center gap-2 text-xs text-[#52627F]">
-        <a href="{{ route('dashboard') }}" class="hover:underline text-[#1D4ED8]">Dashboard</a>
-        <span>/</span>
-        <a href="{{ route('batches.index') }}" class="hover:underline text-[#1D4ED8]">Inventaris Obat</a>
-        <span>/</span>
-        <span class="text-[#0B1F4B] font-semibold">Input Stok Obat &amp; Batch Baru</span>
+    <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ml-muted);">
+        <a href="{{ route('dashboard') }}" style="color: var(--ml-primary); text-decoration: none;">Dashboard</a>
+        <span style="color: var(--ml-subtle);">/</span>
+        <a href="{{ route('batches.index') }}" style="color: var(--ml-primary); text-decoration: none;">Inventaris Obat</a>
+        <span style="color: var(--ml-subtle);">/</span>
+        <span style="color: var(--ml-text); font-weight: 600;">Input Stok Obat &amp; Batch Baru</span>
     </div>
 
     <!-- Header -->
-    <div class="pb-4 border-b border-[#DBE5F5] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div style="padding-bottom: 16px; border-bottom: 1px solid var(--ml-border); display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px;">
         <div>
-            <h1 class="text-2xl font-extrabold text-[#0B1F4B]">Input Data Stok Batch Obat</h1>
-            <p class="text-xs text-[#52627F] mt-1">
-                Catat batch obat masuk atau stok berjalan untuk fasilitas: <strong class="text-[#0B1F4B]">{{ $user->facility?->name ?? 'Fasilitas Terdaftar' }}</strong>.
+            <h1 style="font-size: 20px; font-weight: 800; color: var(--ml-text); margin: 0; font-family: var(--font-heading); letter-spacing: -0.02em;">Input Data Stok Batch Obat</h1>
+            <p style="font-size: 12.5px; color: var(--ml-muted); margin: 4px 0 0;">
+                Catat batch obat masuk atau stok berjalan untuk fasilitas: <strong style="color: var(--ml-text);">{{ $user->facility?->name ?? 'Fasilitas Terdaftar' }}</strong>.
             </p>
         </div>
-        <a href="{{ route('batches.index') }}" class="text-xs font-semibold text-[#52627F] hover:text-[#0B1F4B] px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg border border-[#DBE5F5] transition">
+        <a href="{{ route('batches.index') }}" class="ml-btn-ghost" style="padding: 7px 14px; font-size: 12px; flex-shrink: 0;">
             &larr; Kembali ke Inventaris
         </a>
     </div>
 
     <!-- Regulatory & Zero PHI Banner -->
-    <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
-        <svg class="w-5 h-5 text-[#1D4ED8] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div style="padding: 12px 16px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; display: flex; align-items: flex-start; gap: 10px;">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--ml-primary); flex-shrink: 0; margin-top: 1px;">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <div class="text-xs text-[#0B1F4B] leading-relaxed">
-            <strong class="font-bold">STANDAR KEFARMASIAN &amp; PRIVASI REKAM MEDIS:</strong>
+        <div style="font-size: 12.5px; color: var(--ml-text); line-height: 1.5;">
+            <strong style="font-weight: 700;">STANDAR KEFARMASIAN &amp; PRIVASI REKAM MEDIS:</strong>
             Pencatatan hanya mengelola atribut logistik sediaan farmasi (SKU, nomor batch, stok fisik, laju pemakaian, dan tanggal kedaluwarsa). Sistem ini <strong>bebas data identitas pasien (Zero PHI)</strong> dan tidak memberikan rekomendasi dosis medis individu.
         </div>
     </div>
 
     <!-- Form Errors Alert -->
     @if($errors->any())
-        <div class="p-4 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800">
-            <strong class="font-bold block mb-1">Terjadi kesalahan pada pengisian formulir:</strong>
-            <ul class="list-disc list-inside space-y-0.5">
+        <div style="padding: 12px 16px; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 10px; font-size: 12.5px; color: #7F1D1D;">
+            <strong style="font-weight: 700; display: block; margin-bottom: 6px;">Terjadi kesalahan pada pengisian formulir:</strong>
+            <ul style="list-style: disc; padding-left: 18px; margin: 0;">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach

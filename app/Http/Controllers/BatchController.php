@@ -53,6 +53,12 @@ class BatchController extends Controller
             $query->where('status', $request->get('status'));
         }
 
+        $statsBatches = (clone $query)->get();
+        $totalBatchesCount = $statsBatches->count();
+        $totalStockUnits = (int) $statsBatches->sum('current_stock');
+        $atRiskCount = $statsBatches->filter(fn ($b) => in_array($b->risk_level, ['CRITICAL', 'HIGH']))->count();
+        $totalWasteValue = (float) $statsBatches->sum(fn ($b) => $b->projected_waste * (float) $b->unit_price_idr);
+
         $batches = $query->orderBy('expiry_date', 'asc')->paginate(15)->withQueryString();
 
         $facilitiesList = Facility::where('type', '!=', 'DINKES')->get();
@@ -64,6 +70,10 @@ class BatchController extends Controller
             'user' => $user,
             'currentSearch' => $request->get('search', ''),
             'currentStatus' => $request->get('status', ''),
+            'totalBatchesCount' => $totalBatchesCount,
+            'totalStockUnits' => $totalStockUnits,
+            'atRiskCount' => $atRiskCount,
+            'totalWasteValue' => $totalWasteValue,
         ]);
     }
 
