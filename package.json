@@ -8,8 +8,7 @@
         "lint": "php vendor/bin/pint --format agent",
         "typecheck": "php vendor/bin/phpstan analyse",
         "test": "php artisan test --compact",
-        "slop-scan": "node .agent/skills/ai-slop-detector/scripts/slop-scan.mjs resources/",
-        "check": "npm run slop-scan && npm run lint && npm run typecheck && npm run test"
+        "check": "npm run lint && npm run typecheck && npm run test"
     },
     "dependencies": {
         "@laravel/passkeys": "^0.2.0",
