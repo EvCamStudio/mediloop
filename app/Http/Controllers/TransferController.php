@@ -46,7 +46,7 @@ class TransferController extends Controller
     /**
      * Show candidate matching and redistribution proposal screen.
      */
-    public function propose(Batch $batch): View
+    public function propose(Request $request, Batch $batch): View
     {
         $user = Auth::user();
 
@@ -55,12 +55,16 @@ class TransferController extends Controller
             abort(403, 'Anda hanya dapat mengusulkan redistribusi untuk fasilitas Anda sendiri.');
         }
 
+        $sort = $request->string('sort')->toString();
+        $sort = in_array($sort, ['score', 'distance'], true) ? $sort : 'score';
+
         $batch->load(['medicine', 'facility']);
-        $candidates = RedistributionEngine::findCandidateRecipients($batch);
+        $candidates = RedistributionEngine::findCandidateRecipients($batch, $sort);
 
         return view('transfers.propose', [
             'batch' => $batch,
             'candidates' => $candidates,
+            'sort' => $sort,
             'user' => $user,
         ]);
     }

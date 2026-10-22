@@ -862,6 +862,396 @@
         }
 
         /* ============================================================ */
+        /* FACILITY NETWORK MAP                                         */
+        /* ============================================================ */
+        .ml-network-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .ml-network-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 18px 20px;
+            background: #fff;
+            border: 1px solid var(--ml-border);
+            border-radius: 14px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+        .ml-network-stat-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--ml-muted);
+        }
+        .ml-network-stat-value {
+            font-family: var(--font-heading);
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            color: var(--ml-text);
+            font-variant-numeric: tabular-nums;
+        }
+        .ml-network-stat-unit {
+            margin-left: 2px;
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0;
+            color: var(--ml-muted);
+        }
+        .ml-network-stat-sub {
+            font-size: 11.5px;
+            color: var(--ml-subtle);
+        }
+        .ml-network-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 14px 18px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            background: #fff;
+            border: 1px solid var(--ml-border);
+            border-radius: 14px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+        .ml-network-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 170px;
+        }
+        .ml-network-field label {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--ml-muted);
+        }
+        .ml-network-field select {
+            min-height: 38px;
+            padding: 7px 10px;
+            font-family: var(--font-body);
+            font-size: 12.5px;
+            color: var(--ml-text);
+            background: #fff;
+            border: 1px solid var(--ml-border);
+            border-radius: 9px;
+        }
+        .ml-network-field select:focus-visible,
+        .ml-network-check input:focus-visible {
+            outline: 2px solid var(--ml-primary);
+            outline-offset: 2px;
+        }
+        .ml-network-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 38px;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--ml-text);
+            cursor: pointer;
+        }
+        .ml-network-check input {
+            width: 15px;
+            height: 15px;
+            accent-color: var(--ml-primary);
+        }
+        .ml-network-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .ml-network-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+        .ml-network-map-wrap {
+            position: relative;
+            padding: 20px 24px 0;
+        }
+        .ml-network-map {
+            height: 480px;
+            border: 1px solid var(--ml-border);
+            border-radius: 12px;
+            background: var(--ml-surface);
+            position: relative;
+            z-index: 0;
+            isolation: isolate;
+            overflow: hidden;
+        }
+        .ml-network-map:focus-visible {
+            outline: 2px solid var(--ml-primary);
+            outline-offset: 2px;
+        }
+        .ml-network-map .leaflet-container {
+            height: 100%;
+            width: 100%;
+            border-radius: 12px;
+            font-family: var(--font-body);
+            background: #EAF1FF;
+        }
+        .ml-network-map-fallback {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--ml-muted);
+        }
+        .ml-network-noscript {
+            margin: 8px 0 0;
+            padding: 10px 12px;
+            border-left: 3px solid var(--ml-warning);
+            background: #FFFBEB;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #78350F;
+        }
+        .ml-network-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 18px;
+            padding: 12px 24px 0;
+        }
+        .ml-network-legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11.5px;
+            color: var(--ml-muted);
+        }
+        .ml-network-legend-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .ml-network-legend-dot.is-origin { background: var(--ml-navy); }
+        .ml-network-legend-dot.is-partner { background: var(--ml-primary); }
+        .ml-network-legend-dot.is-radius {
+            background: transparent;
+            border: 1.5px dashed var(--ml-primary);
+        }
+        .ml-network-source {
+            margin: 0;
+            padding: 10px 24px 18px;
+            font-size: 11px;
+            line-height: 1.5;
+            color: var(--ml-subtle);
+        }
+        .ml-network-list {
+            list-style: none;
+            margin: 0;
+            padding: 4px 0;
+            max-height: 560px;
+            overflow-y: auto;
+        }
+        .ml-network-item {
+            border-bottom: 1px solid var(--ml-border);
+        }
+        .ml-network-item:last-child {
+            border-bottom: none;
+        }
+        .ml-network-target {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            width: 100%;
+            padding: 14px 20px;
+            background: transparent;
+            border: 0;
+            text-align: left;
+            cursor: pointer;
+            font-family: var(--font-body);
+            transition: background 0.15s ease;
+        }
+        .ml-network-target:hover {
+            background: #FAFCFF;
+        }
+        .ml-network-target:focus-visible {
+            outline: 2px solid var(--ml-primary);
+            outline-offset: -2px;
+        }
+        .ml-network-target.is-active {
+            background: #EAF1FF;
+            box-shadow: inset 3px 0 0 var(--ml-primary);
+        }
+        .ml-network-rank {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            border: 1px solid var(--ml-border);
+            border-radius: 8px;
+            background: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ml-muted);
+            font-variant-numeric: tabular-nums;
+        }
+        .ml-network-body {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+            min-width: 0;
+        }
+        .ml-network-name {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--ml-text);
+        }
+        .ml-network-meta {
+            font-size: 11.5px;
+            line-height: 1.45;
+            color: var(--ml-muted);
+        }
+        .ml-network-cold {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 3px;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #0369A1;
+        }
+        .ml-network-distance {
+            flex-shrink: 0;
+            text-align: right;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--ml-primary);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+        .ml-network-distance-unit {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--ml-muted);
+        }
+        .ml-network-proximity {
+            display: block;
+            margin-top: 2px;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--ml-subtle);
+        }
+        .ml-network-distance-missing {
+            font-size: 10.5px;
+            font-weight: 500;
+            color: var(--ml-subtle);
+            white-space: normal;
+        }
+        .ml-network-empty {
+            padding: 28px 20px;
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--ml-muted);
+        }
+        .ml-network-empty p {
+            margin: 0 0 12px;
+        }
+        .ml-map-marker-shell {
+            background: transparent;
+            border: none;
+        }
+        .ml-map-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            color: #fff;
+            font-family: var(--font-heading);
+            font-size: 11px;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            box-shadow: 0 2px 6px rgba(11, 31, 75, 0.28);
+        }
+        .ml-map-marker-origin {
+            width: 30px;
+            height: 30px;
+            background: var(--ml-navy);
+        }
+        .ml-map-marker-facility {
+            background: var(--ml-primary);
+        }
+        .ml-map-hint {
+            padding: 3px 8px;
+            border: 1px solid var(--ml-border);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.92);
+            font-family: var(--font-body);
+            font-size: 10.5px;
+            color: var(--ml-muted);
+        }
+        .ml-map-radius-btn {
+            padding: 6px 10px;
+            border: 1px solid var(--ml-border);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 1px 4px rgba(11, 31, 75, 0.12);
+            font-family: var(--font-body);
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--ml-primary);
+            cursor: pointer;
+        }
+        .ml-map-radius-btn:hover {
+            background: var(--ml-sky, #EAF1FF);
+        }
+        .ml-map-radius-btn:focus-visible {
+            outline: 2px solid var(--ml-primary);
+            outline-offset: 2px;
+        }
+        .ml-map-popup {
+            font-family: var(--font-body);
+            max-width: 240px;
+        }
+        .ml-map-popup p {
+            margin: 0;
+        }
+        .ml-map-popup-title {
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.35;
+            color: var(--ml-text);
+        }
+        .ml-map-popup-meta {
+            margin-top: 3px !important;
+            font-size: 11px;
+            line-height: 1.45;
+            color: var(--ml-muted);
+        }
+        .ml-map-popup-distance {
+            margin-top: 6px !important;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--ml-primary);
+            font-variant-numeric: tabular-nums;
+        }
+        .ml-map-popup-cold {
+            margin-top: 3px !important;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #0369A1;
+        }
+
+        /* ============================================================ */
         /* MOBILE & ANDROID RESPONSIVE DESIGN                           */
         /* ============================================================ */
         .ml-sidebar-backdrop {
@@ -1056,6 +1446,9 @@
             }
             .ml-row-actions { justify-content: flex-start; }
             .ml-runway { max-width: 100%; }
+            .ml-network-layout { grid-template-columns: 1fr; }
+            .ml-network-map { height: 380px; }
+            .ml-network-list { max-height: none; }
         }
 
         @media (max-width: 767px) {
@@ -1095,6 +1488,42 @@
             }
             .ml-rec-note {
                 padding: 4px 18px 16px;
+            }
+            .ml-network-stats {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .ml-network-stat {
+                padding: 14px 16px;
+            }
+            .ml-network-toolbar {
+                padding: 14px;
+            }
+            .ml-network-field {
+                width: 100%;
+            }
+            .ml-network-actions {
+                width: 100%;
+                margin-left: 0;
+            }
+            .ml-network-actions .ml-btn-primary {
+                flex: 1;
+                justify-content: center;
+            }
+            .ml-network-map-wrap {
+                padding: 16px 14px 0;
+            }
+            .ml-network-map {
+                height: 320px;
+            }
+            .ml-network-legend {
+                padding: 10px 14px 0;
+            }
+            .ml-network-source {
+                padding: 8px 14px 14px;
+            }
+            .ml-network-target {
+                padding: 13px 14px;
             }
             .ml-stat-value {
                 font-size: 22px;
@@ -1142,6 +1571,12 @@
             .ml-rec-note {
                 padding: 4px 14px 14px;
             }
+            .ml-network-distance {
+                font-size: 11.5px;
+            }
+            .ml-network-proximity {
+                font-size: 9.5px;
+            }
             /* Collapse filter grid to single column on very small screens */
             form[style*="grid-template-columns: repeat(12"] {
                 display: flex !important;
@@ -1178,6 +1613,10 @@
         <a href="{{ route('batches.index') }}" class="ml-nav-item {{ request()->routeIs('batches.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             Stok &amp; Batch Obat
+        </a>
+        <a href="{{ route('network.index') }}" class="ml-nav-item {{ request()->routeIs('network.*') ? 'active' : '' }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-7-10a7 7 0 1114 0c0 5.65-7 10-7 10z"/><circle cx="12" cy="11" r="2.5"/></svg>
+            Peta Jaringan
         </a>
         <a href="{{ route('transfers.index') }}" class="ml-nav-item {{ request()->routeIs('transfers.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
@@ -1362,6 +1801,13 @@
                 <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/>
             </svg>
             <span>Redistribusi</span>
+        </a>
+        <a href="{{ route('network.index') }}" class="ml-bottom-item {{ request()->routeIs('network.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 21s-7-4.35-7-10a7 7 0 1114 0c0 5.65-7 10-7 10z"/>
+                <circle cx="12" cy="11" r="2.5"/>
+            </svg>
+            <span>Peta</span>
         </a>
         <a href="{{ route('audit.index') }}" class="ml-bottom-item {{ request()->routeIs('audit.*') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

@@ -72,6 +72,22 @@
             </span>
         </div>
 
+        <!-- Sort toggle -->
+        <div class="px-5 py-3 border-b border-[#DBE5F5] flex flex-wrap items-center gap-2 bg-white">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-[#52627F]">Urutkan</span>
+            <a href="{{ route('transfers.propose', ['batch' => $batch, 'sort' => 'score']) }}"
+                aria-current="{{ $sort === 'score' ? 'true' : 'false' }}"
+                class="px-3 py-1.5 text-xs font-semibold rounded border transition {{ $sort === 'score' ? 'bg-[#1D4ED8] text-white border-[#1D4ED8]' : 'bg-white text-[#52627F] border-[#DBE5F5] hover:bg-[#EAF1FF]' }}">
+                Skor Terbaik
+            </a>
+            <a href="{{ route('transfers.propose', ['batch' => $batch, 'sort' => 'distance']) }}"
+                aria-current="{{ $sort === 'distance' ? 'true' : 'false' }}"
+                class="px-3 py-1.5 text-xs font-semibold rounded border transition {{ $sort === 'distance' ? 'bg-[#1D4ED8] text-white border-[#1D4ED8]' : 'bg-white text-[#52627F] border-[#DBE5F5] hover:bg-[#EAF1FF]' }}">
+                Terdekat
+            </a>
+            <span class="ml-auto text-[11px] text-[#52627F]">Jarak udara (Haversine), bukan jarak tempuh jalan.</span>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs border-collapse">
                 <thead>

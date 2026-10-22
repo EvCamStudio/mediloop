@@ -74,6 +74,148 @@ test('match score weights: 50% need, 30% proximity, 20% logistics', function () 
     expect(RedistributionEngine::calculateMatchingScore($need, $proximity, $logistics))->toBe(87.0);
 });
 
+test('proximity score decays to zero at the maximum radius', function () {
+    expect(RedistributionEngine::calculateProximityScore(0.0))->toBe(100.0)
+        ->and(RedistributionEngine::calculateProximityScore(25.0))->toBe(50.0)
+        ->and(RedistributionEngine::calculateProximityScore(50.0))->toBe(0.0)
+        ->and(RedistributionEngine::calculateProximityScore(9.0, 18.0))->toBe(50.0);
+});
+
+test('nearest facilities are ranked by distance and unusable coordinates are skipped', function () {
+    $origin = Facility::create([
+        'name' => 'RSUD Tarakan Jakarta',
+        'code' => 'FSK-RSUD-TRK',
+        'type' => 'RSUD',
+        'address' => 'Jl. Kyai Caringin No. 7',
+        'city' => 'Jakarta Pusat',
+        'latitude' => -6.1729000,
+        'longitude' => 106.8122000,
+        'cold_chain_ready' => true,
+        'contact_person' => 'Apt. Budi Santoso',
+        'phone' => '021-3842934',
+    ]);
+
+    $near = Facility::create([
+        'name' => 'Puskesmas Kecamatan Gambir',
+        'code' => 'FSK-PKM-GMB',
+        'type' => 'PUSKESMAS',
+        'address' => 'Jl. Tanah Abang II No. 27',
+        'city' => 'Jakarta Pusat',
+        'latitude' => -6.1764000,
+        'longitude' => 106.8285000,
+        'cold_chain_ready' => true,
+        'contact_person' => 'Apt. Dewi Sartika',
+        'phone' => '021-3501234',
+    ]);
+
+    $far = Facility::create([
+        'name' => 'Klinik Jakarta Selatan',
+        'code' => 'FSK-KLN-JS',
+        'type' => 'KLINIK',
+        'address' => 'Jl. Fatmawati No. 10',
+        'city' => 'Jakarta Selatan',
+        'latitude' => -6.2085000,
+        'longitude' => 106.8145000,
+        'cold_chain_ready' => true,
+        'contact_person' => 'Apt. Rina Kartika',
+        'phone' => '021-7501234',
+    ]);
+
+    $unusable = Facility::create([
+        'name' => 'Faskes Tanpa Koordinat',
+        'code' => 'FSK-NO-COORD',
+        'type' => 'KLINIK',
+        'address' => 'Alamat belum diverifikasi',
+        'city' => 'Jakarta Pusat',
+        'latitude' => 0,
+        'longitude' => 0,
+        'cold_chain_ready' => true,
+        'contact_person' => 'Apt. Tanpa Nama',
+        'phone' => '021-0000000',
+    ]);
+
+    $ranked = RedistributionEngine::nearestFacilities($origin, Facility::all());
+    $rankedIds = array_map(fn (array $row): int => $row['facility']->id, $ranked);
+
+    expect($ranked)->toHaveCount(2)
+        ->and($ranked[0]['facility']->id)->toBe($near->id)
+        ->and($ranked[1]['facility']->id)->toBe($far->id)
+        ->and($ranked[0]['distance_km'])->toBeLessThan($ranked[1]['distance_km'])
+        ->and($ranked[0]['proximity_score'])->toBeGreaterThan($ranked[1]['proximity_score'])
+        ->and($rankedIds)->not->toContain($unusable->id);
+});
+
+test('candidate recipients can be ranked by nearest distance', function () {
+    $donor = Facility::create([
+        'name' => 'RSUD Tarakan Jakarta',
+        'code' => 'FSK-RSUD-TRK',
+        'type' => 'RSUD',
+        'address' => 'Jl. Kyai Caringin No. 7',
+        'city' => 'Jakarta Pusat',
+        'latitude' => -6.1729000,
+        'longitude' => 106.8122000,
+        'cold_chain_ready' => true,
+        'contact_person' => 'Apt. Budi Santoso',
+        'phone' => '021-3842934',
+    ]);
+
+    $near = Facility::create([
+        'name' => 'Puskesmas Kecamatan Gambir',
+        'code' => 'FSK-PKM-GMB',
+        'type' => 'PUSKESMAS',
+        'address' => 'Jl. Tanah Abang II No. 27',
+        'city' => 'Jakarta Pusat',
+        'latitude' => -6.1764000,
+        'longitude' => 106.8285000,
+        'cold_chain_ready' => true,
+        'contact_person' => 'Apt. Dewi Sartika',
+        'phone' => '021-3501234',
+    ]);
+
+    $far = Facility::create([
+        'name' => 'Klinik Jakarta Selatan',
+        'code' => 'FSK-KLN-JS',
+        'type' => 'KLINIK',
+        'address' => 'Jl. Fatmawati No. 10',
+        'city' => 'Jakarta Selatan',
+        'latitude' => -6.2085000,
+        'longitude' => 106.8145000,
+        'cold_chain_ready' => true,
+        'contact_person' => 'Apt. Rina Kartika',
+        'phone' => '021-7501234',
+    ]);
+
+    $medicine = Medicine::create([
+        'name' => 'Ceftriaxone 1g Injeksi',
+        'generic_name' => 'Ceftriaxone Sodium',
+        'sku' => 'MED-CFT-001',
+        'category' => 'Antibiotic',
+        'dosage_form' => 'Vial Injeksi',
+        'unit' => 'Vial',
+        'unit_price_idr' => 45000,
+        'requires_cold_chain' => false,
+    ]);
+
+    $batch = Batch::create([
+        'facility_id' => $donor->id,
+        'medicine_id' => $medicine->id,
+        'batch_number' => 'CFT-2026-X89',
+        'current_stock' => 480,
+        'daily_burn_rate' => 4.0,
+        'expiry_date' => now()->addDays(45)->toDateString(),
+        'unit_price_idr' => 45000,
+        'status' => 'ACTIVE',
+    ]);
+
+    $byDistance = RedistributionEngine::findCandidateRecipients($batch, 'distance');
+    $byScore = RedistributionEngine::findCandidateRecipients($batch);
+
+    expect($byDistance)->toHaveCount(2)
+        ->and($byDistance[0]['facility']->id)->toBe($near->id)
+        ->and($byDistance[0]['distance_km'])->toBeLessThanOrEqual($byDistance[1]['distance_km'])
+        ->and($byScore[0]['match_score'])->toBeGreaterThanOrEqual($byScore[1]['match_score']);
+});
+
 test('recipient intake cap prevents secondary expiration', function () {
     // Projected waste is 300 units, but recipient consumes 5/day and there are 45 days left (minus 7-day buffer = 38 days)
     // Max absorbable = 5 * 38 = 190 units

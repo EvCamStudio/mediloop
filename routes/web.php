@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\TransferController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,6 +13,7 @@ Route::view('/', 'welcome')->name('home');
 // Protected Healthcare Decision-Support Routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/network', [NetworkController::class, 'index'])->name('network.index');
 
     // Pharmaceutical Inventory & Batch Data Management
     Route::get('/batches', [BatchController::class, 'index'])->name('batches.index');
