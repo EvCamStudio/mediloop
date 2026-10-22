@@ -4,12 +4,22 @@
 <div class="space-y-6">
 
     <!-- Breadcrumb & Navigation -->
-    <div class="flex items-center gap-2 text-xs text-[#52627F]">
-        <a href="{{ route('dashboard') }}" class="hover:underline text-[#1D4ED8]">Dashboard</a>
-        <span>/</span>
-        <a href="{{ route('transfers.index') }}" class="hover:underline text-[#1D4ED8]">Redistribusi</a>
-        <span>/</span>
-        <span class="text-[#0B1F4B] font-semibold">Usulan Transfer Batch #{{ $batch->batch_number }}</span>
+    <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2 text-[#52627F]">
+            <a href="{{ route('dashboard') }}" class="hover:underline text-[#1D4ED8]">Dashboard</a>
+            <span>/</span>
+            <a href="{{ route('batches.index') }}" class="hover:underline text-[#1D4ED8]">Stok &amp; Batch Obat</a>
+            <span>/</span>
+            <a href="{{ route('transfers.index') }}" class="hover:underline text-[#1D4ED8]">Redistribusi</a>
+            <span>/</span>
+            <span class="text-[#0B1F4B] font-semibold">Usulan Transfer #{{ $batch->batch_number }}</span>
+        </div>
+        <a href="{{ route('batches.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-[#0B1F4B] font-semibold rounded-lg border border-[#DBE5F5] transition text-xs shadow-2xs">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Kembali ke Stok Obat</span>
+        </a>
     </div>
 
     <!-- Mandatory Regulatory Disclaimer Banner (PRD Rule) -->
@@ -166,11 +176,13 @@
                 <!-- Transfer Quantity -->
                 <div>
                     <label for="quantity" class="block text-xs font-bold text-[#0B1F4B] mb-1">Jumlah Unit yang Diredistribusikan:</label>
-                    <div class="relative">
-                        <input type="number" id="quantity" name="quantity" min="1" max="{{ $batch->current_stock }}" value="{{ $candidates[0]['recommended_quantity'] ?? 100 }}" class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none" required>
-                        <span class="absolute right-3 top-2 text-xs text-[#52627F]">{{ $batch->medicine->unit }}</span>
+                    <div class="flex rounded-lg border border-[#DBE5F5] overflow-hidden focus-within:ring-2 focus-within:ring-[#1D4ED8] bg-white">
+                        <input type="number" id="quantity" name="quantity" min="1" max="{{ $batch->current_stock }}" value="{{ $candidates[0]['recommended_quantity'] ?? 100 }}" class="w-full px-3 py-2 text-xs font-mono font-bold focus:outline-none border-0 text-[#0B1F4B]" required>
+                        <span class="inline-flex items-center px-3 bg-slate-100 border-l border-[#DBE5F5] text-xs font-semibold text-[#52627F] shrink-0 select-none">
+                            {{ $batch->medicine->unit }}
+                        </span>
                     </div>
-                    <span class="text-[11px] text-[#52627F] block mt-1">Maksimal stok tersedia di donor: {{ $batch->current_stock }} unit.</span>
+                    <span class="text-[11px] text-[#52627F] block mt-1">Maksimal stok tersedia di donor: {{ $batch->current_stock }} {{ $batch->medicine->unit }}.</span>
                 </div>
             </div>
 

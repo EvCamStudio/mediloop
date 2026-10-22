@@ -57,43 +57,52 @@
         @endif
     </div>
 
-    <!-- Quick Filter Tabs (Saran Claude & Standar Sistem Informasi Farmasi) -->
-    <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+    <!-- Quick Filter Tabs (Bebas Emot & Selalu Terlihat Jelas Saat Ditekan) -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs select-none">
         <!-- Tab: Semua -->
+        @php $isAllActive = ($currentTab === 'all' || !$currentTab); @endphp
         <a href="{{ request()->fullUrlWithQuery(['tab' => 'all', 'page' => 1]) }}"
-           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0 {{ ($currentTab === 'all' || !$currentTab) ? 'bg-[#1D4ED8] text-white border-[#1D4ED8] shadow-xs' : 'bg-white text-slate-700 hover:bg-slate-50 border-[#DBE5F5]' }}">
+           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0"
+           style="{{ $isAllActive ? 'background: #1D4ED8; color: #ffffff; border-color: #1D4ED8;' : 'background: #ffffff; color: #0B1F4B; border-color: #DBE5F5;' }}">
             <span>Semua Batch</span>
-            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ ($currentTab === 'all' || !$currentTab) ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600' }}">
+            <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold"
+                  style="{{ $isAllActive ? 'background: rgba(255,255,255,0.25); color: #ffffff;' : 'background: #F1F5F9; color: #52627F;' }}">
                 {{ $counts['all'] }}
             </span>
         </a>
 
         <!-- Tab: Berisiko Kritis & Tinggi -->
+        @php $isRiskActive = ($currentTab === 'risk'); @endphp
         <a href="{{ request()->fullUrlWithQuery(['tab' => 'risk', 'page' => 1]) }}"
-           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0 {{ $currentTab === 'risk' ? 'bg-[#D9480F] text-white border-[#D9480F] shadow-xs' : 'bg-white text-slate-700 hover:bg-orange-50/50 border-[#DBE5F5]' }}">
-            <span class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                <span>Berisiko Kritis &amp; Tinggi</span>
-            </span>
-            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ $currentTab === 'risk' ? 'bg-white/25 text-white' : 'bg-orange-100 text-[#D9480F]' }}">
+           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0"
+           style="{{ $isRiskActive ? 'background: #D9480F; color: #ffffff; border-color: #D9480F;' : 'background: #ffffff; color: #0B1F4B; border-color: #DBE5F5;' }}">
+            <span>Berisiko Kritis &amp; Tinggi</span>
+            <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold"
+                  style="{{ $isRiskActive ? 'background: rgba(255,255,255,0.25); color: #ffffff;' : 'background: #FFF4EC; color: #D9480F;' }}">
                 {{ $counts['risk'] }}
             </span>
         </a>
 
         <!-- Tab: Expired <= 60 Hari -->
+        @php $isExpActive = ($currentTab === 'expiring'); @endphp
         <a href="{{ request()->fullUrlWithQuery(['tab' => 'expiring', 'page' => 1]) }}"
-           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0 {{ $currentTab === 'expiring' ? 'bg-amber-600 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 hover:bg-amber-50/50 border-[#DBE5F5]' }}">
+           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0"
+           style="{{ $isExpActive ? 'background: #D97706; color: #ffffff; border-color: #D97706;' : 'background: #ffffff; color: #0B1F4B; border-color: #DBE5F5;' }}">
             <span>Expired &le; 60 Hari</span>
-            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ $currentTab === 'expiring' ? 'bg-white/25 text-white' : 'bg-amber-100 text-amber-800' }}">
+            <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold"
+                  style="{{ $isExpActive ? 'background: rgba(255,255,255,0.25); color: #ffffff;' : 'background: #FEF3C7; color: #B45309;' }}">
                 {{ $counts['expiring'] }}
             </span>
         </a>
 
         <!-- Tab: Rantai Dingin (Cold Chain) -->
+        @php $isCCActive = ($currentTab === 'cold_chain'); @endphp
         <a href="{{ request()->fullUrlWithQuery(['tab' => 'cold_chain', 'page' => 1]) }}"
-           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0 {{ $currentTab === 'cold_chain' ? 'bg-cyan-700 text-white border-cyan-700 shadow-xs' : 'bg-white text-slate-700 hover:bg-cyan-50/50 border-[#DBE5F5]' }}">
+           class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0"
+           style="{{ $isCCActive ? 'background: #0284C7; color: #ffffff; border-color: #0284C7;' : 'background: #ffffff; color: #0B1F4B; border-color: #DBE5F5;' }}">
             <span>Rantai Dingin</span>
-            <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ $currentTab === 'cold_chain' ? 'bg-white/25 text-white' : 'bg-cyan-100 text-cyan-800' }}">
+            <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold"
+                  style="{{ $isCCActive ? 'background: rgba(255,255,255,0.25); color: #ffffff;' : 'background: #E0F2FE; color: #0369A1;' }}">
                 {{ $counts['cold_chain'] }}
             </span>
         </a>

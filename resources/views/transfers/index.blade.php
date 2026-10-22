@@ -113,8 +113,8 @@
                             </td>
 
                             <!-- Action -->
-                            <td class="py-3.5 px-4 text-right">
-                                <a href="{{ route('transfers.show', $t) }}" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded text-[#1D4ED8] bg-[#EAF1FF] hover:bg-blue-100 border border-blue-200 transition">
+                            <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                                <a href="{{ route('transfers.show', $t) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-[#1D4ED8] bg-[#EAF1FF] hover:bg-blue-100 border border-blue-200 transition whitespace-nowrap shadow-2xs">
                                     <span>Lacak & Periksa</span>
                                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

@@ -169,37 +169,37 @@
                                 </span>
                             </td>
                             <td>
-                                <div class="ml-days-wrap">
-                                    <span class="ml-days-pill ml-days-expiry">
-                                        {{ $batch->days_to_expiry }} Hari<br>
-                                        <span style="font-size: 9.5px; font-weight:400;">Kedaluwarsa</span>
-                                    </span>
-                                    <span class="ml-days-vs">vs</span>
-                                    <span class="ml-days-pill ml-days-deplete">
-                                        {{ is_finite($batch->days_to_deplete) ? $batch->days_to_deplete : '∞' }} Hari<br>
-                                        <span style="font-size: 9.5px; font-weight:400;">Habis Stok</span>
-                                    </span>
+                                <div style="display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                                    <div style="background: #FFF4EC; color: #D9480F; border: 1px solid #FFEDD5; padding: 4px 8px; border-radius: 6px; text-align: center; min-width: 68px;">
+                                        <div style="font-size: 11.5px; font-weight: 700; line-height: 1.2;">{{ $batch->days_to_expiry }} Hari</div>
+                                        <div style="font-size: 9px; font-weight: 500; opacity: 0.85; line-height: 1.1;">Kedaluwarsa</div>
+                                    </div>
+                                    <span style="font-size: 10px; font-weight: 700; color: #94A3B8;">vs</span>
+                                    <div style="background: #EFF6FF; color: #1D4ED8; border: 1px solid #DBEAFE; padding: 4px 8px; border-radius: 6px; text-align: center; min-width: 68px;">
+                                        <div style="font-size: 11.5px; font-weight: 700; line-height: 1.2;">{{ is_finite($batch->days_to_deplete) ? $batch->days_to_deplete : '∞' }} Hari</div>
+                                        <div style="font-size: 9px; font-weight: 500; opacity: 0.85; line-height: 1.1;">Habis Stok</div>
+                                    </div>
                                 </div>
                             </td>
-                            <td style="text-align: right;">
+                            <td style="text-align: right; white-space: nowrap;">
                                 <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px;">
                                     @php $risk = $batch->risk_level; @endphp
                                     @if($risk === 'CRITICAL')
-                                        <span class="ml-risk-high" style="background:#FEE2E2; color:#991B1B; border-color:#FCA5A5;">CRITICAL</span>
+                                        <span class="ml-risk-high" style="background:#FEE2E2; color:#991B1B; border-color:#FCA5A5; white-space: nowrap;">CRITICAL</span>
                                     @elseif($risk === 'HIGH')
-                                        <span class="ml-risk-high">HIGH</span>
+                                        <span class="ml-risk-high" style="white-space: nowrap;">HIGH</span>
                                     @elseif($risk === 'MEDIUM')
-                                        <span class="ml-risk-medium">MEDIUM</span>
+                                        <span class="ml-risk-medium" style="white-space: nowrap;">MEDIUM</span>
                                     @else
-                                        <span style="display: inline-flex; align-items: center; padding: 4px 8px; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; border-radius: 8px; font-size: 11px; font-weight: 700;">LOW</span>
+                                        <span style="display: inline-flex; align-items: center; padding: 4px 8px; background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; border-radius: 8px; font-size: 11px; font-weight: 700; white-space: nowrap;">LOW</span>
                                     @endif
 
                                     @if(! $user->isDinkesAuditor() && $batch->projected_waste > 0 && $batch->current_stock > 0)
-                                        <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-primary">
+                                        <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-primary" style="white-space: nowrap;">
                                             Find Match
                                         </a>
                                     @else
-                                        <a href="{{ route('batches.edit', $batch) }}" class="ml-btn-ghost" style="padding: 5px 10px; font-size: 11.5px;">
+                                        <a href="{{ route('batches.edit', $batch) }}" class="ml-btn-ghost" style="padding: 5px 10px; font-size: 11.5px; white-space: nowrap;">
                                             Detail
                                         </a>
                                     @endif
