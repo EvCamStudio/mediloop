@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Batch;
 use App\Models\Facility;
 use App\Models\Medicine;
+use App\Services\RedistributionEngine;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,6 +59,14 @@ class BatchController extends Controller
         $totalStockUnits = (int) $statsBatches->sum('current_stock');
         $atRiskCount = $statsBatches->filter(fn ($b) => in_array($b->risk_level, ['CRITICAL', 'HIGH']))->count();
         $totalWasteValue = (float) $statsBatches->sum(fn ($b) => $b->projected_waste * (float) $b->unit_price_idr);
+        $totalWasteUnits = (int) $statsBatches->sum('projected_waste');
+        $estimatedWasteKg = round($totalWasteUnits * 0.085, 1);
+
+        $topRiskBatch = $statsBatches->first(fn ($b) => in_array($b->risk_level, ['CRITICAL', 'HIGH']) && $b->projected_waste > 0 && $b->current_stock > 0);
+        $topCandidates = [];
+        if ($topRiskBatch) {
+            $topCandidates = array_slice(RedistributionEngine::findCandidateRecipients($topRiskBatch), 0, 3);
+        }
 
         $batches = $query->orderBy('expiry_date', 'asc')->paginate(15)->withQueryString();
 
@@ -74,6 +83,10 @@ class BatchController extends Controller
             'totalStockUnits' => $totalStockUnits,
             'atRiskCount' => $atRiskCount,
             'totalWasteValue' => $totalWasteValue,
+            'totalWasteUnits' => $totalWasteUnits,
+            'estimatedWasteKg' => $estimatedWasteKg,
+            'topRiskBatch' => $topRiskBatch,
+            'topCandidates' => $topCandidates,
         ]);
     }
 
