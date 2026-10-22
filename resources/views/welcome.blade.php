@@ -241,14 +241,16 @@
 
                         <!-- Sparkle Highlights -->
                         <div class="absolute top-6 left-12 text-blue-500/80 mediloop-sparkle text-lg font-bold select-none">+</div>
-                        <div class="absolute bottom-16 right-8 text-cyan-400/90 mediloop-sparkle text-sm font-bold select-none" style="animation-delay: 1.5s;">✦</div>
+                        <div class="absolute bottom-16 right-8 text-cyan-400/90 mediloop-sparkle text-sm font-bold select-none" style="animation-delay: 1.5s;">+</div>
                         <div class="absolute top-12 right-12 text-indigo-400/70 mediloop-sparkle text-xs font-bold select-none" style="animation-delay: 0.8s;">+</div>
 
                         <!-- FLOATING GLASS CHIP 1: Top Left (Redistribution Status & Batch Name) -->
                         <div class="mediloop-chip-1 absolute top-2 left-0 sm:-left-4 z-30 bg-white/85 hover:bg-white backdrop-blur-md border border-white/70 shadow-lg rounded-2xl px-4 py-2.5 transition transform hover:scale-105 cursor-default">
                             <div class="flex items-center gap-2.5">
                                 <div class="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center text-[#D9480F] font-bold text-xs shrink-0">
-                                    💊
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                    </svg>
                                 </div>
                                 <div>
                                     <div class="flex items-center gap-2">
@@ -369,7 +371,10 @@
                         <div class="mediloop-chip-2 absolute bottom-2 -right-2 sm:-right-4 z-30 bg-white/85 hover:bg-white backdrop-blur-md border border-white/70 shadow-lg rounded-2xl px-4 py-2.5 transition transform hover:scale-105 cursor-default">
                             <div class="flex items-center gap-2.5">
                                 <div class="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-[#1D4ED8] font-bold text-xs shrink-0">
-                                    📍
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
                                 </div>
                                 <div>
                                     <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Rekomendasi Match</div>
@@ -377,7 +382,7 @@
                                     <div class="text-[10.5px] font-semibold text-blue-700 flex items-center gap-1">
                                         <span>1.8 km</span>
                                         <span class="text-slate-400">•</span>
-                                        <span class="text-cyan-700 font-bold">❄️ Cold-Chain Ready</span>
+                                        <span class="text-cyan-700 font-bold">Cold-Chain Ready</span>
                                     </div>
                                 </div>
                             </div>
@@ -385,7 +390,9 @@
 
                         <!-- FLOATING GLASS CHIP 3: Bottom Left (Algorithm Score) -->
                         <div class="mediloop-chip-3 absolute bottom-6 left-2 sm:-left-2 z-30 bg-white/85 hover:bg-white backdrop-blur-md border border-white/70 shadow-lg rounded-2xl px-3.5 py-2 transition transform hover:scale-105 cursor-default hidden sm:flex items-center gap-2">
-                            <span class="text-emerald-500 font-black text-sm">✓</span>
+                            <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                            </svg>
                             <div>
                                 <div class="text-xs font-extrabold text-[#0B1F4B]">92% Match Score</div>
                                 <div class="text-[10px] text-slate-500 font-mono">BATCH: CFT-2026-X89</div>

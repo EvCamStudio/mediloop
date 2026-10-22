@@ -20,13 +20,13 @@
         <!-- Quick Summary Stats Pills -->
         <div class="flex items-center flex-wrap gap-2 text-xs">
             <span class="px-3 py-1.5 rounded-lg bg-white border border-[#DBE5F5] font-semibold text-[#0B1F4B] shadow-2xs">
-                🏥 <b class="text-[#1D4ED8]">{{ $facilityStats['total'] }}</b> Faskes Terhubung
+                <b class="text-[#1D4ED8]">{{ $facilityStats['total'] }}</b> Faskes Terhubung
             </span>
             <span class="px-3 py-1.5 rounded-lg bg-white border border-[#DBE5F5] font-semibold text-[#0B1F4B] shadow-2xs">
-                ❄️ <b class="text-cyan-700">{{ $facilityStats['cold_chain'] }}</b> Cold-Chain Ready
+                <b class="text-cyan-700">{{ $facilityStats['cold_chain'] }}</b> Cold-Chain Ready
             </span>
             <span class="px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 font-semibold text-[#1D4ED8] shadow-2xs">
-                🔄 <b class="text-[#1D4ED8]">{{ $facilityStats['active_routes'] }}</b> Rute Redistribusi
+                <b class="text-[#1D4ED8]">{{ $facilityStats['active_routes'] }}</b> Rute Redistribusi
             </span>
         </div>
     </div>
@@ -107,14 +107,14 @@
                         <div class="flex items-center justify-between text-[11px] pt-1 border-t border-slate-100">
                             <span class="font-semibold text-slate-600">
                                 @if($f['distance_from_user_km'] !== null)
-                                    📍 <b>{{ $f['distance_from_user_km'] }} km</b>
+                                    <b>{{ $f['distance_from_user_km'] }} km</b>
                                 @else
                                     {{ $f['city'] }}
                                 @endif
                             </span>
 
                             @if($f['cold_chain_ready'])
-                                <span class="text-cyan-700 font-bold text-[10.5px]">❄️ Cold Chain</span>
+                                <span class="text-cyan-700 font-bold text-[10.5px]">Cold Chain</span>
                             @endif
 
                             <span class="text-[#1D4ED8] font-bold">
@@ -202,12 +202,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 <div style="display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap;">
                     <span style="background: #EFF6FF; color: #1D4ED8; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;">${f.type}</span>
-                    ${f.cold_chain_ready ? '<span style="background: #ECFEFF; color: #0891B2; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;">❄️ Cold Chain Ready</span>' : ''}
+                    ${f.cold_chain_ready ? '<span style="background: #ECFEFF; color: #0891B2; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;">Cold Chain Ready</span>' : ''}
                 </div>
 
                 <div style="background: #F8FAFC; padding: 6px 8px; border-radius: 6px; border: 1px solid #E2E8F0; margin-bottom: 8px; font-size: 11px;">
                     <div>Stok Aktif: <b>${f.total_stock} unit</b> (${f.active_batches_count} batch)</div>
-                    ${f.at_risk_count > 0 ? `<div style="color: #DC2626; font-weight: 700;">⚠️ ${f.at_risk_count} Batch Berisiko Expired</div>` : '<div style="color: #10B981;">✓ Stok Terkendali</div>'}
+                    ${f.at_risk_count > 0 ? `<div style="color: #DC2626; font-weight: 700;">${f.at_risk_count} Batch Berisiko Expired</div>` : '<div style="color: #10B981;">Stok Terkendali</div>'}
                 </div>
 
                 <a href="/batches?facility_id=${f.id}" style="display: block; text-align: center; background: #1D4ED8; color: #fff; padding: 5px 8px; border-radius: 6px; text-decoration: none; font-weight: 700; font-size: 11px;">

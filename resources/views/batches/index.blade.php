@@ -73,7 +73,7 @@
            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0 {{ $currentTab === 'risk' ? 'bg-[#D9480F] text-white border-[#D9480F] shadow-xs' : 'bg-white text-slate-700 hover:bg-orange-50/50 border-[#DBE5F5]' }}">
             <span class="flex items-center gap-1.5">
                 <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                <span>🚨 Berisiko Kritis &amp; Tinggi</span>
+                <span>Berisiko Kritis &amp; Tinggi</span>
             </span>
             <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ $currentTab === 'risk' ? 'bg-white/25 text-white' : 'bg-orange-100 text-[#D9480F]' }}">
                 {{ $counts['risk'] }}
@@ -83,7 +83,7 @@
         <!-- Tab: Expired <= 60 Hari -->
         <a href="{{ request()->fullUrlWithQuery(['tab' => 'expiring', 'page' => 1]) }}"
            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0 {{ $currentTab === 'expiring' ? 'bg-amber-600 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-700 hover:bg-amber-50/50 border-[#DBE5F5]' }}">
-            <span>⏳ Expired &le; 60 Hari</span>
+            <span>Expired &le; 60 Hari</span>
             <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ $currentTab === 'expiring' ? 'bg-white/25 text-white' : 'bg-amber-100 text-amber-800' }}">
                 {{ $counts['expiring'] }}
             </span>
@@ -92,7 +92,7 @@
         <!-- Tab: Rantai Dingin (Cold Chain) -->
         <a href="{{ request()->fullUrlWithQuery(['tab' => 'cold_chain', 'page' => 1]) }}"
            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0 {{ $currentTab === 'cold_chain' ? 'bg-cyan-700 text-white border-cyan-700 shadow-xs' : 'bg-white text-slate-700 hover:bg-cyan-50/50 border-[#DBE5F5]' }}">
-            <span>❄️ Rantai Dingin</span>
+            <span>Rantai Dingin</span>
             <span class="px-1.5 py-0.5 rounded-full text-[10px] font-black {{ $currentTab === 'cold_chain' ? 'bg-white/25 text-white' : 'bg-cyan-100 text-cyan-800' }}">
                 {{ $counts['cold_chain'] }}
             </span>
@@ -132,10 +132,10 @@
             <div class="md:col-span-4 lg:col-span-2">
                 <select name="risk" onchange="this.form.submit()" class="w-full px-2.5 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
                     <option value="">Risiko: Semua</option>
-                    <option value="CRITICAL" {{ $currentRisk === 'CRITICAL' ? 'selected' : '' }}>🔴 Kritis</option>
-                    <option value="HIGH" {{ $currentRisk === 'HIGH' ? 'selected' : '' }}>🟠 Tinggi</option>
-                    <option value="MEDIUM" {{ $currentRisk === 'MEDIUM' ? 'selected' : '' }}>🟡 Sedang</option>
-                    <option value="LOW" {{ $currentRisk === 'LOW' ? 'selected' : '' }}>🟢 Rendah</option>
+                    <option value="CRITICAL" {{ $currentRisk === 'CRITICAL' ? 'selected' : '' }}>Kritis</option>
+                    <option value="HIGH" {{ $currentRisk === 'HIGH' ? 'selected' : '' }}>Tinggi</option>
+                    <option value="MEDIUM" {{ $currentRisk === 'MEDIUM' ? 'selected' : '' }}>Sedang</option>
+                    <option value="LOW" {{ $currentRisk === 'LOW' ? 'selected' : '' }}>Rendah</option>
                 </select>
             </div>
 

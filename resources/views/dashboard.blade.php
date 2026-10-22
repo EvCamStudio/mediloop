@@ -84,8 +84,10 @@
     {{-- Quick Analytics & Map Callout Banner --}}
     <div style="background: linear-gradient(135deg, #0B1F4B 0%, #1D4ED8 100%); border-radius: 14px; padding: 14px 20px; color: #ffffff; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.15);">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 18px; shrink: 0;">
-                📊
+            <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; shrink: 0;">
+                <svg style="width: 20px; height: 20px; color: #ffffff;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
             </div>
             <div>
                 <div style="font-weight: 700; font-size: 13.5px; letter-spacing: -0.01em;">Pusat Visualisasi &amp; Analitik Prediktif Obat</div>
@@ -93,8 +95,11 @@
             </div>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
-            <a href="{{ route('map.index') }}" style="background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 700; text-decoration: none; transition: all 0.15s;">
-                🗺️ Buka Peta Logistik
+            <a href="{{ route('map.index') }}" style="background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 8px; font-size: 11.5px; font-weight: 700; text-decoration: none; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;">
+                <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                <span>Buka Peta Logistik</span>
             </a>
             <a href="{{ route('analytics.index') }}" style="background: #ffffff; color: #1D4ED8; padding: 6px 16px; border-radius: 8px; font-size: 11.5px; font-weight: 800; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.15s;">
                 Buka Analitik &amp; Grafik &rarr;
