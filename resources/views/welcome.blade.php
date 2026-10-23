@@ -246,14 +246,6 @@
                 <!-- Right: Animated pharmaceutical hero illustration (simulated PRD case) -->
                 <div class="lg:col-span-5 flex justify-center items-center relative py-6">
                     <div class="w-full max-w-lg">
-                        <div class="mb-3 flex justify-center">
-                            <span
-                                class="inline-flex items-center gap-1.5 rounded-full border border-[var(--brand-border)] bg-[var(--brand-sky)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[var(--brand-primary)]">
-                                <span class="h-1.5 w-1.5 rounded-full bg-[var(--brand-primary)]" aria-hidden="true"></span>
-                                Simulasi kasus PRD
-                            </span>
-                        </div>
-
                         <div class="ml-hero-stage relative flex h-[380px] w-full select-none items-center justify-center sm:h-[460px]"
                             id="hero-interactive-stage">
                             <!-- Ambient glow and orbital depth -->
@@ -452,6 +444,9 @@
                                 </div>
                             </div>
                         </div>
+                        <p class="mt-3 text-center text-[11px] font-medium leading-relaxed text-slate-600">
+                            Simulasi kasus PRD · data contoh, bukan data operasional.
+                        </p>
                     </div>
                 </div>
 
