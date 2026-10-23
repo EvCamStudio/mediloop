@@ -97,7 +97,7 @@ class BatchController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->isDinkesAuditor()) {
+        if ($user->isDinkesAuditor() && ! $user->isSysadmin()) {
             abort(403, 'Auditor Dinas Kesehatan hanya memiliki hak akses pantau (Read-Only).');
         }
 
@@ -118,7 +118,7 @@ class BatchController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->isDinkesAuditor()) {
+        if ($user->isDinkesAuditor() && ! $user->isSysadmin()) {
             abort(403, 'Auditor Dinas Kesehatan hanya memiliki hak akses pantau.');
         }
 
