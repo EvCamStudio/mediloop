@@ -22,6 +22,13 @@
     --color-brand-risk: #D9480F;
     --color-brand-warning: #B7791F;
 
+    /* Facility marker colours; white labels meet WCAG AA contrast. */
+    --color-facility-rsud: #1D4ED8;
+    --color-facility-puskesmas: #0F766E;
+    --color-facility-klinik: #047857;
+    --color-facility-rs-swasta: #6D28D9;
+    --color-facility-other: #64748B;
+
     --color-surface-canvas: #F6F8FB;
     --color-surface-raised: #FFFFFF;
     --color-surface-subtle: #F1F5F9;

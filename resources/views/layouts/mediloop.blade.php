@@ -1046,7 +1046,11 @@
             flex-shrink: 0;
         }
         .ml-network-legend-dot.is-origin { background: var(--ml-navy); }
-        .ml-network-legend-dot.is-partner { background: var(--ml-primary); }
+        .ml-network-legend-dot.is-rsud { background: var(--color-facility-rsud); }
+        .ml-network-legend-dot.is-puskesmas { background: var(--color-facility-puskesmas); }
+        .ml-network-legend-dot.is-klinik { background: var(--color-facility-klinik); }
+        .ml-network-legend-dot.is-rs-swasta { background: var(--color-facility-rs-swasta); }
+        .ml-network-legend-dot.is-other { background: var(--color-facility-other); }
         .ml-network-legend-dot.is-radius {
             background: transparent;
             border: 1.5px dashed var(--ml-primary);
@@ -1181,15 +1185,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
-            border: 2px solid #fff;
+            width: 26px;
+            height: 26px;
+            border: 3px solid var(--color-surface-raised);
             border-radius: 50%;
-            color: #fff;
+            color: var(--color-surface-raised);
             font-family: var(--font-heading);
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 800;
-            font-variant-numeric: tabular-nums;
+            line-height: 1;
             box-shadow: 0 2px 6px rgba(11, 31, 75, 0.28);
         }
         .ml-map-marker-origin {
@@ -1199,6 +1203,21 @@
         }
         .ml-map-marker-facility {
             background: var(--ml-primary);
+        }
+        .ml-map-marker-rsud {
+            background: var(--color-facility-rsud);
+        }
+        .ml-map-marker-puskesmas {
+            background: var(--color-facility-puskesmas);
+        }
+        .ml-map-marker-klinik {
+            background: var(--color-facility-klinik);
+        }
+        .ml-map-marker-rs-swasta {
+            background: var(--color-facility-rs-swasta);
+        }
+        .ml-map-marker-other {
+            background: var(--color-facility-other);
         }
         .ml-map-hint {
             padding: 3px 8px;

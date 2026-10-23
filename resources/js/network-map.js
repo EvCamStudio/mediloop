@@ -27,12 +27,23 @@ function originIcon() {
     });
 }
 
-function facilityIcon(rank) {
+const FACILITY_MARKER_STYLES = {
+    RSUD: { label: 'RS', className: 'ml-map-marker-rsud' },
+    PUSKESMAS: { label: 'PK', className: 'ml-map-marker-puskesmas' },
+    KLINIK: { label: 'KL', className: 'ml-map-marker-klinik' },
+    RS_SWASTA: { label: 'RS', className: 'ml-map-marker-rs-swasta' },
+};
+
+const DEFAULT_MARKER_STYLE = { label: 'FK', className: 'ml-map-marker-other' };
+
+function facilityIcon(facility) {
+    const style = FACILITY_MARKER_STYLES[facility.type] ?? DEFAULT_MARKER_STYLE;
+
     return L.divIcon({
         className: 'ml-map-marker-shell',
-        html: `<span class="ml-map-marker ml-map-marker-facility">${rank}</span>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
+        html: `<span class="ml-map-marker ml-map-marker-facility ${style.className}"><span aria-hidden="true">${style.label}</span></span>`,
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
         popupAnchor: [0, -12],
     });
 }
@@ -170,9 +181,9 @@ function initNetworkMap() {
         bounds.extend([origin.lat, origin.lng]);
     }
 
-    facilities.forEach((facility, index) => {
+    facilities.forEach((facility) => {
         const marker = L.marker([facility.lat, facility.lng], {
-            icon: facilityIcon(index + 1),
+            icon: facilityIcon(facility),
             keyboard: true,
             title: facility.name,
             alt: `${facility.name}, ${distanceLabel(facility.distanceKm)}`,

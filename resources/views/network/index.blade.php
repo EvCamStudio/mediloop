@@ -104,10 +104,27 @@
                         Faskes Anda
                     </span>
                 @endif
-                <span class="ml-network-legend-item">
-                    <span class="ml-network-legend-dot is-partner" aria-hidden="true"></span>
-                    Faskes mitra
-                </span>
+                @php
+                    $legendTypeClasses = [
+                        'RSUD' => 'is-rsud',
+                        'PUSKESMAS' => 'is-puskesmas',
+                        'KLINIK' => 'is-klinik',
+                        'RS_SWASTA' => 'is-rs-swasta',
+                    ];
+                    $legendTypeLabels = [
+                        'RSUD' => 'RSUD',
+                        'PUSKESMAS' => 'Puskesmas',
+                        'KLINIK' => 'Klinik',
+                        'RS_SWASTA' => 'RS Swasta',
+                    ];
+                @endphp
+                @foreach ($facilityTypes as $type)
+                    <span class="ml-network-legend-item">
+                        <span class="ml-network-legend-dot {{ $legendTypeClasses[$type] ?? 'is-other' }}"
+                            aria-hidden="true"></span>
+                        {{ $legendTypeLabels[$type] ?? $type }}
+                    </span>
+                @endforeach
                 @if ($origin)
                     <span class="ml-network-legend-item">
                         <span class="ml-network-legend-dot is-radius" aria-hidden="true"></span>
