@@ -55,6 +55,20 @@
         </div>
     @endif
 
+    <div class="ml-alert ml-alert-info ml-compliance-banner" role="note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" />
+            <path d="M12 8v4m0 4h.01" />
+        </svg>
+        <div>
+            <strong>Kepatuhan regulasi kefarmasian</strong>
+            <p>
+                MediLoop adalah sistem pendukung keputusan, bukan marketplace. Setiap otorisasi transfer
+                tetap memerlukan persetujuan petugas berwenang dan verifikasi penerimaan fisik.
+            </p>
+        </div>
+    </div>
+
     <header class="ml-passport">
         <div class="ml-passport-main">
             <span class="ml-passport-mark" aria-hidden="true">
@@ -175,12 +189,23 @@
                                     @csrf
                                     <div class="ml-form-grid">
                                         <div class="ml-field">
-                                            <label for="courier_type" class="ml-label">Jenis kurir / transportasi</label>
-                                            <input id="courier_type" name="courier_type" type="text" class="ml-input" value="Kurir farmasi berpendingin (cold-box)" required>
+                                            <label for="courier_type" class="ml-label">Jenis kurir / transportasi <span class="ml-required">*</span></label>
+                                            <input id="courier_type" name="courier_type" type="text" class="ml-input" value="{{ old('courier_type', 'Kurir farmasi berpendingin (cold-box)') }}" required>
                                         </div>
                                         <div class="ml-field">
-                                            <label for="tracking_number" class="ml-label">Nomor resi / surat jalan</label>
-                                            <input id="tracking_number" name="tracking_number" type="text" class="ml-input is-mono" value="EXP-DKI-{{ random_int(1000, 9999) }}" required>
+                                            <label for="tracking_number" class="ml-label">Nomor resi / surat jalan <span class="ml-required">*</span></label>
+                                            <input
+                                                id="tracking_number"
+                                                name="tracking_number"
+                                                type="text"
+                                                class="ml-input is-mono"
+                                                value="{{ old('tracking_number') }}"
+                                                placeholder="Contoh: EXP-DKI-2026-001"
+                                                aria-describedby="tracking-number-help"
+                                                autocomplete="off"
+                                                required
+                                            >
+                                            <p id="tracking-number-help" class="ml-help">Isi sesuai nomor resi atau surat jalan fisik.</p>
                                         </div>
                                     </div>
                                     <button type="submit" class="ml-btn-primary">Berangkatkan pengiriman</button>

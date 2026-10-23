@@ -128,6 +128,18 @@ test('a transfer cannot be dispatched before the recipient accepts', function ()
     expect($fixture['transfer']->fresh()->status)->toBe('PROPOSED');
 });
 
+test('the dispatch form shows the compliance notice and does not prefill a tracking number', function () {
+    $fixture = transferFixture('ACCEPTED');
+
+    $this->actingAs($fixture['donor']['staff'])
+        ->get(route('transfers.show', $fixture['transfer']))
+        ->assertOk()
+        ->assertSee('Kepatuhan regulasi kefarmasian')
+        ->assertSee('Contoh: EXP-DKI-2026-001')
+        ->assertSee('Isi sesuai nomor resi atau surat jalan fisik.')
+        ->assertDontSee('value="EXP-DKI-', false);
+});
+
 test('only parties and auditors can view a transfer', function () {
     $fixture = transferFixture();
     $outsider = transferParty('Klinik Lain', 'FSK-AUTH-OUTSIDER', 'KLINIK')['staff'];
