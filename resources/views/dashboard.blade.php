@@ -1,89 +1,105 @@
-@extends('layouts.mediloop', ['title' => 'Overview Dashboard - MediLoop'])
+@extends('layouts.mediloop', ['title' => 'Ringkasan Logistik'])
 
 @section('content')
-<div class="ml-dashboard">
+@php
+    $batchCollection = $batches ?? collect();
+    $highRiskCount = $batchCollection->filter(fn ($batch) => in_array($batch->risk_level, ['HIGH', 'CRITICAL'], true))->count();
+    $watchRiskCount = max(0, ($atRiskCount ?? 0) - $highRiskCount);
+    $totalUnits = $batchCollection->sum('current_stock');
+    $networkCount = isset($facilitiesList) ? $facilitiesList->count() : 0;
+@endphp
 
-    {{-- Header & Action Row --}}
+<div class="ml-dashboard">
     <header class="ml-page-head">
         <div>
+            <p class="ml-page-eyebrow">Pusat kendali fasilitas</p>
             <div class="ml-page-title-row">
-                <h1 class="ml-page-title">Ringkasan Logistik &amp; Prediksi Kedaluwarsa</h1>
-                <span class="ml-facility-chip">{{ $facility?->name ?? 'Fasilitas Kesehatan' }}</span>
+                <h1 class="ml-page-title">Ringkasan logistik</h1>
+                <span class="ml-facility-chip">{{ $facility?->name ?? 'Fasilitas kesehatan' }}</span>
             </div>
-            <p class="ml-page-sub">
-                Sistem pendukung keputusan pemantauan stok farmasi dan redistribusi antarfaskes.
-            </p>
+            <p class="ml-page-sub">Pantau risiko kedaluwarsa dan peluang redistribusi antar fasilitas.</p>
         </div>
 
-        <div class="ml-page-actions">
-            <a href="{{ route('batches.index') }}" class="ml-btn-quiet">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
-                <span>Kelola Semua Stok</span>
-            </a>
-            @if(! $user->isDinkesAuditor())
-                <a href="{{ route('batches.create') }}" class="ml-btn-primary">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v16m8-8H4"/></svg>
-                    <span>Input Stok Obat Baru</span>
+        @if (! ($facilityMissing ?? false))
+            <div class="ml-page-actions">
+                <a href="{{ route('batches.index') }}" class="ml-btn-quiet">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                    <span>Kelola stok</span>
                 </a>
-            @endif
-        </div>
+                @if(! $user->isDinkesAuditor())
+                    <a href="{{ route('batches.create') }}" class="ml-btn-primary">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v16m8-8H4"/></svg>
+                        <span>Input batch</span>
+                    </a>
+                @endif
+            </div>
+        @endif
     </header>
 
-    {{-- 4 STAT CARDS --}}
-    <div class="ml-stat-grid">
-
-        {{-- At-Risk Batches --}}
-        <div class="ml-stat-card">
-            <div class="ml-stat-label">At-Risk Batches</div>
-            <div style="margin-bottom: 8px;">
-                <span class="ml-stat-badge">{{ $atRiskCount ?? 0 }} Batches</span>
-            </div>
-            @php
-                $highRiskCount = isset($batches) ? $batches->filter(fn($b) => $b->risk_level === 'HIGH' || $b->risk_level === 'CRITICAL')->count() : 0;
-                $watchRiskCount = ($atRiskCount ?? 0) - $highRiskCount;
-            @endphp
-            <div class="ml-stat-sub">
-                <b>{{ $highRiskCount }} High Risk</b>
-                &nbsp;·&nbsp;
-                {{ $watchRiskCount > 0 ? $watchRiskCount : 0 }} Watch
-            </div>
+    @if ($facilityMissing ?? false)
+        <div class="ml-alert ml-alert-warning" role="status">
+            <strong>Akun belum terhubung ke fasilitas</strong>
+            <p>Data stok antar fasilitas tidak ditampilkan sampai akun Anda dihubungkan ke fasilitas terverifikasi. Hubungi administrator platform untuk menyelesaikan verifikasi.</p>
         </div>
+    @endif
 
-        {{-- Redistributed Medicine --}}
-        <div class="ml-stat-card">
-            <div class="ml-stat-label">Redistributed Medicine</div>
-            <div class="ml-stat-sublabel">SDG 3 &amp; 12 impact</div>
-            <div class="ml-stat-value">{{ number_format(isset($batches) ? $batches->sum('current_stock') : 0) }} Units</div>
-            <div class="ml-stat-sub" style="color: var(--ml-subtle);">{{ isset($batches) ? $batches->count() : 0 }} batches total</div>
-        </div>
-
-        {{-- Prevented Waste Value --}}
-        <div class="ml-stat-card">
-            <div class="ml-stat-label">Prevented Waste Value</div>
-            <div style="margin-bottom: 8px;">
-                <span class="ml-stat-badge-blue">Rp {{ number_format($totalProjectedWasteValue ?? 0, 0, ',', '.') }}</span>
+    <div class="ml-kpi-grid">
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Batch berisiko</span>
+                <span class="ml-kpi-icon is-risk" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01" /><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+                </span>
             </div>
-            <div class="ml-stat-sub" style="color: var(--ml-subtle);">Saved</div>
-        </div>
-
-        {{-- Active Network Partners --}}
-        <div class="ml-stat-card">
-            <div class="ml-stat-label">Active Network Partners</div>
-            <div class="ml-stat-value" style="font-size: 26px; margin-top: 8px;">
-                {{ isset($facilitiesList) ? $facilitiesList->count() : 0 }} Health Facilities
+            <div class="ml-kpi-value">{{ number_format($atRiskCount ?? 0, 0, ',', '.') }} <span>batch</span></div>
+            <div class="ml-kpi-meta">
+                <span class="ml-kpi-emphasis">{{ $highRiskCount }} risiko tinggi</span>
+                <span class="ml-meta-dot">·</span>
+                {{ $watchRiskCount }} dipantau
             </div>
-        </div>
+        </article>
+
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Stok aktif</span>
+                <span class="ml-kpi-icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                </span>
+            </div>
+            <div class="ml-kpi-value">{{ number_format($totalUnits, 0, ',', '.') }} <span>unit</span></div>
+            <div class="ml-kpi-meta">{{ number_format($batchCollection->count(), 0, ',', '.') }} batch tercatat</div>
+        </article>
+
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Nilai berisiko</span>
+                <span class="ml-kpi-icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></svg>
+                </span>
+            </div>
+            <div class="ml-kpi-value ml-kpi-value-currency">Rp {{ number_format($totalProjectedWasteValue ?? 0, 0, ',', '.') }}</div>
+            <div class="ml-kpi-meta">Proyeksi nilai yang dapat diselamatkan</div>
+        </article>
+
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Jaringan fasilitas</span>
+                <span class="ml-kpi-icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13A4 4 0 0116 11" /></svg>
+                </span>
+            </div>
+            <div class="ml-kpi-value">{{ number_format($networkCount, 0, ',', '.') }} <span>fasilitas</span></div>
+            <div class="ml-kpi-meta">Terhubung untuk redistribusi</div>
+        </article>
     </div>
 
-    {{-- FORECAST TABLE --}}
     <section class="ml-section" aria-labelledby="forecast-title">
-        <div class="ml-section-header">
+        <div class="ml-section-header ml-section-header-split">
             <div>
-                <h2 class="ml-section-title" id="forecast-title">Prediksi Risiko Kedaluwarsa &amp; Rekomendasi Match</h2>
-                <p class="ml-section-sub">
-                    Dihitung otomatis: hari hingga kedaluwarsa dibandingkan laju pemakaian harian faskes.
-                </p>
+                <h2 class="ml-section-title" id="forecast-title">Prediksi risiko kedaluwarsa</h2>
+                <p class="ml-section-sub">Hari hingga kedaluwarsa dibandingkan laju pemakaian harian fasilitas.</p>
             </div>
+            <a href="{{ route('batches.index') }}" class="ml-section-link">Lihat semua stok</a>
         </div>
 
         <div class="ml-table-responsive">
@@ -93,14 +109,14 @@
                 </caption>
                 <thead>
                     <tr>
-                        <th scope="col">Obat &amp; Batch</th>
-                        <th scope="col" class="is-right">Stok Fisik</th>
-                        <th scope="col">Sisa Umur Batch</th>
+                        <th scope="col">Obat &amp; batch</th>
+                        <th scope="col" class="is-right">Stok fisik</th>
+                        <th scope="col">Sisa umur batch</th>
                         <th scope="col" class="is-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($batches ?? [] as $batch)
+                    @forelse($batchCollection as $batch)
                         @php
                             $daysToDeplete = is_finite($batch->days_to_deplete) ? max(0, (float) $batch->days_to_deplete) : null;
                             $daysToExpiry = max(1, (int) $batch->days_to_expiry);
@@ -108,6 +124,13 @@
                             $depletePercent = $daysToDeplete === null ? 100 : min(100, round($daysToDeplete / $timelineDays * 100, 1));
                             $expiryPercent = min(100, round($daysToExpiry / $timelineDays * 100, 1));
                             $isLowRisk = $batch->risk_level === 'LOW';
+                            $riskLabel = match ($batch->risk_level) {
+                                'CRITICAL' => 'Kritis',
+                                'HIGH' => 'Tinggi',
+                                'MEDIUM' => 'Sedang',
+                                'LOW' => 'Rendah',
+                                default => ucfirst(strtolower((string) $batch->risk_level)),
+                            };
                         @endphp
                         <tr>
                             <td>
@@ -115,7 +138,7 @@
                                 <div class="ml-cell-meta">
                                     {{ $batch->medicine->dosage_form }} &middot; {{ $batch->medicine->category }}
                                     @if($batch->medicine->requires_cold_chain)
-                                        <span class="ml-cold-chain" title="Perlu rantai dingin" aria-label="Perlu rantai dingin">
+                                        <span class="ml-cold-chain" role="img" title="Perlu rantai dingin" aria-label="Perlu rantai dingin">
                                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1"/></svg>
                                         </span>
                                     @endif
@@ -146,12 +169,12 @@
                             <td>
                                 <div class="ml-row-actions">
                                     <span class="ml-risk ml-risk-{{ strtolower($batch->risk_level) }}">
-                                        {{ $batch->risk_level }}
+                                        {{ $riskLabel }}
                                     </span>
 
                                     @if(! $user->isDinkesAuditor() && $batch->projected_waste > 0 && $batch->current_stock > 0)
                                         <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-quiet ml-btn-sm">
-                                            <span>Cari Penerima</span>
+                                            <span>Cari penerima</span>
                                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                                         </a>
                                     @else
@@ -169,13 +192,13 @@
                                     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                                     </svg>
-                                    <div class="ml-empty-title">Belum Ada Data Stok di Fasilitas Ini</div>
+                                    <div class="ml-empty-title">Belum ada data stok</div>
                                     <p class="ml-empty-copy">
-                                        Data obat yang Anda input akan langsung dianalisis oleh mesin prediksi untuk mendeteksi risiko limbah kedaluwarsa.
+                                        Data obat yang Anda input akan langsung dianalisis untuk mendeteksi risiko limbah kedaluwarsa.
                                     </p>
                                     @if(! $user->isDinkesAuditor())
                                         <a href="{{ route('batches.create') }}" class="ml-btn-primary">
-                                            Input Stok Obat Sekarang
+                                            Input stok obat
                                         </a>
                                     @endif
                                 </div>
@@ -187,12 +210,11 @@
         </div>
     </section>
 
-    {{-- MATCH RECOMMENDATIONS --}}
     @if(isset($topRiskBatch))
         <section class="ml-section ml-rec-band" aria-labelledby="match-title">
             <div class="ml-section-header">
                 <div>
-                    <h2 class="ml-section-title" id="match-title">Rekomendasi Match Redistribusi</h2>
+                    <h2 class="ml-section-title" id="match-title">Rekomendasi match redistribusi</h2>
                     <p class="ml-section-sub">
                         Kandidat untuk <strong>{{ $topRiskBatch->medicine->name }}</strong>
                         (batch {{ $topRiskBatch->batch_number }}).
@@ -233,7 +255,7 @@
 
                         @if(! $user->isDinkesAuditor())
                             <a href="{{ route('transfers.propose', $topRiskBatch) }}" class="ml-btn-primary ml-btn-sm ml-rec-cta">
-                                <span>Ajukan Transfer</span>
+                                <span>Ajukan transfer</span>
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                             </a>
                         @endif

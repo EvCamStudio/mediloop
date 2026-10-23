@@ -1,209 +1,194 @@
-@extends('layouts.mediloop', ['title' => 'Rekomendasi & Pengusulan Transfer — MediLoop'])
+@extends('layouts.mediloop', ['title' => 'Rekomendasi & Pengusulan Transfer'])
 
 @section('content')
-<div class="space-y-6">
+<div class="ml-page-admin">
+    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ route('dashboard') }}">Dashboard</a>
+        <span class="ml-breadcrumb-sep">/</span>
+        <a href="{{ route('transfers.index') }}">Redistribusi</a>
+        <span class="ml-breadcrumb-sep">/</span>
+        <span>Usulan batch {{ $batch->batch_number }}</span>
+    </nav>
 
-    <!-- Breadcrumb & Navigation -->
-    <div class="flex items-center gap-2 text-xs text-[#52627F]">
-        <a href="{{ route('dashboard') }}" class="hover:underline text-[#1D4ED8]">Dashboard</a>
-        <span>/</span>
-        <a href="{{ route('transfers.index') }}" class="hover:underline text-[#1D4ED8]">Redistribusi</a>
-        <span>/</span>
-        <span class="text-[#0B1F4B] font-semibold">Usulan Transfer Batch #{{ $batch->batch_number }}</span>
-    </div>
+    <header class="ml-page-head">
+        <div>
+            <p class="ml-page-eyebrow">Rekomendasi redistribusi</p>
+            <h1 class="ml-page-title">Cari penerima untuk {{ $batch->medicine->name }}</h1>
+            <p class="ml-page-sub">Kandidat diperingkatkan dari kebutuhan, jarak, dan kesiapan logistik.</p>
+        </div>
+    </header>
 
-    <!-- Mandatory Regulatory Disclaimer Banner (PRD Rule) -->
-    <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
-        <svg class="w-5 h-5 text-[#1D4ED8] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <div class="ml-alert ml-alert-info ml-compliance-banner" role="note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" />
+            <path d="M12 8v4m0 4h.01" />
         </svg>
-        <div class="text-xs text-[#0B1F4B] leading-relaxed">
-            <strong class="font-bold">PEMBERITAHUAN KEPATUHAN REGULASI KEFARMASIAN (PERMENKES RI):</strong>
-            Platform MediLoop bertindak murni sebagai <em>clinical decision-support system</em>. Sistem ini bukan pasar bebas atau e-commerce komersial. Seluruh pengalihan obat hibah/redistribusi antarfaskes wajib mendapatkan persetujuan tertulis dari Kepala Instalasi Farmasi faskes donor dan verifikasi penerimaan fisik oleh Kepala Faskes penerima.
+        <div>
+            <strong>Kepatuhan regulasi kefarmasian</strong>
+            <p>
+                MediLoop adalah sistem pendukung keputusan, bukan marketplace. Redistribusi tetap memerlukan
+                persetujuan Kepala Instalasi Farmasi donor dan verifikasi penerimaan fisik oleh Kepala Fasilitas penerima.
+            </p>
         </div>
     </div>
 
-    <!-- Source Batch Card -->
-    <div class="bg-white rounded-xl border border-[#DBE5F5] p-6 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#DBE5F5] gap-2">
-            <div>
-                <span class="text-xs font-mono text-[#52627F]">SUMBER OBAT DONOR</span>
-                <h2 class="text-xl font-extrabold text-[#0B1F4B]">{{ $batch->medicine->name }}</h2>
-                <span class="text-xs text-[#52627F]">{{ $batch->facility->name }} • Batch: <strong class="font-mono text-[#0B1F4B]">{{ $batch->batch_number }}</strong></span>
-            </div>
-            <div>
-                <span class="px-3 py-1 text-xs font-bold rounded bg-orange-100 text-[#D9480F] border border-orange-300">
-                    RISIKO TINGGI: {{ $batch->projected_waste }} UNIT LIMBAH TERPROYEKSI
-                </span>
-            </div>
-        </div>
+    <div class="ml-two-col">
+        <div>
+            <section class="ml-card" aria-labelledby="source-title">
+                <div class="ml-card-head ml-card-head-split">
+                    <div>
+                        <h2 class="ml-card-title" id="source-title">Batch sumber</h2>
+                        <p class="ml-card-sub">{{ $batch->facility->name }} · batch {{ $batch->batch_number }}</p>
+                    </div>
+                    <span class="ml-risk ml-risk-high">Risiko tinggi</span>
+                </div>
+                <div class="ml-card-body">
+                    <div class="ml-metric-grid">
+                        <div class="ml-metric">
+                            <span class="ml-metric-label">Stok donor</span>
+                            <span class="ml-metric-value">{{ number_format($batch->current_stock) }} <small>{{ $batch->medicine->unit }}</small></span>
+                        </div>
+                        <div class="ml-metric">
+                            <span class="ml-metric-label">Laju pakai</span>
+                            <span class="ml-metric-value">{{ $batch->daily_burn_rate }} <small>unit/hari</small></span>
+                        </div>
+                        <div class="ml-metric">
+                            <span class="ml-metric-label">Sisa kedaluwarsa</span>
+                            <span class="ml-metric-value">{{ $batch->days_to_expiry }} <small>hari</small></span>
+                        </div>
+                        <div class="ml-metric is-risk">
+                            <span class="ml-metric-label">Proyeksi terbuang</span>
+                            <span class="ml-metric-value">{{ number_format($batch->projected_waste) }} <small>unit</small></span>
+                        </div>
+                    </div>
+                    <p class="ml-help">
+                        Proyeksi limbah dihitung dari selisih stok dan laju pemakaian sampai tanggal kedaluwarsa.
+                    </p>
+                </div>
+            </section>
 
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 text-xs font-mono">
-            <div class="p-3 bg-slate-50 rounded-lg">
-                <span class="text-[#52627F] block">Stok Aktif Donor:</span>
-                <span class="text-base font-bold text-[#0B1F4B]">{{ number_format($batch->current_stock) }} {{ $batch->medicine->unit }}</span>
-            </div>
-            <div class="p-3 bg-slate-50 rounded-lg">
-                <span class="text-[#52627F] block">Burn Rate Donor:</span>
-                <span class="text-base font-bold text-[#0B1F4B]">{{ $batch->daily_burn_rate }} unit/hari</span>
-            </div>
-            <div class="p-3 bg-slate-50 rounded-lg">
-                <span class="text-[#52627F] block">Sisa Waktu Expiry:</span>
-                <span class="text-base font-bold text-[#D9480F]">{{ $batch->days_to_expiry }} hari</span>
-            </div>
-            <div class="p-3 bg-slate-50 rounded-lg">
-                <span class="text-[#52627F] block">Proyeksi Terbuang:</span>
-                <span class="text-base font-bold text-[#D9480F]">{{ $batch->projected_waste }} unit ({{ round($batch->waste_ratio * 100, 1) }}%)</span>
-            </div>
-        </div>
-    </div>
+            <section class="ml-card" aria-labelledby="candidates-title">
+                <div class="ml-card-head ml-card-head-split">
+                    <div>
+                        <h2 class="ml-card-title" id="candidates-title">Kandidat penerima</h2>
+                        <p class="ml-card-sub">50% kebutuhan · 30% jarak udara · 20% logistik</p>
+                    </div>
+                    <span class="ml-tab-count">{{ count($candidates) }} faskes</span>
+                </div>
 
-    <!-- Candidate Matching Algorithm Results (50% Need + 30% Proximity + 20% Logistics) -->
-    <div class="bg-white rounded-xl border border-[#DBE5F5] shadow-xs overflow-hidden">
-        <div class="p-5 border-b border-[#DBE5F5] flex items-center justify-between">
-            <div>
-                <h3 class="text-base font-bold text-[#0B1F4B]">Rekomendasi Kandidat Faskes Penerima (Scoring Model)</h3>
-                <p class="text-xs text-[#52627F]">
-                    Peringkat dihitung berdasarkan: <strong class="text-[#0B1F4B]">50% Kebutuhan Riil + 30% Jarak Haversine + 20% Logistik/Cold-Chain</strong>.
-                </p>
-            </div>
-            <span class="px-2.5 py-1 text-xs font-medium text-[#1D4ED8] bg-[#EAF1FF] rounded border border-blue-200">
-                {{ count($candidates) }} Faskes Teranalisis
-            </span>
-        </div>
+                <div class="ml-sort-row" role="group" aria-label="Urutkan kandidat">
+                    <a
+                        href="{{ route('transfers.propose', ['batch' => $batch, 'sort' => 'score']) }}"
+                        class="ml-sort-pill {{ $sort === 'score' ? 'is-active' : '' }}"
+                        @if($sort === 'score') aria-current="true" @endif
+                    >Skor terbaik</a>
+                    <a
+                        href="{{ route('transfers.propose', ['batch' => $batch, 'sort' => 'distance']) }}"
+                        class="ml-sort-pill {{ $sort === 'distance' ? 'is-active' : '' }}"
+                        @if($sort === 'distance') aria-current="true" @endif
+                    >Terdekat</a>
+                    <span class="ml-sort-note">Jarak udara (Haversine), bukan jarak tempuh jalan.</span>
+                </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
-                <thead>
-                    <tr class="bg-slate-50 border-b border-[#DBE5F5] text-[#52627F] uppercase tracking-wider text-[11px]">
-                        <th class="py-3 px-4">Peringkat & Faskes Penerima</th>
-                        <th class="py-3 px-4 text-right font-mono">Jarak (Haversine)</th>
-                        <th class="py-3 px-4 text-center">Bobot Kebutuhan (50%)</th>
-                        <th class="py-3 px-4 text-center">Bobot Jarak (30%)</th>
-                        <th class="py-3 px-4 text-center">Bobot Logistik (20%)</th>
-                        <th class="py-3 px-4 text-right font-mono">Match Score</th>
-                        <th class="py-3 px-4 text-right font-mono">Batas Serapan (Cap)</th>
-                        <th class="py-3 px-4 text-right">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-[#DBE5F5]">
-                    @foreach($candidates as $index => $c)
-                        <tr class="hover:bg-blue-50/40 transition {{ $index === 0 ? 'bg-blue-50/20' : '' }}">
-                            <td class="py-3 px-4">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] {{ $index === 0 ? 'bg-[#1D4ED8] text-white' : 'bg-slate-200 text-slate-700' }}">
-                                        {{ $index + 1 }}
-                                    </span>
-                                    <div>
-                                        <div class="font-bold text-[#0B1F4B]">{{ $c['facility']->name }}</div>
-                                        <div class="text-[11px] text-[#52627F]">{{ $c['facility']->type }} • {{ $c['facility']->address }}</div>
+                @if(count($candidates) === 0)
+                    <div class="ml-empty-state">
+                        <p class="ml-empty-title">Belum ada kandidat penerima</p>
+                        <p class="ml-empty-copy">Tidak ada fasilitas yang memenuhi syarat rantai dingin dan jarak saat ini.</p>
+                    </div>
+                @else
+                    <ol class="ml-candidate-list">
+                        @foreach($candidates as $index => $candidate)
+                            <li class="ml-candidate {{ $index === 0 ? 'is-top' : '' }}">
+                                <div class="ml-candidate-rank" aria-hidden="true">{{ $index + 1 }}</div>
+                                <div class="ml-candidate-copy">
+                                    <div class="ml-candidate-name">{{ $candidate['facility']->name }}</div>
+                                    <div class="ml-cell-meta">
+                                        {{ \App\Enums\FacilityType::tryFrom($candidate['facility']->type)?->label() ?? $candidate['facility']->type }}
+                                        <span class="ml-meta-dot">·</span>
+                                        {{ $candidate['facility']->city ?? $candidate['facility']->address }}
+                                    </div>
+                                    <div class="ml-candidate-metrics">
+                                        <span>Kebutuhan <strong>{{ $candidate['need_score'] }}%</strong></span>
+                                        <span>Jarak <strong>{{ $candidate['proximity_score'] }}%</strong></span>
+                                        <span>Logistik <strong>{{ $candidate['logistics_score'] }}%</strong></span>
+                                        <span>Kapasitas <strong>{{ $candidate['recipient_intake_cap'] }} unit</strong></span>
                                     </div>
                                 </div>
-                            </td>
-
-                            <td class="py-3 px-4 text-right font-mono font-semibold text-[#0B1F4B]">
-                                {{ $c['distance_km'] }} km
-                            </td>
-
-                            <td class="py-3 px-4 text-center font-mono">
-                                <span class="px-2 py-0.5 rounded text-[11px] font-semibold {{ $c['need_score'] >= 80 ? 'bg-orange-100 text-[#D9480F]' : 'bg-slate-100 text-slate-700' }}">
-                                    {{ $c['need_score'] }}%
-                                </span>
-                            </td>
-
-                            <td class="py-3 px-4 text-center font-mono">
-                                <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-[#1D4ED8]">
-                                    {{ $c['proximity_score'] }}%
-                                </span>
-                            </td>
-
-                            <td class="py-3 px-4 text-center font-mono">
-                                <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-100 text-[#0B1F4B]">
-                                    {{ $c['logistics_score'] }}%
-                                </span>
-                            </td>
-
-                            <td class="py-3 px-4 text-right font-mono font-extrabold text-sm text-[#1D4ED8]">
-                                {{ $c['match_score'] }}%
-                            </td>
-
-                            <td class="py-3 px-4 text-right font-mono">
-                                <span class="font-bold text-[#0B1F4B]">{{ $c['recipient_intake_cap'] }} unit</span>
-                                <span class="block text-[10px] text-[#52627F]">Bakar: {{ $c['recipient_daily_burn_rate'] }}/hari</span>
-                            </td>
-
-                            <td class="py-3 px-4 text-right">
-                                <button type="button" 
-                                    onclick="selectCandidate({{ $c['facility']->id }}, '{{ addslashes($c['facility']->name) }}', {{ $c['recommended_quantity'] }})"
-                                    class="px-3 py-1.5 text-xs font-semibold rounded text-white bg-[#1D4ED8] hover:bg-blue-800 transition">
-                                    Pilih Faskes
-                                </button>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                                <div class="ml-candidate-side">
+                                    <div class="ml-candidate-score">{{ $candidate['match_score'] }}%</div>
+                                    <div class="ml-cell-meta">{{ $candidate['distance_km'] }} km</div>
+                                    <button
+                                        type="button"
+                                        class="ml-btn-primary ml-btn-sm"
+                                        onclick="selectCandidate({{ $candidate['facility']->id }}, '{{ addslashes($candidate['facility']->name) }}', {{ $candidate['recommended_quantity'] }})"
+                                    >Pilih</button>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ol>
+                @endif
+            </section>
         </div>
-    </div>
 
-    <!-- Proposal Submission Form -->
-    <div id="proposalForm" class="bg-white rounded-xl border border-[#DBE5F5] p-6 shadow-xs">
-        <h3 class="text-base font-bold text-[#0B1F4B] mb-2">Formulir Pengusulan Transfer Hibah</h3>
-        <p class="text-xs text-[#52627F] mb-6">Usulan ini akan diajukan ke Kepala Instalasi Farmasi untuk mendapatkan otorisasi pengeluaran resmi.</p>
+        <aside>
+            <form method="POST" action="{{ route('transfers.store') }}" class="ml-card ml-sticky" id="proposalForm" novalidate>
+                @csrf
+                <input type="hidden" name="batch_id" value="{{ $batch->id }}">
+                <input type="hidden" id="selectedFacilityId" name="recipient_facility_id" value="{{ $candidates[0]['facility']->id ?? '' }}">
 
-        <form method="POST" action="{{ route('transfers.store') }}" class="space-y-4">
-            @csrf
-            <input type="hidden" name="batch_id" value="{{ $batch->id }}">
-            <input type="hidden" id="selectedFacilityId" name="recipient_facility_id" value="{{ $candidates[0]['facility']->id ?? '' }}">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Selected Recipient Facility -->
-                <div>
-                    <label class="block text-xs font-bold text-[#0B1F4B] mb-1">Fasilitas Penerima Terpilih:</label>
-                    <input type="text" id="selectedFacilityName" readonly value="{{ $candidates[0]['facility']->name ?? '' }}" class="w-full px-3 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-semibold text-[#0B1F4B]">
+                <div class="ml-card-head">
+                    <h2 class="ml-card-title">Ajukan transfer</h2>
+                    <p class="ml-card-sub">Usulan diteruskan ke Kepala Instalasi Farmasi donor.</p>
                 </div>
+                <div class="ml-card-body">
+                    @if($errors->any())
+                        <div class="ml-alert ml-alert-error" role="alert">
+                            <ul>
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-                <!-- Transfer Quantity -->
-                <div>
-                    <label for="quantity" class="block text-xs font-bold text-[#0B1F4B] mb-1">Jumlah Unit yang Diredistribusikan:</label>
-                    <div class="relative">
-                        <input type="number" id="quantity" name="quantity" min="1" max="{{ $batch->current_stock }}" value="{{ $candidates[0]['recommended_quantity'] ?? 100 }}" class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none" required>
-                        <span class="absolute right-3 top-2 text-xs text-[#52627F]">{{ $batch->medicine->unit }}</span>
+                    <div class="ml-field">
+                        <label for="selectedFacilityName" class="ml-label">Fasilitas penerima</label>
+                        <input type="text" id="selectedFacilityName" readonly value="{{ $candidates[0]['facility']->name ?? '' }}" class="ml-input">
                     </div>
-                    <span class="text-[11px] text-[#52627F] block mt-1">Maksimal stok tersedia di donor: {{ $batch->current_stock }} unit.</span>
+
+                    <div class="ml-field">
+                        <label for="quantity" class="ml-label">Jumlah unit <span class="ml-required">*</span></label>
+                        <input type="number" id="quantity" name="quantity" min="1" max="{{ $batch->current_stock }}" value="{{ $candidates[0]['recommended_quantity'] ?? 100 }}" class="ml-input is-mono" required>
+                        <p class="ml-help">Maksimal {{ number_format($batch->current_stock) }} {{ $batch->medicine->unit }} tersedia di donor.</p>
+                    </div>
+
+                    <div class="ml-field">
+                        <label for="notes" class="ml-label">Catatan justifikasi</label>
+                        <textarea id="notes" name="notes" class="ml-textarea" rows="4" placeholder="Jelaskan kebutuhan penerima dan alasan redistribusi.">Pengusulan redistribusi surplus stok {{ $batch->medicine->name }} untuk mencegah pemusnahan obat kedaluwarsa dan mendukung ketersediaan di fasilitas sekitar.</textarea>
+                    </div>
+
+                    <div class="ml-action-row">
+                        <span class="ml-help">Pengusul: <strong>{{ $user->name }}</strong></span>
+                        <button type="submit" class="ml-btn-primary">
+                            Ajukan transfer
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        </button>
+                    </div>
                 </div>
-            </div>
-
-            <!-- Notes & Justification -->
-            <div>
-                <label for="notes" class="block text-xs font-bold text-[#0B1F4B] mb-1">Catatan Justifikasi Klinis & Logistik:</label>
-                <textarea id="notes" name="notes" rows="2" class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none" placeholder="Contoh: Redistribusi untuk mengatasi lonjakan kasus infeksi dan mencegah kedaluwarsa sekunder.">Pengusulan redistribusi surplus stok Ceftriaxone untuk mencegah pemusnahan obat kedaluwarsa dan mendukung ketersediaan obat di puskesmas sekitar.</textarea>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="pt-4 border-t border-[#DBE5F5] flex items-center justify-between">
-                <span class="text-xs text-[#52627F]">
-                    Pengusul: <strong class="text-[#0B1F4B]">{{ $user->name }}</strong> ({{ $user->job_title }})
-                </span>
-
-                <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition inline-flex items-center gap-1.5">
-                    <span>Ajukan Permohonan Transfer</span>
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                </button>
-            </div>
-        </form>
+            </form>
+        </aside>
     </div>
-
 </div>
+@endsection
 
+@section('scripts')
 <script>
     function selectCandidate(facilityId, facilityName, recommendedQty) {
         document.getElementById('selectedFacilityId').value = facilityId;
         document.getElementById('selectedFacilityName').value = facilityName;
         document.getElementById('quantity').value = recommendedQty;
-        document.getElementById('proposalForm').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('proposalForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('quantity').focus({ preventScroll: true });
     }
 </script>
 @endsection

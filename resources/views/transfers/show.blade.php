@@ -1,312 +1,368 @@
-@extends('layouts.mediloop', ['title' => 'Lacak Alur Transfer #' . $transfer->transfer_code . ' — MediLoop'])
+@extends('layouts.mediloop', ['title' => 'Lacak Transfer #' . $transfer->transfer_code])
 
 @section('content')
-<div class="space-y-6">
+@php
+    $statusLabels = [
+        'PROPOSED' => ['label' => 'Menunggu otorisasi donor', 'tone' => 'pending'],
+        'APPROVED' => ['label' => 'Menunggu kesediaan penerima', 'tone' => 'active'],
+        'ACCEPTED' => ['label' => 'Siap kirim', 'tone' => 'active'],
+        'IN_TRANSIT' => ['label' => 'Dalam pengiriman', 'tone' => 'transit'],
+        'COMPLETED' => ['label' => 'Selesai', 'tone' => 'inactive'],
+        'CANCELLED' => ['label' => 'Dibatalkan', 'tone' => 'suspended'],
+    ];
+    $statusMeta = $statusLabels[$transfer->status] ?? ['label' => $transfer->status, 'tone' => 'inactive'];
+    $stages = [
+        'PROPOSED' => ['label' => 'Pengusulan', 'time' => $transfer->proposed_at],
+        'APPROVED' => ['label' => 'Otorisasi donor', 'time' => $transfer->approved_at],
+        'ACCEPTED' => ['label' => 'Kesediaan penerima', 'time' => $transfer->accepted_at],
+        'IN_TRANSIT' => ['label' => 'Pengiriman', 'time' => $transfer->shipped_at],
+        'COMPLETED' => ['label' => 'Penerimaan & mutasi', 'time' => $transfer->completed_at],
+    ];
+    $statusOrder = ['PROPOSED' => 1, 'APPROVED' => 2, 'ACCEPTED' => 3, 'IN_TRANSIT' => 4, 'COMPLETED' => 5];
+    $currentRank = $statusOrder[$transfer->status] ?? 0;
+    $isDonorStaff = $user->isSysadmin() || $user->facility_id === $transfer->donor_facility_id;
+    $isRecipientStaff = $user->isSysadmin() || $user->facility_id === $transfer->recipient_facility_id;
+    $canApprove = $isDonorStaff && $user->canApproveDonorTransfer();
+    $canAccept = $isRecipientStaff && $user->canAcceptRecipientTransfer();
+    $canDispatch = $user->isSysadmin() || ($user->facility_id === $transfer->donor_facility_id && $user->hasFacilityRole());
+    $canComplete = $isRecipientStaff && $user->canConfirmPhysicalArrival();
+    $canCancel = $transfer->status !== 'COMPLETED'
+        && $transfer->status !== 'CANCELLED'
+        && ($user->isSysadmin() || in_array($user->facility_id, [$transfer->donor_facility_id, $transfer->recipient_facility_id], true));
+@endphp
 
-    <!-- Header Navigation & Code -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#DBE5F5] gap-4">
-        <div>
-            <div class="flex items-center gap-2 text-xs text-[#52627F] mb-1">
-                <a href="{{ route('transfers.index') }}" class="hover:underline text-[#1D4ED8]">&larr; Kembali ke Daftar</a>
-                <span>/</span>
-                <span class="font-mono">{{ $transfer->transfer_code }}</span>
-            </div>
-            <h1 class="text-2xl font-extrabold text-[#0B1F4B]">Alur Redistribusi Hibah Antarfaskes</h1>
-        </div>
+<div class="ml-page-admin">
+    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ route('dashboard') }}">Dashboard</a>
+        <span class="ml-breadcrumb-sep">/</span>
+        <a href="{{ route('transfers.index') }}">Redistribusi</a>
+        <span class="ml-breadcrumb-sep">/</span>
+        <span>{{ $transfer->transfer_code }}</span>
+    </nav>
 
-        <div>
-            @if($transfer->status === 'PROPOSED')
-                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-100 text-[#B7791F] border border-amber-300">
-                    [MENUNGGU OTORISASI DONOR]
-                </span>
-            @elseif($transfer->status === 'APPROVED')
-                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-100 text-[#1D4ED8] border border-blue-300">
-                    [MENUNGGU KESEDIAAN PENERIMA]
-                </span>
-            @elseif($transfer->status === 'ACCEPTED')
-                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-100 text-[#1D4ED8] border border-blue-300">
-                    [SIAP KIRIM]
-                </span>
-            @elseif($transfer->status === 'IN_TRANSIT')
-                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-100 text-purple-800 border border-purple-300">
-                    [DALAM PERJALANAN / KURIR]
-                </span>
-            @elseif($transfer->status === 'COMPLETED')
-                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-[#0B1F4B] border border-slate-300">
-                    [SELESAI: STOK TERMUTASI]
-                </span>
-            @elseif($transfer->status === 'CANCELLED')
-                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-red-100 text-[#D9480F] border border-red-300">
-                    [DIBATALKAN]
-                </span>
-            @endif
-        </div>
-    </div>
+    @if(session('status'))
+        <div class="ml-alert ml-alert-success" role="status">{{ session('status') }}</div>
+    @endif
 
-    <!-- 5-Stage Visual Progress Tracker -->
-    <div class="bg-white rounded-xl border border-[#DBE5F5] p-6 shadow-xs">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-[#52627F] mb-6">Tahapan Alur State Machine:</h3>
-        
-        @php
-            $stages = [
-                'PROPOSED' => ['num' => 1, 'label' => '1. Pengusulan', 'time' => $transfer->proposed_at],
-                'APPROVED' => ['num' => 2, 'label' => '2. Otorisasi Donor', 'time' => $transfer->approved_at],
-                'ACCEPTED' => ['num' => 3, 'label' => '3. Kesediaan Penerima', 'time' => $transfer->accepted_at],
-                'IN_TRANSIT' => ['num' => 4, 'label' => '4. Pengiriman', 'time' => $transfer->shipped_at],
-                'COMPLETED' => ['num' => 5, 'label' => '5. Penerimaan & Mutasi', 'time' => $transfer->completed_at],
-            ];
-            $statusOrder = ['PROPOSED' => 1, 'APPROVED' => 2, 'ACCEPTED' => 3, 'IN_TRANSIT' => 4, 'COMPLETED' => 5, 'CANCELLED' => 0];
-            $currentRank = $statusOrder[$transfer->status] ?? 0;
-        @endphp
-
-        <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
-            @foreach($stages as $statusKey => $stage)
-                @php
-                    $isDone = $currentRank >= $stage['num'];
-                    $isCurrent = $transfer->status === $statusKey;
-                @endphp
-                <div class="p-3 rounded-lg border {{ $isCurrent ? 'bg-blue-50 border-[#1D4ED8] ring-1 ring-[#1D4ED8]' : ($isDone ? 'bg-slate-50 border-slate-300' : 'bg-slate-50/40 border-slate-200 opacity-60') }}">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-xs font-bold {{ $isCurrent ? 'text-[#1D4ED8]' : ($isDone ? 'text-[#0B1F4B]' : 'text-slate-400') }}">
-                            {{ $stage['label'] }}
-                        </span>
-                        @if($isDone)
-                            <svg class="w-4 h-4 text-[#1D4ED8]" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                            </svg>
-                        @endif
-                    </div>
-                    <span class="text-[10px] text-[#52627F] font-mono block">
-                        {{ $stage['time'] ? $stage['time']->format('d M, H:i') : 'Menunggu' }}
-                    </span>
-                </div>
-            @endforeach
-        </div>
-    </div>
-
-    <!-- The Non-Destructive Ledger Invariant Banner -->
-    @if($transfer->status !== 'COMPLETED')
-        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-            <svg class="w-5 h-5 text-[#B7791F] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            <div class="text-xs text-[#0B1F4B] leading-relaxed">
-                <strong class="font-bold text-[#B7791F]">INVARIAN SISTEM AKTIF:</strong>
-                Stok fisik pada fasilitas donor ({{ $transfer->donorFacility->name }}) <strong>belum dipotong</strong> dan masih tercatat utuh. Mutasi saldo persediaan donor dan penerima HANYA akan dieksekusi secara atomik saat faskes penerima melakukan <em>Konfirmasi Penerimaan Fisik</em>.
-            </div>
-        </div>
-    @else
-        <div class="p-4 bg-slate-100 border border-slate-300 rounded-xl flex items-start gap-3">
-            <svg class="w-5 h-5 text-[#0B1F4B] shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div class="text-xs text-[#0B1F4B] leading-relaxed">
-                <strong class="font-bold text-[#0B1F4B]">INVARIAN BERHASIL DIEKSEKUSI:</strong>
-                Stok fisik sejumlah <strong>{{ $transfer->quantity }} {{ $transfer->batch->medicine->unit }}</strong> telah secara resmi dipotong dari {{ $transfer->donorFacility->name }} dan ditambahkan ke inventaris aktif {{ $transfer->recipientFacility->name }} pada {{ $transfer->completed_at->format('d M Y, H:i') }}.
-            </div>
+    @if($errors->any())
+        <div class="ml-alert ml-alert-error" role="alert">
+            <strong>Periksa kembali isian berikut:</strong>
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
-    <!-- Context-Aware Dynamic Action Controls -->
-    @if($transfer->status !== 'COMPLETED' && $transfer->status !== 'CANCELLED')
-        <div class="bg-white rounded-xl border-2 border-blue-200 p-6 shadow-sm">
-            <div class="flex items-center justify-between pb-4 border-b border-[#DBE5F5] mb-4">
-                <div>
-                    <h3 class="text-base font-bold text-[#0B1F4B]">Tindakan Otorisasi Tahap Ini</h3>
-                    <p class="text-xs text-[#52627F]">
-                        Status pengguna aktif: <strong class="text-[#0B1F4B]">{{ $user->name }}</strong> ({{ $user->job_title }})
-                    </p>
-                </div>
-                <span class="text-xs font-mono text-[#1D4ED8]">Peran: {{ $user->role }}</span>
-            </div>
-
-            <!-- Action 1: Donor Approver (Head of Pharmacy) Approves Proposed Transfer -->
-            @if($transfer->status === 'PROPOSED')
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <p class="text-xs text-[#52627F]">
-                        Menunggu verifikasi dan tanda tangan persetujuan resmi dari Kepala Instalasi Farmasi faskes donor.
-                    </p>
-                    @if($user->canApproveDonorTransfer() || $user->isDinkesAuditor())
-                        <form method="POST" action="{{ route('transfers.approve', $transfer) }}">
-                            @csrf
-                            <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
-                                Setujui Pengeluaran Obat Resmi (Approve)
-                            </button>
-                        </form>
-                    @else
-                        <span class="px-3 py-1.5 text-xs font-medium rounded bg-slate-100 text-slate-500 italic">
-                            Hanya Kepala Farmasi Donor yang berwenang menyetujui. (Gunakan switcher demo di kanan bawah)
-                        </span>
-                    @endif
-                </div>
-            @endif
-
-            <!-- Action 2: Recipient Accepts Transfer -->
-            @if($transfer->status === 'APPROVED')
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <p class="text-xs text-[#52627F]">
-                        Donor telah menyetujui. Menunggu konfirmasi kesediaan menerima alokasi dari pihak faskes penerima.
-                    </p>
-                    @if($user->canAcceptRecipientTransfer() || $user->isDinkesAuditor())
-                        <form method="POST" action="{{ route('transfers.accept', $transfer) }}">
-                            @csrf
-                            <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
-                                Konfirmasi Kesediaan Menerima Alokasi (Accept)
-                            </button>
-                        </form>
-                    @else
-                        <span class="px-3 py-1.5 text-xs font-medium rounded bg-slate-100 text-slate-500 italic">
-                            Hanya Apoteker/Kepala Penerima yang berwenang. (Gunakan switcher demo di kanan bawah)
-                        </span>
-                    @endif
-                </div>
-            @endif
-
-            <!-- Action 3: Dispatch Shipment (Input Courier & Tracking) -->
-            @if($transfer->status === 'ACCEPTED')
-                <form method="POST" action="{{ route('transfers.dispatch', $transfer) }}" class="space-y-4">
-                    @csrf
-                    <p class="text-xs text-[#52627F]">
-                        Faskes penerima siap menerima. Masukkan rincian kurir pengiriman berizin untuk memberangkatkan obat:
-                    </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label for="courier_type" class="block text-xs font-bold text-[#0B1F4B] mb-1">Jenis Kurir / Transportasi:</label>
-                            <input type="text" id="courier_type" name="courier_type" value="Kurir Khusus Farmasi Berpendingin (Cold-Box)" class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs" required>
-                        </div>
-                        <div>
-                            <label for="tracking_number" class="block text-xs font-bold text-[#0B1F4B] mb-1">Nomor Resi / Surat Jalan Ekspedisi:</label>
-                            <input type="text" id="tracking_number" name="tracking_number" value="EXP-DKI-{{ rand(1000, 9999) }}" class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-mono" required>
-                        </div>
-                    </div>
-                    <div class="flex justify-end">
-                        <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-purple-700 hover:bg-purple-800 rounded-lg shadow-xs transition">
-                            Berangkatkan Pengiriman Obat (Dispatch)
-                        </button>
-                    </div>
-                </form>
-            @endif
-
-            <!-- Action 4: Confirm Physical Arrival & Complete (Atomic Stock Mutation) -->
-            @if($transfer->status === 'IN_TRANSIT')
-                <div class="p-4 bg-purple-50 border border-purple-200 rounded-lg space-y-3">
-                    <div class="flex items-center justify-between text-xs">
-                        <span class="font-bold text-purple-900">Obat Sedang Dalam Perjalanan Kurir:</span>
-                        <span class="font-mono text-purple-800">Resi: {{ $transfer->tracking_number }} ({{ $transfer->courier_type }})</span>
-                    </div>
-                    <p class="text-xs text-[#52627F]">
-                        Fisik obat telah tiba di fasilitas penerima? Kepala Faskes Penerima wajib memeriksa kondisi fisik, segel kemasan, dan suhu dingin sebelum konfirmasi.
-                    </p>
-                    <div class="flex justify-end pt-2">
-                        @if($user->canConfirmPhysicalArrival() || $user->isDinkesAuditor())
-                            <form method="POST" action="{{ route('transfers.complete', $transfer) }}">
-                                @csrf
-                                <button type="submit" class="px-5 py-2.5 text-xs font-bold text-white bg-[#0B1F4B] hover:bg-blue-900 rounded-lg shadow-xs transition">
-                                    Konfirmasi Penerimaan Fisik & Mutasi Stok Otomatis
-                                </button>
-                            </form>
-                        @else
-                            <span class="px-3 py-1.5 text-xs font-medium rounded bg-slate-100 text-slate-500 italic">
-                                Hanya Kepala Faskes Penerima yang berwenang menyelesaikan penerimaan fisik.
-                            </span>
-                        @endif
-                    </div>
-                </div>
-            @endif
+    <div class="ml-alert ml-alert-info ml-compliance-banner" role="note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" />
+            <path d="M12 8v4m0 4h.01" />
+        </svg>
+        <div>
+            <strong>Kepatuhan regulasi kefarmasian</strong>
+            <p>
+                MediLoop adalah sistem pendukung keputusan, bukan marketplace. Setiap otorisasi transfer
+                tetap memerlukan persetujuan petugas berwenang dan verifikasi penerimaan fisik.
+            </p>
         </div>
-    @endif
+    </div>
 
-    <!-- Transfer Logistics & Clinical Details -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Card 1: Medicine & Facilities -->
-        <div class="bg-white rounded-xl border border-[#DBE5F5] p-6 shadow-xs space-y-4">
-            <h3 class="text-sm font-bold text-[#0B1F4B] pb-3 border-b border-[#DBE5F5]">Informasi Obat & Logistik</h3>
-            
-            <div class="space-y-2.5 text-xs">
-                <div class="flex justify-between">
-                    <span class="text-[#52627F]">Nama Obat:</span>
-                    <span class="font-bold text-[#0B1F4B]">{{ $transfer->batch->medicine->name }}</span>
+    <header class="ml-passport">
+        <div class="ml-passport-main">
+            <span class="ml-passport-mark" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M4 7h12l3 3-3 3H4" />
+                    <path d="M20 17H8l-3-3 3-3" />
+                </svg>
+            </span>
+            <div class="ml-passport-copy">
+                <p class="ml-passport-eyebrow">Transfer obat · {{ $transfer->transfer_code }}</p>
+                <div class="ml-passport-title-row">
+                    <h1 class="ml-page-title">{{ $transfer->batch->medicine->name }}</h1>
+                    <span class="ml-status ml-status-{{ $statusMeta['tone'] }}">{{ $statusMeta['label'] }}</span>
                 </div>
-                <div class="flex justify-between font-mono">
-                    <span class="text-[#52627F]">Nomor Batch:</span>
-                    <span class="font-bold text-[#0B1F4B]">{{ $transfer->batch->batch_number }}</span>
-                </div>
-                <div class="flex justify-between font-mono">
-                    <span class="text-[#52627F]">Jumlah Dihibahkan:</span>
-                    <span class="font-bold text-[#1D4ED8]">{{ number_format($transfer->quantity) }} {{ $transfer->batch->medicine->unit }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-[#52627F]">Faskes Donor:</span>
-                    <span class="font-semibold text-[#0B1F4B]">{{ $transfer->donorFacility->name }}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-[#52627F]">Faskes Penerima:</span>
-                    <span class="font-semibold text-[#1D4ED8]">{{ $transfer->recipientFacility->name }}</span>
-                </div>
-                <div class="flex justify-between font-mono">
-                    <span class="text-[#52627F]">Jarak Tempuh:</span>
-                    <span class="font-bold text-[#0B1F4B]">{{ $transfer->distance_km }} km</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card 2: Scoring Weights & Safeguard Cap -->
-        <div class="bg-white rounded-xl border border-[#DBE5F5] p-6 shadow-xs space-y-4">
-            <h3 class="text-sm font-bold text-[#0B1F4B] pb-3 border-b border-[#DBE5F5]">Hasil Penilaian Matching & Safeguard Cap</h3>
-            
-            <div class="space-y-2.5 text-xs">
-                <div class="flex justify-between font-mono">
-                    <span class="text-[#52627F]">Skor Kebutuhan Riil (50%):</span>
-                    <span class="font-bold text-[#0B1F4B]">{{ $transfer->need_score }}%</span>
-                </div>
-                <div class="flex justify-between font-mono">
-                    <span class="text-[#52627F]">Skor Jarak Haversine (30%):</span>
-                    <span class="font-bold text-[#0B1F4B]">{{ $transfer->proximity_score }}%</span>
-                </div>
-                <div class="flex justify-between font-mono">
-                    <span class="text-[#52627F]">Skor Kesiapan Logistik (20%):</span>
-                    <span class="font-bold text-[#0B1F4B]">{{ $transfer->logistics_score }}%</span>
-                </div>
-                <div class="flex justify-between font-mono pt-2 border-t border-[#DBE5F5]">
-                    <span class="font-bold text-[#0B1F4B]">Skor Kecocokan Komposit:</span>
-                    <span class="font-extrabold text-sm text-[#1D4ED8]">{{ $transfer->match_score }}%</span>
-                </div>
-                <div class="flex justify-between font-mono pt-2 border-t border-[#DBE5F5]">
-                    <span class="text-[#52627F]">Batas Serapan Penerima (Cap):</span>
-                    <span class="font-bold text-[#0B1F4B]">{{ $transfer->recipient_intake_cap }} unit</span>
-                </div>
-                <p class="text-[10px] text-[#52627F] leading-tight">
-                    *Batas serapan menjamin bahwa faskes penerima memiliki kecepatan pakai cukup untuk menghabiskan obat sebelum batas kedaluwarsa.
+                <p class="ml-passport-meta">
+                    {{ number_format($transfer->quantity) }} {{ $transfer->batch->medicine->unit }}
+                    <span class="ml-meta-dot">·</span>
+                    Diajukan {{ $transfer->created_at->format('d M Y, H:i') }}
+                    <span class="ml-meta-dot">·</span>
+                    Skor {{ $transfer->match_score }}%
                 </p>
             </div>
         </div>
-    </div>
-
-    <!-- Immutable Audit Trail History for this Transfer -->
-    <div class="bg-white rounded-xl border border-[#DBE5F5] shadow-xs overflow-hidden">
-        <div class="p-4 border-b border-[#DBE5F5] bg-slate-50">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-[#0B1F4B]">Log Audit & Bukti Riwayat Otorisasi</h3>
+        <div class="ml-passport-actions">
+            <a href="{{ route('transfers.index') }}" class="ml-btn-quiet">Kembali ke daftar</a>
         </div>
-        <div class="divide-y divide-[#DBE5F5] text-xs">
-            @forelse($transfer->auditLogs as $log)
-                <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+    </header>
+
+    <section class="ml-card" aria-labelledby="progress-title">
+        <div class="ml-card-head ml-card-head-split">
+            <div>
+                <h2 class="ml-card-title" id="progress-title">Progres transfer</h2>
+                <p class="ml-card-sub">Setiap tahap memerlukan otorisasi pihak yang berwenang.</p>
+            </div>
+            <span class="ml-card-index" aria-hidden="true">5 TAHAP</span>
+        </div>
+        <div class="ml-card-body">
+            <ol class="ml-transfer-stages">
+                @foreach($stages as $statusKey => $stage)
+                    @php
+                        $stageRank = $statusOrder[$statusKey];
+                        $isDone = $currentRank >= $stageRank;
+                        $isCurrent = $transfer->status === $statusKey;
+                    @endphp
+                    <li class="ml-transfer-stage {{ $isDone ? 'is-done' : '' }} {{ $isCurrent ? 'is-current' : '' }}">
+                        <span class="ml-transfer-stage-dot" aria-hidden="true">
+                            @if($isDone)
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5" /></svg>
+                            @else
+                                {{ $loop->iteration }}
+                            @endif
+                        </span>
+                        <span class="ml-transfer-stage-copy">
+                            <span class="ml-transfer-stage-label">{{ $stage['label'] }}</span>
+                            <span class="ml-transfer-stage-time">{{ $stage['time'] ? $stage['time']->format('d M Y, H:i') : 'Menunggu' }}</span>
+                        </span>
+                    </li>
+                @endforeach
+            </ol>
+        </div>
+    </section>
+
+    <div class="ml-two-col">
+        <div>
+            @if($transfer->status !== 'COMPLETED')
+                <div class="ml-alert ml-alert-warning ml-invariant-note" role="status">
+                    <strong>Stok donor belum dipotong</strong>
+                    <p>
+                        Mutasi stok donor dan penerima hanya dijalankan saat penerima mengonfirmasi
+                        penerimaan fisik. Sebelum tahap itu, stok donor tetap utuh.
+                    </p>
+                </div>
+            @else
+                <div class="ml-alert ml-alert-success ml-invariant-note" role="status">
+                    <strong>Mutasi stok selesai</strong>
+                    <p>
+                        {{ number_format($transfer->quantity) }} {{ $transfer->batch->medicine->unit }}
+                        telah dipotong dari {{ $transfer->donorFacility->name }} dan ditambahkan ke
+                        {{ $transfer->recipientFacility->name }} pada {{ $transfer->completed_at?->format('d M Y, H:i') }}.
+                    </p>
+                </div>
+            @endif
+
+            @if($transfer->status !== 'COMPLETED' && $transfer->status !== 'CANCELLED')
+                <section class="ml-card ml-action-panel" aria-labelledby="action-title">
+                    <div class="ml-card-head ml-card-head-split">
+                        <div>
+                            <h2 class="ml-card-title" id="action-title">Tindakan tahap ini</h2>
+                            <p class="ml-card-sub">{{ $user->name }} · {{ $user->job_title }}</p>
+                        </div>
+                        <span class="ml-role-chip">{{ \App\Enums\UserRole::tryFrom($user->role)?->label() ?? $user->role }}</span>
+                    </div>
+                    <div class="ml-card-body">
+                        @if($transfer->status === 'PROPOSED')
+                            <p class="ml-action-copy">Menunggu persetujuan Kepala Instalasi Farmasi fasilitas donor.</p>
+                            @if($canApprove)
+                                <form method="POST" action="{{ route('transfers.approve', $transfer) }}">
+                                    @csrf
+                                    <button type="submit" class="ml-btn-primary">Setujui pengeluaran obat</button>
+                                </form>
+                            @else
+                                <p class="ml-action-note">Hanya Kepala Instalasi Farmasi fasilitas donor yang berwenang menyetujui tahap ini.</p>
+                            @endif
+                        @elseif($transfer->status === 'APPROVED')
+                            <p class="ml-action-copy">Donor telah menyetujui. Menunggu kesediaan menerima dari fasilitas penerima.</p>
+                            @if($canAccept)
+                                <form method="POST" action="{{ route('transfers.accept', $transfer) }}">
+                                    @csrf
+                                    <button type="submit" class="ml-btn-primary">Konfirmasi kesediaan menerima</button>
+                                </form>
+                            @else
+                                <p class="ml-action-note">Hanya Apoteker atau Kepala Fasilitas penerima yang berwenang.</p>
+                            @endif
+                        @elseif($transfer->status === 'ACCEPTED')
+                            <p class="ml-action-copy">Penerima siap. Masukkan rincian kurir untuk memberangkatkan obat.</p>
+                            @if($canDispatch)
+                                <form method="POST" action="{{ route('transfers.dispatch', $transfer) }}">
+                                    @csrf
+                                    <div class="ml-form-grid">
+                                        <div class="ml-field">
+                                            <label for="courier_type" class="ml-label">Jenis kurir / transportasi <span class="ml-required">*</span></label>
+                                            <input id="courier_type" name="courier_type" type="text" class="ml-input" value="{{ old('courier_type', 'Kurir farmasi berpendingin (cold-box)') }}" required>
+                                        </div>
+                                        <div class="ml-field">
+                                            <label for="tracking_number" class="ml-label">Nomor resi / surat jalan <span class="ml-required">*</span></label>
+                                            <input
+                                                id="tracking_number"
+                                                name="tracking_number"
+                                                type="text"
+                                                class="ml-input is-mono"
+                                                value="{{ old('tracking_number') }}"
+                                                placeholder="Contoh: EXP-DKI-2026-001"
+                                                aria-describedby="tracking-number-help"
+                                                autocomplete="off"
+                                                required
+                                            >
+                                            <p id="tracking-number-help" class="ml-help">Isi sesuai nomor resi atau surat jalan fisik.</p>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="ml-btn-primary">Berangkatkan pengiriman</button>
+                                </form>
+                            @else
+                                <p class="ml-action-note">Hanya staf fasilitas donor yang dapat memberangkatkan pengiriman.</p>
+                            @endif
+                        @elseif($transfer->status === 'IN_TRANSIT')
+                            <div class="ml-transit-banner">
+                                <span class="ml-detail-label">Sedang dalam perjalanan</span>
+                                <div class="ml-transit-meta">
+                                    <span>Resi <strong>{{ $transfer->tracking_number }}</strong></span>
+                                    <span>{{ $transfer->courier_type }}</span>
+                                </div>
+                            </div>
+                            <p class="ml-action-copy">
+                                Penerima memeriksa kondisi fisik, segel kemasan, dan suhu dingin sebelum mengonfirmasi penerimaan.
+                            </p>
+                            @if($canComplete)
+                                <form method="POST" action="{{ route('transfers.complete', $transfer) }}">
+                                    @csrf
+                                    <button type="submit" class="ml-btn-primary">Konfirmasi penerimaan fisik &amp; mutasi stok</button>
+                                </form>
+                            @else
+                                <p class="ml-action-note">Menunggu konfirmasi Kepala Fasilitas penerima sebelum stok dimutasi.</p>
+                            @endif
+                        @endif
+
+                        @if($canCancel)
+                            <div class="ml-action-cancel">
+                                <form method="POST" action="{{ route('transfers.cancel', $transfer) }}" onsubmit="return confirm('Batalkan transfer ini? Tindakan tidak dapat dibatalkan.');">
+                                    @csrf
+                                    <button type="submit" class="ml-link-action ml-link-danger">Batalkan transfer</button>
+                                </form>
+                            </div>
+                        @endif
+                    </div>
+                </section>
+            @endif
+
+            <section class="ml-card" aria-labelledby="details-title">
+                <div class="ml-card-head ml-card-head-split">
                     <div>
-                        <div class="font-semibold text-[#0B1F4B]">{{ $log->description }}</div>
-                        <div class="text-[11px] text-[#52627F] mt-0.5">
-                            Aktor: <strong class="text-[#0B1F4B]">{{ $log->actor->name ?? 'Sistem' }}</strong> ({{ $log->actor->job_title ?? 'Automated Engine' }})
+                        <h2 class="ml-card-title" id="details-title">Detail logistik</h2>
+                        <p class="ml-card-sub">Rute, jumlah, dan hasil pencocokan kandidat.</p>
+                    </div>
+                    <span class="ml-card-index" aria-hidden="true">DATA</span>
+                </div>
+                <div class="ml-card-body">
+                    <div class="ml-detail-grid">
+                        <div>
+                            <div class="ml-detail-label">Batch</div>
+                            <div class="ml-detail-value is-mono">{{ $transfer->batch->batch_number }}</div>
+                        </div>
+                        <div>
+                            <div class="ml-detail-label">Jumlah</div>
+                            <div class="ml-detail-value">{{ number_format($transfer->quantity) }} {{ $transfer->batch->medicine->unit }}</div>
+                        </div>
+                        <div>
+                            <div class="ml-detail-label">Donor</div>
+                            <div class="ml-detail-value">{{ $transfer->donorFacility->name }}</div>
+                        </div>
+                        <div>
+                            <div class="ml-detail-label">Penerima</div>
+                            <div class="ml-detail-value">{{ $transfer->recipientFacility->name }}</div>
+                        </div>
+                        <div>
+                            <div class="ml-detail-label">Jarak udara</div>
+                            <div class="ml-detail-value">{{ $transfer->distance_km }} km</div>
+                        </div>
+                        <div>
+                            <div class="ml-detail-label">Batas serapan penerima</div>
+                            <div class="ml-detail-value">{{ $transfer->recipient_intake_cap }} unit</div>
+                        </div>
+                        <div class="is-full">
+                            <div class="ml-detail-label">Catatan</div>
+                            <div class="ml-detail-value">{{ $transfer->notes ?: 'Tidak ada catatan tambahan.' }}</div>
                         </div>
                     </div>
-                    <span class="text-[11px] font-mono text-[#52627F] shrink-0">
-                        {{ $log->created_at->format('d M Y, H:i:s') }}
-                    </span>
                 </div>
-            @empty
-                <div class="p-4 text-center text-[#52627F]">
-                    Belum ada catatan log audit tambahan.
-                </div>
-            @endforelse
-        </div>
-    </div>
+            </section>
 
+            <section class="ml-card" aria-labelledby="audit-title">
+                <div class="ml-card-head ml-card-head-split">
+                    <div>
+                        <h2 class="ml-card-title" id="audit-title">Jejak audit</h2>
+                        <p class="ml-card-sub">Riwayat otorisasi dan perubahan status.</p>
+                    </div>
+                    <span class="ml-card-index" aria-hidden="true">LOG</span>
+                </div>
+                @if($transfer->auditLogs->isEmpty())
+                    <div class="ml-empty-state">
+                        <p class="ml-empty-title">Belum ada catatan audit</p>
+                        <p class="ml-empty-copy">Aktivitas transfer akan muncul di sini.</p>
+                    </div>
+                @else
+                    <ol class="ml-audit-list">
+                        @foreach($transfer->auditLogs as $log)
+                            <li class="ml-audit-item">
+                                <span class="ml-audit-dot" aria-hidden="true"></span>
+                                <div class="ml-audit-time">{{ $log->created_at->format('d M Y · H:i') }}</div>
+                                <div class="ml-audit-body">
+                                    <strong>{{ $log->actor->name ?? 'Sistem' }}</strong>
+                                    <span>{{ $log->description }}</span>
+                                    <code>{{ $log->action }}</code>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ol>
+                @endif
+            </section>
+        </div>
+
+        <aside>
+            <section class="ml-card ml-sticky" aria-labelledby="summary-title">
+                <div class="ml-card-head">
+                    <h2 class="ml-card-title" id="summary-title">Ringkasan transfer</h2>
+                </div>
+                <div class="ml-card-body">
+                    <div class="ml-route-vertical">
+                        <div>
+                            <span class="ml-detail-label">Donor</span>
+                            <div class="ml-detail-value">{{ $transfer->donorFacility->name }}</div>
+                        </div>
+                        <span class="ml-route-line" aria-hidden="true"></span>
+                        <div>
+                            <span class="ml-detail-label">Penerima</span>
+                            <div class="ml-detail-value">{{ $transfer->recipientFacility->name }}</div>
+                        </div>
+                    </div>
+
+                    <div class="ml-score-list">
+                        <div class="ml-score-row">
+                            <span>Kebutuhan (50%)</span>
+                            <strong>{{ $transfer->need_score }}%</strong>
+                        </div>
+                        <div class="ml-score-bar" aria-hidden="true"><span style="width: {{ $transfer->need_score }}%"></span></div>
+                        <div class="ml-score-row">
+                            <span>Jarak (30%)</span>
+                            <strong>{{ $transfer->proximity_score }}%</strong>
+                        </div>
+                        <div class="ml-score-bar" aria-hidden="true"><span style="width: {{ $transfer->proximity_score }}%"></span></div>
+                        <div class="ml-score-row">
+                            <span>Logistik (20%)</span>
+                            <strong>{{ $transfer->logistics_score }}%</strong>
+                        </div>
+                        <div class="ml-score-bar" aria-hidden="true"><span style="width: {{ $transfer->logistics_score }}%"></span></div>
+                        <div class="ml-score-total">
+                            <span>Skor kecocokan</span>
+                            <strong>{{ $transfer->match_score }}%</strong>
+                        </div>
+                    </div>
+
+                    <p class="ml-help">Rekomendasi bersifat saran. Setiap transfer memerlukan persetujuan petugas fasilitas.</p>
+                </div>
+            </section>
+        </aside>
+    </div>
 </div>
 @endsection

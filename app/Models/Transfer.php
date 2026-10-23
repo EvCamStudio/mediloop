@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Transfer extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory;
 
     protected $fillable = [
@@ -57,41 +59,65 @@ class Transfer extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<Facility, $this>
+     */
     public function donorFacility(): BelongsTo
     {
         return $this->belongsTo(Facility::class, 'donor_facility_id');
     }
 
+    /**
+     * @return BelongsTo<Facility, $this>
+     */
     public function recipientFacility(): BelongsTo
     {
         return $this->belongsTo(Facility::class, 'recipient_facility_id');
     }
 
+    /**
+     * @return BelongsTo<Batch, $this>
+     */
     public function batch(): BelongsTo
     {
         return $this->belongsTo(Batch::class);
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function proposedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'proposed_by');
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function approvedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function acceptedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'accepted_by');
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function completedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'completed_by');
     }
 
+    /**
+     * @return HasMany<AuditLog, $this>
+     */
     public function auditLogs(): HasMany
     {
         return $this->hasMany(AuditLog::class);

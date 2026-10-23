@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -21,7 +23,11 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property string $name
  * @property string $email
  * @property int|null $facility_id
+ * @property Facility|null $facility
  * @property string $role
+ * @property string $status
+ * @property int|null $invited_by
+ * @property Carbon|null $joined_at
  * @property string|null $license_sip
  * @property string|null $job_title
  * @property Carbon|null $email_verified_at
@@ -33,12 +39,16 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'facility_id', 'role', 'license_sip', 'job_title'])]
+#[Fillable(['name', 'email', 'password', 'facility_id', 'role', 'status', 'invited_by', 'joined_at', 'license_sip', 'job_title'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
+
+    protected $attributes = [
+        'status' => UserStatus::Active->value,
+    ];
 
     /**
      * Get the attributes that should be cast.
@@ -49,53 +59,85 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     {
         return [
             'email_verified_at' => 'datetime',
+            'joined_at' => 'datetime',
             'password' => 'hashed',
         ];
     }
 
+    /**
+     * @return BelongsTo<Facility, $this>
+     */
     public function facility(): BelongsTo
     {
         return $this->belongsTo(Facility::class);
     }
 
-    public function isDonorStaff(): bool
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function invitedBy(): BelongsTo
     {
-        return $this->role === 'DONOR_STAFF';
+        return $this->belongsTo(self::class, 'invited_by');
     }
 
-    public function isDonorApprover(): bool
+    public function isSysadmin(): bool
     {
-        return in_array($this->role, ['DONOR_APPROVER', 'SYSADMIN']);
-    }
-
-    public function isRecipientStaff(): bool
-    {
-        return $this->role === 'RECIPIENT_STAFF';
-    }
-
-    public function isRecipientApprover(): bool
-    {
-        return in_array($this->role, ['RECIPIENT_APPROVER', 'SYSADMIN']);
+        return $this->role === UserRole::Sysadmin->value;
     }
 
     public function isDinkesAuditor(): bool
     {
-        return in_array($this->role, ['DINKES_AUDITOR', 'SYSADMIN']);
+        return in_array($this->role, [UserRole::DinkesAuditor->value, UserRole::Sysadmin->value], true);
+    }
+
+    public function isFacilityApprover(): bool
+    {
+        return $this->role === UserRole::FacilityApprover->value;
+    }
+
+    public function isFacilityStaff(): bool
+    {
+        return $this->role === UserRole::FacilityStaff->value;
+    }
+
+    public function hasFacilityRole(): bool
+    {
+        return $this->isFacilityApprover() || $this->isFacilityStaff();
+    }
+
+    public function canManageFacility(): bool
+    {
+        return $this->isSysadmin() || $this->isFacilityApprover();
     }
 
     public function canApproveDonorTransfer(): bool
     {
-        return in_array($this->role, ['DONOR_APPROVER', 'SYSADMIN']);
+        return $this->isSysadmin() || $this->isFacilityApprover();
     }
 
     public function canAcceptRecipientTransfer(): bool
     {
-        return in_array($this->role, ['RECIPIENT_APPROVER', 'RECIPIENT_STAFF', 'SYSADMIN']);
+        return $this->isSysadmin() || $this->hasFacilityRole();
     }
 
     public function canConfirmPhysicalArrival(): bool
     {
-        return in_array($this->role, ['RECIPIENT_APPROVER', 'SYSADMIN']);
+        return $this->isSysadmin() || $this->isFacilityApprover();
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === UserStatus::Active->value;
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->status === UserStatus::Suspended->value;
+    }
+
+    public function getRoleLabelAttribute(): string
+    {
+        return UserRole::tryFrom((string) $this->role)?->label() ?? (string) $this->role;
     }
 
     /**

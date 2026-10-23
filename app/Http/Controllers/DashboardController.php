@@ -18,22 +18,38 @@ class DashboardController extends Controller
     public function index(Request $request): View
     {
         $user = Auth::user();
-        $facilityId = $user->facility_id;
+        $isAuditor = $user->isDinkesAuditor();
+        $requestedFacilityId = $request->filled('facility_id') ? $request->integer('facility_id') : null;
+        $facilityId = $isAuditor && $requestedFacilityId ? $requestedFacilityId : $user->facility_id;
 
-        // Allow Dinkes Auditor or Admin to view any facility
-        if ($user->isDinkesAuditor() && $request->has('facility_id')) {
-            $facilityId = (int) $request->get('facility_id');
+        // Accounts without a verified facility must not see cross-facility inventory.
+        if (! $isAuditor && ! $facilityId) {
+            return view('dashboard', [
+                'user' => $user,
+                'facility' => null,
+                'facilityMissing' => true,
+                'batches' => collect(),
+                'totalStockUnits' => 0,
+                'atRiskCount' => 0,
+                'totalProjectedWasteUnits' => 0,
+                'totalProjectedWasteValue' => 0,
+                'activeTransfersCount' => 0,
+                'facilitiesList' => collect(),
+                'topRiskBatch' => null,
+                'matchCandidates' => [],
+                'partnerFacilities' => [],
+            ]);
         }
 
-        $facility = Facility::find($facilityId);
+        $facility = $facilityId ? Facility::find($facilityId) : null;
 
         $query = Batch::with(['medicine', 'facility'])
             ->where('status', 'ACTIVE');
 
-        if ($facilityId && ! $user->isDinkesAuditor()) {
+        if (! $isAuditor) {
             $query->where('facility_id', $facilityId);
-        } elseif ($request->filled('facility_id')) {
-            $query->where('facility_id', $request->get('facility_id'));
+        } elseif ($requestedFacilityId) {
+            $query->where('facility_id', $requestedFacilityId);
         }
 
         $batches = $query->orderBy('expiry_date', 'asc')->get();
@@ -51,7 +67,7 @@ class DashboardController extends Controller
             ->whereIn('status', ['PROPOSED', 'APPROVED', 'ACCEPTED', 'IN_TRANSIT'])
             ->count();
 
-        $facilitiesList = Facility::where('type', '!=', 'DINKES')->get();
+        $facilitiesList = Facility::where('type', '!=', 'DINKES')->where('status', 'ACTIVE')->get();
 
         // Top at-risk batch for candidate recommendations
         $topRiskBatch = $atRiskBatches->first() ?? $batches->first();

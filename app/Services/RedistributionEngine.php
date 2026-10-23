@@ -2,16 +2,23 @@
 
 namespace App\Services;
 
+use App\Enums\FacilityStatus;
 use App\Models\AuditLog;
 use App\Models\Batch;
 use App\Models\Facility;
 use App\Models\Transfer;
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class RedistributionEngine
 {
+    /**
+     * Maximum distance (km) at which a recipient still earns a proximity score.
+     */
+    public const PROXIMITY_MAX_RADIUS_KM = 50.0;
+
     /**
      * Calculate daily burn rate over an observation window.
      */
@@ -125,10 +132,12 @@ class RedistributionEngine
     }
 
     /**
-     * Calculate proximity score decaying with distance up to a 50km threshold.
+     * Calculate proximity score decaying with distance up to the proximity radius threshold.
      */
-    public static function calculateProximityScore(float $distanceKm, float $maxRadiusKm = 50.0): float
-    {
+    public static function calculateProximityScore(
+        float $distanceKm,
+        float $maxRadiusKm = self::PROXIMITY_MAX_RADIUS_KM
+    ): float {
         if ($distanceKm <= 0.0) {
             return 100.0;
         }
@@ -157,11 +166,72 @@ class RedistributionEngine
     }
 
     /**
+     * Rank facilities by straight-line distance from an origin facility.
+     *
+     * @param  Collection<int, Facility>|null  $facilities
+     * @return array<int, array{facility: Facility, distance_km: float, proximity_score: float}>
+     */
+    public static function nearestFacilities(
+        Facility $origin,
+        ?Collection $facilities = null,
+        ?int $limit = null
+    ): array {
+        $candidates = $facilities ?? Facility::query()->operational()->active()->get();
+
+        $ranked = [];
+
+        foreach ($candidates as $facility) {
+            if ($facility->is($origin) || ! self::hasUsableCoordinates($facility)) {
+                continue;
+            }
+
+            $distanceKm = self::calculateHaversineDistance(
+                (float) $origin->latitude,
+                (float) $origin->longitude,
+                (float) $facility->latitude,
+                (float) $facility->longitude
+            );
+
+            $ranked[] = [
+                'facility' => $facility,
+                'distance_km' => $distanceKm,
+                'proximity_score' => self::calculateProximityScore($distanceKm),
+            ];
+        }
+
+        usort($ranked, fn (array $a, array $b): int => $a['distance_km'] <=> $b['distance_km']);
+
+        return $limit === null ? $ranked : array_slice($ranked, 0, max(0, $limit));
+    }
+
+    /**
+     * Determine whether a facility has coordinates usable for distance calculation.
+     */
+    private static function hasUsableCoordinates(Facility $facility): bool
+    {
+        $latitude = $facility->latitude;
+        $longitude = $facility->longitude;
+
+        if (! is_finite($latitude) || ! is_finite($longitude)) {
+            return false;
+        }
+
+        // (0, 0) is treated as an unset coordinate rather than a real facility location.
+        if ($latitude === 0.0 && $longitude === 0.0) {
+            return false;
+        }
+
+        return $latitude >= -90.0 && $latitude <= 90.0
+            && $longitude >= -180.0 && $longitude <= 180.0;
+    }
+
+    /**
      * Score candidate facilities for an impending waste batch.
      *
+     * @param  string  $sort  Either "score" (composite match score) or "distance" (nearest first).
      * @return array<int, array<string, mixed>>
      */
-    public static function findCandidateRecipients(Batch $batch): array
+    public static function findCandidateRecipients(Batch $batch, string $sort = 'score'): array
     {
         $donor = $batch->facility;
         $medicine = $batch->medicine;
@@ -170,6 +240,7 @@ class RedistributionEngine
 
         $facilities = Facility::where('id', '!=', $donor->id)
             ->where('type', '!=', 'DINKES')
+            ->where('status', FacilityStatus::Active->value)
             ->get();
 
         $candidates = [];
@@ -231,8 +302,12 @@ class RedistributionEngine
             ];
         }
 
-        // Sort descending by match score
-        usort($candidates, fn ($a, $b) => $b['match_score'] <=> $a['match_score']);
+        // Rank by the requested order: nearest distance or composite match score.
+        if ($sort === 'distance') {
+            usort($candidates, fn ($a, $b) => $a['distance_km'] <=> $b['distance_km']);
+        } else {
+            usort($candidates, fn ($a, $b) => $b['match_score'] <=> $a['match_score']);
+        }
 
         return $candidates;
     }
