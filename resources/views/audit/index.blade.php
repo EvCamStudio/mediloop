@@ -1,4 +1,4 @@
-@extends('layouts.mediloop', ['title' => 'Audit Regional Dinkes — MediLoop'])
+@extends('layouts.mediloop', ['title' => 'Audit Regional Dinkes'])
 
 @section('content')
 <div class="space-y-6">

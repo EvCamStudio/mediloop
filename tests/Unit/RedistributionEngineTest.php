@@ -256,7 +256,7 @@ test('inventory invariant: stock changes atomically ONLY upon completed transfer
 
     $user = User::factory()->create([
         'facility_id' => $recipientFacility->id,
-        'role' => 'RECIPIENT_APPROVER',
+        'role' => 'FACILITY_APPROVER',
     ]);
 
     $medicine = Medicine::create([

@@ -1,4 +1,4 @@
-@extends('layouts.mediloop', ['title' => 'Peta Jaringan Faskes - MediLoop'])
+@extends('layouts.mediloop', ['title' => 'Peta Jaringan Faskes'])
 
 @section('content')
 <div class="ml-dashboard">

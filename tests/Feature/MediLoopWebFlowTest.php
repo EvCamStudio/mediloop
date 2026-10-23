@@ -48,7 +48,7 @@ test('dashboard displays inventory ledger and risk badges', function () {
 
     $user = User::factory()->create([
         'facility_id' => $facility->id,
-        'role' => 'DONOR_STAFF',
+        'role' => 'FACILITY_STAFF',
     ]);
 
     $medicine = Medicine::create([
@@ -76,8 +76,8 @@ test('dashboard displays inventory ledger and risk badges', function () {
     $response->assertStatus(200);
     $response->assertSee('CFT-2026-X89');
     $response->assertSee('Ceftriaxone 1g Injeksi');
-    $response->assertSee('HIGH');
-    $response->assertSee('Cari Penerima');
+    $response->assertSee('Tinggi');
+    $response->assertSee('Cari penerima');
 });
 
 test('complete transfer lifecycle and invariant verification', function () {
@@ -107,10 +107,10 @@ test('complete transfer lifecycle and invariant verification', function () {
         'phone' => '021-3501234',
     ]);
 
-    $donorStaff = User::factory()->create(['facility_id' => $donor->id, 'role' => 'DONOR_STAFF']);
-    $donorApprover = User::factory()->create(['facility_id' => $donor->id, 'role' => 'DONOR_APPROVER']);
-    $recipientStaff = User::factory()->create(['facility_id' => $recipient->id, 'role' => 'RECIPIENT_STAFF']);
-    $recipientApprover = User::factory()->create(['facility_id' => $recipient->id, 'role' => 'RECIPIENT_APPROVER']);
+    $donorStaff = User::factory()->create(['facility_id' => $donor->id, 'role' => 'FACILITY_STAFF']);
+    $donorApprover = User::factory()->create(['facility_id' => $donor->id, 'role' => 'FACILITY_APPROVER']);
+    $recipientStaff = User::factory()->create(['facility_id' => $recipient->id, 'role' => 'FACILITY_STAFF']);
+    $recipientApprover = User::factory()->create(['facility_id' => $recipient->id, 'role' => 'FACILITY_APPROVER']);
 
     $medicine = Medicine::create([
         'name' => 'Ceftriaxone 1g Injeksi',

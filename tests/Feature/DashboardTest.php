@@ -57,7 +57,7 @@ test('users without a facility do not see cross-facility inventory', function ()
     $response = $this->actingAs($user)->get(route('dashboard'));
 
     $response->assertOk();
-    $response->assertSee('Akun Belum Terhubung ke Fasilitas');
+    $response->assertSee('Akun belum terhubung ke fasilitas');
     $response->assertDontSee('Ceftriaxone 1g Injeksi');
     $response->assertDontSee('CFT-2026-X89');
 });

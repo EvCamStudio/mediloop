@@ -23,8 +23,8 @@ class CreateNewUser implements CreatesNewUsers
     {
         Validator::make($input, [
             ...$this->profileRules(),
-            'facility_id' => ['required', 'integer', Rule::exists(Facility::class, 'id')->whereNot('type', 'DINKES')],
-            'role' => ['required', 'string', Rule::in(['DONOR_STAFF', 'RECIPIENT_STAFF'])],
+            'facility_id' => ['required', 'integer', Rule::exists(Facility::class, 'id')->whereNot('type', 'DINKES')->where('status', 'ACTIVE')],
+            'role' => ['required', 'string', Rule::in(['FACILITY_STAFF'])],
             'job_title' => ['nullable', 'string', 'max:255'],
             'license_sip' => ['nullable', 'string', 'max:255'],
             'password' => $this->passwordRules(),

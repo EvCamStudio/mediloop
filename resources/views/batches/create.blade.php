@@ -1,4 +1,4 @@
-@extends('layouts.mediloop', ['title' => 'Input Stok Obat & Batch Baru — MediLoop'])
+@extends('layouts.mediloop', ['title' => 'Input Stok Obat & Batch Baru'])
 
 @section('content')
 <div class="space-y-6 max-w-4xl mx-auto">
@@ -52,7 +52,7 @@
     <form method="POST" action="{{ route('batches.store') }}" id="batchForm" class="space-y-6">
         @csrf
 
-        @if($user->role === 'SYSADMIN' && isset($facilities))
+        @if($user->isSysadmin() && isset($facilities))
             <div class="bg-white p-5 rounded-xl border border-[#DBE5F5] shadow-xs">
                 <label for="facility_id" class="block text-xs font-bold text-[#0B1F4B] mb-1">
                     Fasilitas Kesehatan Penampung Stok:

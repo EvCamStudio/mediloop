@@ -33,7 +33,7 @@ test('staff can view batches index with search and filters', function () {
 
     $user = User::factory()->create([
         'facility_id' => $facility->id,
-        'role' => 'DONOR_STAFF',
+        'role' => 'FACILITY_STAFF',
     ]);
 
     $medicine = Medicine::create([
@@ -77,7 +77,7 @@ test('staff can access batch create form but auditor is forbidden', function () 
         'phone' => '021-3842934',
     ]);
 
-    $staff = User::factory()->create(['facility_id' => $facility->id, 'role' => 'DONOR_STAFF']);
+    $staff = User::factory()->create(['facility_id' => $facility->id, 'role' => 'FACILITY_STAFF']);
     $auditor = User::factory()->create(['facility_id' => $facility->id, 'role' => 'DINKES_AUDITOR']);
 
     $this->actingAs($staff)->get('/batches/create')->assertStatus(200)->assertSee('Input Data Stok Batch Obat');
@@ -98,7 +98,7 @@ test('staff can input a new batch for existing medicine', function () {
         'phone' => '021-3842934',
     ]);
 
-    $user = User::factory()->create(['facility_id' => $facility->id, 'role' => 'DONOR_STAFF']);
+    $user = User::factory()->create(['facility_id' => $facility->id, 'role' => 'FACILITY_STAFF']);
 
     $medicine = Medicine::create([
         'name' => 'Amoxicillin 500mg Kaplet',
@@ -145,7 +145,7 @@ test('staff can input a new batch with new on-the-fly medicine registration', fu
         'phone' => '021-3842934',
     ]);
 
-    $user = User::factory()->create(['facility_id' => $facility->id, 'role' => 'DONOR_STAFF']);
+    $user = User::factory()->create(['facility_id' => $facility->id, 'role' => 'FACILITY_STAFF']);
 
     $response = $this->actingAs($user)->post('/batches', [
         'is_new_medicine' => 1,
@@ -188,7 +188,7 @@ test('staff can update existing batch details', function () {
         'phone' => '021-3842934',
     ]);
 
-    $user = User::factory()->create(['facility_id' => $facility->id, 'role' => 'DONOR_STAFF']);
+    $user = User::factory()->create(['facility_id' => $facility->id, 'role' => 'FACILITY_STAFF']);
 
     $medicine = Medicine::create([
         'name' => 'Amoxicillin 500mg',
@@ -238,7 +238,7 @@ test('staff can delete batch without active transfers', function () {
         'phone' => '021-3842934',
     ]);
 
-    $user = User::factory()->create(['facility_id' => $facility->id, 'role' => 'DONOR_STAFF']);
+    $user = User::factory()->create(['facility_id' => $facility->id, 'role' => 'FACILITY_STAFF']);
 
     $medicine = Medicine::create([
         'name' => 'Paracetamol 500mg',
@@ -293,7 +293,7 @@ test('staff cannot delete batch with active transfer', function () {
         'phone' => '021-3501234',
     ]);
 
-    $user = User::factory()->create(['facility_id' => $donor->id, 'role' => 'DONOR_STAFF']);
+    $user = User::factory()->create(['facility_id' => $donor->id, 'role' => 'FACILITY_STAFF']);
 
     $medicine = Medicine::create([
         'name' => 'Ceftriaxone 1g Injeksi',
@@ -361,7 +361,7 @@ test('batches index renders top risk candidates recommendations without errors',
 
     $user = User::factory()->create([
         'facility_id' => $donor->id,
-        'role' => 'DONOR_STAFF',
+        'role' => 'FACILITY_STAFF',
     ]);
 
     $medicine = Medicine::create([

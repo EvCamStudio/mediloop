@@ -21,6 +21,7 @@ class NetworkController extends Controller
 
         $facilityTypes = Facility::query()
             ->where('type', '!=', 'DINKES')
+            ->where('status', 'ACTIVE')
             ->distinct()
             ->orderBy('type')
             ->pluck('type');
@@ -54,6 +55,7 @@ class NetworkController extends Controller
     {
         return Facility::query()
             ->where('type', '!=', 'DINKES')
+            ->where('status', 'ACTIVE')
             ->when($origin, fn ($query) => $query->whereKeyNot($origin->id))
             ->when($type, fn ($query, string $value) => $query->where('type', $value))
             ->when($coldChainOnly, fn ($query) => $query->where('cold_chain_ready', true))

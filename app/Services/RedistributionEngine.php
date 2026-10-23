@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\FacilityStatus;
 use App\Models\AuditLog;
 use App\Models\Batch;
 use App\Models\Facility;
@@ -175,7 +176,7 @@ class RedistributionEngine
         ?Collection $facilities = null,
         ?int $limit = null
     ): array {
-        $candidates = $facilities ?? Facility::where('type', '!=', 'DINKES')->get();
+        $candidates = $facilities ?? Facility::query()->operational()->active()->get();
 
         $ranked = [];
 
@@ -239,6 +240,7 @@ class RedistributionEngine
 
         $facilities = Facility::where('id', '!=', $donor->id)
             ->where('type', '!=', 'DINKES')
+            ->where('status', FacilityStatus::Active->value)
             ->get();
 
         $candidates = [];

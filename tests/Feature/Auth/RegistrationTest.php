@@ -34,7 +34,7 @@ test('new users can register with a verified facility and staff role', function 
         'name' => 'John Doe',
         'email' => 'test@example.com',
         'facility_id' => $this->facility->id,
-        'role' => 'RECIPIENT_STAFF',
+        'role' => 'FACILITY_STAFF',
         'job_title' => 'Staf Farmasi',
         'license_sip' => 'SIPA.3171.01.2024.0001',
         'password' => 'password',
@@ -49,7 +49,7 @@ test('new users can register with a verified facility and staff role', function 
     $user = User::where('email', 'test@example.com')->firstOrFail();
 
     expect($user->facility_id)->toBe($this->facility->id)
-        ->and($user->role)->toBe('RECIPIENT_STAFF')
+        ->and($user->role)->toBe('FACILITY_STAFF')
         ->and($user->job_title)->toBe('Staf Farmasi')
         ->and($user->license_sip)->toBe('SIPA.3171.01.2024.0001');
 });
@@ -58,7 +58,7 @@ test('registration requires a verified facility', function () {
     $response = $this->post(route('register.store'), [
         'name' => 'John Doe',
         'email' => 'test@example.com',
-        'role' => 'DONOR_STAFF',
+        'role' => 'FACILITY_STAFF',
         'password' => 'password',
         'password_confirmation' => 'password',
     ]);

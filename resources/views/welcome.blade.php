@@ -387,16 +387,16 @@
             </h2>
             <p class="text-sm text-blue-200/90 max-w-2xl mx-auto mb-8">
                 Masuk dengan akun fasilitas kesehatan Anda untuk menguji alur pengusulan, persetujuan, penerimaan,
-                hingga audit pengawasan. Belum terdaftar? Daftarkan fasilitas Anda terlebih dahulu.
+                hingga audit pengawasan. Fasilitas baru dapat mengajukan verifikasi tanpa membuat akun terlebih dahulu.
             </p>
             <div class="flex flex-wrap justify-center gap-4">
                 <a href="{{ route('login') }}"
                     class="px-6 py-3 rounded-lg bg-[#1D4ED8] hover:bg-blue-600 font-bold text-sm text-white shadow-lg transition">
                     Masuk ke Dashboard
                 </a>
-                <a href="{{ route('register') }}"
+                <a href="{{ route('facility-requests.create') }}"
                     class="px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 font-semibold text-sm text-white border border-white/20 transition">
-                    Daftar Akun Faskes
+                    Ajukan Fasilitas
                 </a>
             </div>
         </div>

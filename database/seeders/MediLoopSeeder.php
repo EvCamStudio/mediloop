@@ -21,14 +21,20 @@ class MediLoopSeeder extends Seeder
             'name' => 'RSUD Tarakan Jakarta',
             'code' => 'FSK-RSUD-TRK',
             'type' => 'RSUD',
+            'ownership' => 'PEMERINTAH',
             'license_number' => '445/001/RSUD-DKI/2022',
             'address' => 'Jl. Kyai Caringin No. 7, Cideng',
             'city' => 'Jakarta Pusat',
+            'province' => 'DKI Jakarta',
+            'district' => 'Jakarta Pusat',
             'latitude' => -6.1729000,
             'longitude' => 106.8122000,
             'cold_chain_ready' => true,
             'contact_person' => 'Apt. Hendra Wijaya, S.Farm',
             'phone' => '021-3842934',
+            'email' => 'rsud.tarakan@mediloop.test',
+            'status' => 'ACTIVE',
+            'verified_at' => now(),
         ]);
 
         $puskesmasGambir = Facility::create([
@@ -119,25 +125,62 @@ class MediLoopSeeder extends Seeder
             'name' => 'Dinas Kesehatan Provinsi DKI Jakarta',
             'code' => 'DKS-DKI-PST',
             'type' => 'DINKES',
+            'ownership' => 'PEMERINTAH',
             'license_number' => 'GOV-REG-DKI-01',
             'address' => 'Jl. Kesehatan No. 10, Petojo Selatan',
             'city' => 'Jakarta Pusat',
+            'province' => 'DKI Jakarta',
+            'district' => 'Jakarta Pusat',
             'latitude' => -6.1831000,
             'longitude' => 106.8315000,
             'cold_chain_ready' => true,
             'contact_person' => 'drg. Bambang Sulistyo, M.Kes',
             'phone' => '021-3456789',
+            'email' => 'dinkes.dki@mediloop.test',
+            'status' => 'ACTIVE',
+            'verified_at' => now(),
         ]);
+
+        // Demo facilities are verified and complete enough for the operational views.
+        $demoFacilities = [
+            $puskesmasGambir,
+            $rsudTanahAbang,
+            $puskesmasSawahBesar,
+            $puskesmasTanahAbang,
+            $klinikHarmoni,
+            $rsPgiCikini,
+        ];
+
+        foreach ($demoFacilities as $facility) {
+            $facility->update([
+                'ownership' => in_array($facility->type, ['KLINIK', 'RS_SWASTA'], true) ? 'SWASTA' : 'PEMERINTAH',
+                'province' => 'DKI Jakarta',
+                'district' => 'Jakarta Pusat',
+                'email' => strtolower($facility->code).'@mediloop.test',
+                'status' => 'ACTIVE',
+                'verified_at' => now(),
+            ]);
+        }
 
         // 2. Seed Multi-Role Demonstration Accounts
         $password = Hash::make('password');
+
+        User::create([
+            'name' => 'Administrator MediLoop',
+            'email' => 'admin@mediloop.test',
+            'password' => $password,
+            'role' => 'SYSADMIN',
+            'status' => 'ACTIVE',
+            'email_verified_at' => now(),
+        ]);
 
         $donorStaff = User::create([
             'name' => 'Apt. Hendra Wijaya, S.Farm',
             'email' => 'donor@mediloop.test',
             'password' => $password,
             'facility_id' => $rsudTarakan->id,
-            'role' => 'DONOR_STAFF',
+            'role' => 'FACILITY_STAFF',
+            'status' => 'ACTIVE',
             'job_title' => 'Staf Farmasi Rawat Inap & Gudang',
             'license_sip' => 'SIPA.3171.01.2022.0941',
             'email_verified_at' => now(),
@@ -148,7 +191,8 @@ class MediLoopSeeder extends Seeder
             'email' => 'donor.head@mediloop.test',
             'password' => $password,
             'facility_id' => $rsudTarakan->id,
-            'role' => 'DONOR_APPROVER',
+            'role' => 'FACILITY_APPROVER',
+            'status' => 'ACTIVE',
             'job_title' => 'Kepala Instalasi Farmasi RSUD',
             'license_sip' => 'SIPA.3171.01.2018.0122',
             'email_verified_at' => now(),
@@ -159,7 +203,8 @@ class MediLoopSeeder extends Seeder
             'email' => 'recipient@mediloop.test',
             'password' => $password,
             'facility_id' => $puskesmasGambir->id,
-            'role' => 'RECIPIENT_STAFF',
+            'role' => 'FACILITY_STAFF',
+            'status' => 'ACTIVE',
             'job_title' => 'Apoteker Penanggung Jawab Obat',
             'license_sip' => 'SIPA.3171.02.2023.1104',
             'email_verified_at' => now(),
@@ -170,7 +215,8 @@ class MediLoopSeeder extends Seeder
             'email' => 'recipient.head@mediloop.test',
             'password' => $password,
             'facility_id' => $puskesmasGambir->id,
-            'role' => 'RECIPIENT_APPROVER',
+            'role' => 'FACILITY_APPROVER',
+            'status' => 'ACTIVE',
             'job_title' => 'Kepala Puskesmas Kecamatan Gambir',
             'license_sip' => 'SIPD.3171.02.2015.0089',
             'email_verified_at' => now(),
@@ -182,6 +228,7 @@ class MediLoopSeeder extends Seeder
             'password' => $password,
             'facility_id' => $dinkesDki->id,
             'role' => 'DINKES_AUDITOR',
+            'status' => 'ACTIVE',
             'job_title' => 'Koordinator Pengawas Farmasi & Alkes',
             'license_sip' => 'NIP.197905142006041008',
             'email_verified_at' => now(),

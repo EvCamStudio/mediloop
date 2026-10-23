@@ -67,7 +67,7 @@ class DashboardController extends Controller
             ->whereIn('status', ['PROPOSED', 'APPROVED', 'ACCEPTED', 'IN_TRANSIT'])
             ->count();
 
-        $facilitiesList = Facility::where('type', '!=', 'DINKES')->get();
+        $facilitiesList = Facility::where('type', '!=', 'DINKES')->where('status', 'ACTIVE')->get();
 
         // Top at-risk batch for candidate recommendations
         $topRiskBatch = $atRiskBatches->first() ?? $batches->first();

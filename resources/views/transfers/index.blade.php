@@ -1,144 +1,136 @@
-@extends('layouts.mediloop', ['title' => 'Daftar Redistribusi Obat — MediLoop'])
+@extends('layouts.mediloop', ['title' => 'Daftar Redistribusi Obat'])
 
 @section('content')
-<div class="space-y-6">
+@php
+    $tabs = [
+        ['label' => 'Semua', 'value' => ''],
+        ['label' => 'Menunggu donor', 'value' => 'PROPOSED'],
+        ['label' => 'Menunggu penerima', 'value' => 'APPROVED'],
+        ['label' => 'Dalam pengiriman', 'value' => 'IN_TRANSIT'],
+        ['label' => 'Selesai', 'value' => 'COMPLETED'],
+    ];
 
-    <!-- Header & Action -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#DBE5F5] gap-4">
+    $statusLabels = [
+        'PROPOSED' => ['label' => 'Menunggu donor', 'tone' => 'pending'],
+        'APPROVED' => ['label' => 'Menunggu penerima', 'tone' => 'active'],
+        'ACCEPTED' => ['label' => 'Siap kirim', 'tone' => 'active'],
+        'IN_TRANSIT' => ['label' => 'Dalam pengiriman', 'tone' => 'transit'],
+        'COMPLETED' => ['label' => 'Selesai', 'tone' => 'inactive'],
+        'CANCELLED' => ['label' => 'Dibatalkan', 'tone' => 'suspended'],
+    ];
+@endphp
+
+<div class="ml-page-admin">
+    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ route('dashboard') }}">Dashboard</a>
+        <span class="ml-breadcrumb-sep">/</span>
+        <span>Redistribusi</span>
+    </nav>
+
+    <header class="ml-page-head">
         <div>
-            <h1 class="text-2xl font-extrabold text-[#0B1F4B]">Daftar Redistribusi & Hibah Antarfaskes</h1>
-            <p class="text-xs text-[#52627F] mt-1">Lacak status alur pengajuan dari persetujuan hingga mutasi stok fisik.</p>
+            <p class="ml-page-eyebrow">Koordinasi antarfasilitas</p>
+            <h1 class="ml-page-title">Redistribusi &amp; hibah obat</h1>
+            <p class="ml-page-sub">Lacak status pengajuan dari otorisasi donor hingga mutasi stok fisik.</p>
         </div>
+        <div class="ml-page-actions">
+            <a href="{{ route('dashboard') }}" class="ml-btn-quiet">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                    <path d="M12 4v16m8-8H4" />
+                </svg>
+                Usulkan dari stok
+            </a>
+        </div>
+    </header>
 
-        <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            <span>Usulkan dari Data Stok</span>
-        </a>
-    </div>
+    <nav class="ml-registry-tabs" aria-label="Filter status transfer">
+        @foreach($tabs as $tab)
+            <a
+                href="{{ $tab['value'] === '' ? route('transfers.index') : route('transfers.index', ['status' => $tab['value']]) }}"
+                class="ml-registry-tab {{ $currentStatus === $tab['value'] ? 'is-active' : '' }}"
+                @if($currentStatus === $tab['value']) aria-current="page" @endif
+            >
+                {{ $tab['label'] }}
+            </a>
+        @endforeach
+    </nav>
 
-    <!-- Filter Tabs -->
-    <div class="flex flex-wrap items-center gap-2 border-b border-[#DBE5F5] pb-2 text-xs">
-        <a href="{{ route('transfers.index') }}" class="px-3 py-1.5 rounded-md font-semibold transition {{ !request('status') ? 'bg-[#1D4ED8] text-white' : 'text-[#52627F] hover:bg-slate-100' }}">
-            Semua Transfer
-        </a>
-        <a href="{{ route('transfers.index', ['status' => 'PROPOSED']) }}" class="px-3 py-1.5 rounded-md font-semibold transition {{ request('status') === 'PROPOSED' ? 'bg-[#1D4ED8] text-white' : 'text-[#52627F] hover:bg-slate-100' }}">
-            Menunggu Otorisasi Donor
-        </a>
-        <a href="{{ route('transfers.index', ['status' => 'APPROVED']) }}" class="px-3 py-1.5 rounded-md font-semibold transition {{ request('status') === 'APPROVED' ? 'bg-[#1D4ED8] text-white' : 'text-[#52627F] hover:bg-slate-100' }}">
-            Menunggu Kesediaan Penerima
-        </a>
-        <a href="{{ route('transfers.index', ['status' => 'IN_TRANSIT']) }}" class="px-3 py-1.5 rounded-md font-semibold transition {{ request('status') === 'IN_TRANSIT' ? 'bg-[#1D4ED8] text-white' : 'text-[#52627F] hover:bg-slate-100' }}">
-            Dalam Pengiriman
-        </a>
-        <a href="{{ route('transfers.index', ['status' => 'COMPLETED']) }}" class="px-3 py-1.5 rounded-md font-semibold transition {{ request('status') === 'COMPLETED' ? 'bg-[#1D4ED8] text-white' : 'text-[#52627F] hover:bg-slate-100' }}">
-            Selesai (Stok Termutasi)
-        </a>
-    </div>
+    <section class="ml-registry-panel" aria-labelledby="transfers-title">
+        <h2 id="transfers-title" class="ml-sr-only">Daftar transfer obat</h2>
 
-    <!-- Transfers Table -->
-    <div class="bg-white rounded-xl border border-[#DBE5F5] shadow-xs overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
-                <thead>
-                    <tr class="bg-slate-50 border-b border-[#DBE5F5] text-[#52627F] uppercase tracking-wider text-[11px]">
-                        <th class="py-3.5 px-4 font-mono">Kode Transfer</th>
-                        <th class="py-3.5 px-4">Obat & Jumlah</th>
-                        <th class="py-3.5 px-4">Alur Faskes (Donor &rarr; Penerima)</th>
-                        <th class="py-3.5 px-4 text-center font-mono">Match Score</th>
-                        <th class="py-3.5 px-4">Status Alur</th>
-                        <th class="py-3.5 px-4 text-right">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-[#DBE5F5]">
-                    @forelse($transfers as $t)
-                        <tr class="hover:bg-slate-50/70 transition">
-                            <!-- Code & Date -->
-                            <td class="py-3.5 px-4 font-mono">
-                                <span class="font-bold text-[#0B1F4B]">{{ $t->transfer_code }}</span>
-                                <span class="block text-[10px] text-[#52627F]">{{ $t->created_at->format('d M Y, H:i') }}</span>
-                            </td>
-
-                            <!-- Medicine & Qty -->
-                            <td class="py-3.5 px-4">
-                                <span class="font-bold text-[#0B1F4B]">{{ $t->batch->medicine->name }}</span>
-                                <span class="block text-[11px] text-[#52627F]">
-                                    Jumlah: <strong class="text-[#0B1F4B]">{{ number_format($t->quantity) }}</strong> {{ $t->batch->medicine->unit }} (Batch: {{ $t->batch->batch_number }})
-                                </span>
-                            </td>
-
-                            <!-- Donor -> Recipient -->
-                            <td class="py-3.5 px-4">
-                                <div class="flex items-center gap-1.5 text-xs">
-                                    <span class="font-semibold text-[#0B1F4B]">{{ $t->donorFacility->name }}</span>
-                                    <span class="text-[#52627F]">&rarr;</span>
-                                    <span class="font-semibold text-[#1D4ED8]">{{ $t->recipientFacility->name }}</span>
-                                </div>
-                                <span class="text-[10px] text-[#52627F] block mt-0.5">Jarak Haversine: {{ $t->distance_km }} km</span>
-                            </td>
-
-                            <!-- Match Score -->
-                            <td class="py-3.5 px-4 text-center font-mono font-bold text-[#1D4ED8]">
-                                {{ $t->match_score }}%
-                            </td>
-
-                            <!-- Status Badge with Explicit Text -->
-                            <td class="py-3.5 px-4">
-                                @if($t->status === 'PROPOSED')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-[#B7791F] border border-amber-300">
-                                        [MENUNGGU OTORISASI DONOR]
-                                    </span>
-                                @elseif($t->status === 'APPROVED')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-[#1D4ED8] border border-blue-300">
-                                        [MENUNGGU KESEDIAAN PENERIMA]
-                                    </span>
-                                @elseif($t->status === 'ACCEPTED')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-[#1D4ED8] border border-blue-300">
-                                        [SIAP KIRIM]
-                                    </span>
-                                @elseif($t->status === 'IN_TRANSIT')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-300">
-                                        [DALAM PERJALANAN / KURIR]
-                                    </span>
-                                @elseif($t->status === 'COMPLETED')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-[#0B1F4B] border border-slate-300">
-                                        [SELESAI: STOK TERMUTASI]
-                                    </span>
-                                @elseif($t->status === 'CANCELLED')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-[#D9480F] border border-red-300">
-                                        [DIBATALKAN]
-                                    </span>
-                                @endif
-                            </td>
-
-                            <!-- Action -->
-                            <td class="py-3.5 px-4 text-right">
-                                <a href="{{ route('transfers.show', $t) }}" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded text-[#1D4ED8] bg-[#EAF1FF] hover:bg-blue-100 border border-blue-200 transition">
-                                    <span>Lacak & Periksa</span>
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
+        @if($transfers->isEmpty())
+            <div class="ml-empty-state">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                    <path d="M4 7h11l4 4v6H4z" />
+                    <path d="M4 7V5h8v2M8 13h6" />
+                </svg>
+                <p class="ml-empty-title">Belum ada transfer pada kategori ini</p>
+                <p class="ml-empty-copy">Usulan transfer muncul setelah stok berisiko diajukan dari dashboard.</p>
+                <a href="{{ route('dashboard') }}" class="ml-btn-quiet">Kembali ke dashboard</a>
+            </div>
+        @else
+            <div class="ml-table-responsive">
+                <table class="ml-table ml-table-airy ml-table-registry ml-table-transfers">
+                    <caption class="ml-sr-only">Daftar transfer dan status alurnya</caption>
+                    <thead>
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-[#52627F]">
-                                Belum ada riwayat pengajuan transfer pada kategori ini.
-                            </td>
+                            <th scope="col">Transfer</th>
+                            <th scope="col">Obat &amp; jumlah</th>
+                            <th scope="col">Rute fasilitas</th>
+                            <th scope="col">Skor</th>
+                            <th scope="col">Status</th>
+                            <th scope="col"><span class="ml-sr-only">Aksi</span></th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        @if($transfers->hasPages())
-            <div class="p-4 border-t border-[#DBE5F5]">
+                    </thead>
+                    <tbody>
+                        @foreach($transfers as $transfer)
+                            @php
+                                $statusMeta = $statusLabels[$transfer->status] ?? ['label' => $transfer->status, 'tone' => 'inactive'];
+                            @endphp
+                            <tr>
+                                <td>
+                                    <a href="{{ route('transfers.show', $transfer) }}" class="ml-transfer-code">{{ $transfer->transfer_code }}</a>
+                                    <div class="ml-cell-meta">{{ $transfer->created_at->format('d M Y, H:i') }}</div>
+                                </td>
+                                <td data-label="Obat & jumlah">
+                                    <div class="ml-cell-title">{{ $transfer->batch->medicine->name }}</div>
+                                    <div class="ml-cell-meta">
+                                        {{ number_format($transfer->quantity) }} {{ $transfer->batch->medicine->unit }}
+                                        <span class="ml-meta-dot">·</span>
+                                        Batch {{ $transfer->batch->batch_number }}
+                                    </div>
+                                </td>
+                                <td data-label="Rute fasilitas">
+                                    <div class="ml-route">
+                                        <span class="ml-route-name">{{ $transfer->donorFacility->name }}</span>
+                                        <span class="ml-route-arrow" aria-hidden="true">→</span>
+                                        <span class="ml-route-name is-recipient">{{ $transfer->recipientFacility->name }}</span>
+                                    </div>
+                                    <div class="ml-cell-meta">{{ $transfer->distance_km }} km · jarak udara</div>
+                                </td>
+                                <td data-label="Skor">
+                                    <span class="ml-score">{{ $transfer->match_score }}%</span>
+                                </td>
+                                <td data-label="Status">
+                                    <span class="ml-status ml-status-{{ $statusMeta['tone'] }}">{{ $statusMeta['label'] }}</span>
+                                </td>
+                                <td class="is-right">
+                                    <a href="{{ route('transfers.show', $transfer) }}" class="ml-row-open">
+                                        Lacak
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                            <path d="M5 12h14M13 6l6 6-6 6" />
+                                        </svg>
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="ml-pagination-wrap">
                 {{ $transfers->links() }}
             </div>
         @endif
-    </div>
-
+    </section>
 </div>
 @endsection

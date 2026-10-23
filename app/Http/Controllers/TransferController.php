@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Batch;
 use App\Models\Facility;
 use App\Models\Transfer;
+use App\Models\User;
 use App\Services\RedistributionEngine;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -83,13 +84,30 @@ class TransferController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
-        $batch = Batch::with(['medicine', 'facility'])->findOrFail($validated['batch_id']);
+        $batch = Batch::query()
+            ->with(['medicine', 'facility'])
+            ->whereKey($validated['batch_id'])
+            ->firstOrFail();
+
+        if (! $user instanceof User || (! $user->isSysadmin() && $user->facility_id !== $batch->facility_id)) {
+            abort(403, 'Anda hanya dapat mengusulkan redistribusi untuk fasilitas Anda sendiri.');
+        }
+
+        if ($batch->status !== 'ACTIVE' || $batch->facility === null) {
+            return back()->withErrors(['batch_id' => 'Batch ini tidak tersedia untuk redistribusi.']);
+        }
 
         if ($validated['quantity'] > $batch->current_stock) {
             return back()->withErrors(['quantity' => 'Jumlah transfer melebihi stok yang tersedia.']);
         }
 
-        $recipient = Facility::findOrFail($validated['recipient_facility_id']);
+        $recipient = Facility::query()
+            ->whereKey($validated['recipient_facility_id'])
+            ->firstOrFail();
+
+        if ($recipient->is($batch->facility) || ! $recipient->isActive() || $recipient->type === 'DINKES') {
+            return back()->withErrors(['recipient_facility_id' => 'Fasilitas penerima harus aktif dan berbeda dari fasilitas donor.']);
+        }
 
         // Distance & Scoring
         $distanceKm = RedistributionEngine::calculateHaversineDistance(
@@ -159,6 +177,21 @@ class TransferController extends Controller
      */
     public function show(Transfer $transfer): View
     {
+        $user = Auth::user();
+
+        if (! $user instanceof User) {
+            abort(403);
+        }
+
+        $isParty = in_array($user->facility_id, [
+            $transfer->donor_facility_id,
+            $transfer->recipient_facility_id,
+        ], true);
+
+        if (! $user->isDinkesAuditor() && ! $isParty) {
+            abort(403, 'Anda tidak memiliki akses ke transfer ini.');
+        }
+
         $transfer->load([
             'donorFacility',
             'recipientFacility',
@@ -183,7 +216,17 @@ class TransferController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->canApproveDonorTransfer() && $user->facility_id !== $transfer->donor_facility_id) {
+        if (! $user instanceof User) {
+            abort(403);
+        }
+
+        if ($transfer->status !== 'PROPOSED') {
+            return back()->withErrors(['status' => 'Transfer ini tidak berada pada tahap persetujuan donor.']);
+        }
+
+        $isDonor = $user->isSysadmin() || $user->facility_id === $transfer->donor_facility_id;
+
+        if (! $isDonor || ! $user->canApproveDonorTransfer()) {
             abort(403, 'Hanya Kepala Instalasi Farmasi faskes donor yang dapat menyetujui pengeluaran obat.');
         }
 
@@ -212,7 +255,17 @@ class TransferController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isDinkesAuditor() && $user->facility_id !== $transfer->recipient_facility_id) {
+        if (! $user instanceof User) {
+            abort(403);
+        }
+
+        if ($transfer->status !== 'APPROVED') {
+            return back()->withErrors(['status' => 'Transfer ini belum disetujui faskes donor.']);
+        }
+
+        $isRecipient = $user->isSysadmin() || $user->facility_id === $transfer->recipient_facility_id;
+
+        if (! $isRecipient || ! $user->canAcceptRecipientTransfer()) {
             abort(403, 'Hanya perwakilan faskes penerima yang dapat menerima transfer ini.');
         }
 
@@ -240,6 +293,20 @@ class TransferController extends Controller
     public function dispatchShipment(Request $request, Transfer $transfer): RedirectResponse
     {
         $user = Auth::user();
+
+        if (! $user instanceof User) {
+            abort(403);
+        }
+
+        if ($transfer->status !== 'ACCEPTED') {
+            return back()->withErrors(['status' => 'Pengiriman hanya dapat diproses setelah faskes penerima menyetujui transfer.']);
+        }
+
+        $isDonor = $user->isSysadmin() || $user->facility_id === $transfer->donor_facility_id;
+
+        if (! $isDonor || (! $user->isSysadmin() && ! $user->hasFacilityRole())) {
+            abort(403, 'Hanya staf faskes donor yang dapat memberangkatkan pengiriman.');
+        }
 
         $validated = $request->validate([
             'tracking_number' => 'required|string|max:100',
@@ -272,7 +339,17 @@ class TransferController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->canConfirmPhysicalArrival() && $user->facility_id !== $transfer->recipient_facility_id) {
+        if (! $user instanceof User) {
+            abort(403);
+        }
+
+        if ($transfer->status !== 'IN_TRANSIT') {
+            return back()->withErrors(['status' => 'Penerimaan fisik hanya dapat dikonfirmasi saat obat dalam perjalanan.']);
+        }
+
+        $isRecipient = $user->isSysadmin() || $user->facility_id === $transfer->recipient_facility_id;
+
+        if (! $isRecipient || ! $user->canConfirmPhysicalArrival()) {
             abort(403, 'Hanya Kepala/Direktur faskes penerima yang berwenang memvalidasi penerimaan fisik obat.');
         }
 
@@ -287,6 +364,24 @@ class TransferController extends Controller
     public function cancel(Request $request, Transfer $transfer): RedirectResponse
     {
         $user = Auth::user();
+
+        if (! $user instanceof User) {
+            abort(403);
+        }
+
+        if (! in_array($transfer->status, ['PROPOSED', 'APPROVED', 'ACCEPTED'], true)) {
+            return back()->withErrors(['status' => 'Transfer pada tahap ini tidak dapat dibatalkan.']);
+        }
+
+        $isParty = $user->isSysadmin() || in_array($user->facility_id, [
+            $transfer->donor_facility_id,
+            $transfer->recipient_facility_id,
+        ], true);
+
+        if (! $isParty) {
+            abort(403, 'Anda tidak berwenang membatalkan transfer ini.');
+        }
+
         $reason = $request->input('reason', 'Dibatalkan oleh pengguna.');
 
         $transfer->update([

@@ -23,7 +23,7 @@ class BatchController extends Controller
         $user = Auth::user();
         $facilityId = $user->facility_id;
 
-        if (($user->isDinkesAuditor() || $user->role === 'SYSADMIN') && $request->filled('facility_id')) {
+        if ($user->isDinkesAuditor() && $request->filled('facility_id')) {
             $facilityId = (int) $request->get('facility_id');
         }
 
@@ -70,7 +70,7 @@ class BatchController extends Controller
 
         $batches = $query->orderBy('expiry_date', 'asc')->paginate(15)->withQueryString();
 
-        $facilitiesList = Facility::where('type', '!=', 'DINKES')->get();
+        $facilitiesList = Facility::where('type', '!=', 'DINKES')->where('status', 'ACTIVE')->get();
 
         return view('batches.index', [
             'batches' => $batches,
@@ -123,7 +123,7 @@ class BatchController extends Controller
         }
 
         $facilityId = $user->facility_id;
-        if ($user->role === 'SYSADMIN' && $request->filled('facility_id')) {
+        if ($user->isSysadmin() && $request->filled('facility_id')) {
             $facilityId = (int) $request->get('facility_id');
         }
 
@@ -225,7 +225,7 @@ class BatchController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isDinkesAuditor() && $user->role !== 'SYSADMIN' && $user->facility_id !== $batch->facility_id) {
+        if (! $user->isDinkesAuditor() && $user->facility_id !== $batch->facility_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengedit batch fasilitas lain.');
         }
 
@@ -244,7 +244,7 @@ class BatchController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isDinkesAuditor() && $user->role !== 'SYSADMIN' && $user->facility_id !== $batch->facility_id) {
+        if (! $user->isDinkesAuditor() && $user->facility_id !== $batch->facility_id) {
             abort(403, 'Anda tidak berwenang mengedit batch ini.');
         }
 
@@ -281,7 +281,7 @@ class BatchController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isDinkesAuditor() && $user->role !== 'SYSADMIN' && $user->facility_id !== $batch->facility_id) {
+        if (! $user->isDinkesAuditor() && $user->facility_id !== $batch->facility_id) {
             abort(403, 'Anda tidak berwenang menghapus batch ini.');
         }
 

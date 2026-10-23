@@ -1,4 +1,4 @@
-@extends('layouts.mediloop', ['title' => 'Edit Batch #'.$batch->batch_number.' — MediLoop'])
+@extends('layouts.mediloop', ['title' => 'Edit Batch #'.$batch->batch_number])
 
 @section('content')
 <div class="space-y-6 max-w-3xl mx-auto">

@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Middleware\EnsureFacilityApprover;
+use App\Http\Middleware\EnsureFacilityIsActive;
+use App\Http\Middleware\EnsureUserIsActive;
+use App\Http\Middleware\EnsureUserIsSysadmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,7 +16,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'active' => EnsureUserIsActive::class,
+            'facility.active' => EnsureFacilityIsActive::class,
+            'facility.approver' => EnsureFacilityApprover::class,
+            'sysadmin' => EnsureUserIsSysadmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -1,4 +1,4 @@
-@extends('layouts.mediloop', ['title' => 'Inventaris & Prediksi Risiko Farmasi — MediLoop'])
+@extends('layouts.mediloop', ['title' => 'Inventaris & Prediksi Risiko Farmasi'])
 
 @section('content')
 <div class="ml-dashboard">
@@ -188,7 +188,7 @@
         <form method="GET" action="{{ route('batches.index') }}" style="display: flex; flex-direction: column; gap: 16px;">
             <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
                 {{-- Facility selector (for Dinkes / Sysadmin) --}}
-                @if(($user->isDinkesAuditor() || $user->role === 'SYSADMIN') && isset($facilitiesList))
+                @if($user->isDinkesAuditor() && isset($facilitiesList))
                     <div style="min-width: 240px; flex: 1;">
                         <label for="filter-facility" class="ml-sr-only">Pilih Fasilitas</label>
                         <select id="filter-facility" name="facility_id" onchange="this.form.submit()" style="width: 100%; height: 42px; padding: 0 14px; background: var(--ml-surface); border: 1px solid var(--ml-border); border-radius: 10px; font-size: 13px; color: var(--ml-text); font-family: var(--font-body); outline: none;">

@@ -40,7 +40,7 @@ test('network page ranks partner facilities from nearest and excludes dinkes', f
 
     $user = User::factory()->create([
         'facility_id' => $origin->id,
-        'role' => 'DONOR_STAFF',
+        'role' => 'FACILITY_STAFF',
     ]);
 
     $response = $this->actingAs($user)->get(route('network.index'));
@@ -78,7 +78,7 @@ test('network page filters facilities by type and cold chain readiness', functio
 
     $user = User::factory()->create([
         'facility_id' => $origin->id,
-        'role' => 'DONOR_STAFF',
+        'role' => 'FACILITY_STAFF',
     ]);
 
     $typeFiltered = $this->actingAs($user)->get(route('network.index', ['type' => 'KLINIK']));
@@ -146,7 +146,7 @@ test('propose page can rank recipients by nearest distance', function () {
 
     $user = User::factory()->create([
         'facility_id' => $donor->id,
-        'role' => 'DONOR_STAFF',
+        'role' => 'FACILITY_STAFF',
     ]);
 
     $response = $this->actingAs($user)->get(route('transfers.propose', [

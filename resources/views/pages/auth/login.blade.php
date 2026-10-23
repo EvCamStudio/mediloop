@@ -1,18 +1,18 @@
 <x-layouts::auth :title="__('Masuk')">
     @php
-        $inputClass = 'w-full rounded-lg border border-[#DBE5F5] bg-white px-3.5 py-2.5 text-sm text-[#0B1F4B] shadow-xs outline-none transition placeholder:text-[#8A99B3] focus:border-[#1D4ED8] focus:ring-2 focus:ring-[#1D4ED8]/20';
+        $inputClass = 'w-full rounded-lg border border-border-strong bg-surface-raised px-3.5 py-2.5 text-sm text-text shadow-xs outline-none transition placeholder:text-text-subtle focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20';
     @endphp
 
     <div class="flex flex-col gap-6">
         <header>
-            <h1 class="text-2xl font-extrabold tracking-tight text-[#0B1F4B]">Masuk ke MediLoop</h1>
-            <p class="mt-1.5 text-sm text-[#52627F]">
+            <h1 class="text-2xl font-semibold tracking-tight text-text">Masuk ke MediLoop</h1>
+            <p class="mt-1.5 text-sm text-text-muted">
                 Gunakan akun fasilitas kesehatan Anda untuk melanjutkan.
             </p>
         </header>
 
         @if (session('status'))
-            <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-sm font-medium text-emerald-800"
+            <div class="rounded-lg border border-blue-200 bg-blue-50 px-3.5 py-2.5 text-sm font-medium text-blue-900"
                 role="status">
                 {{ session('status') }}
             </div>
@@ -22,7 +22,7 @@
             @csrf
 
             <div>
-                <label for="email" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-[#0B1F4B]">
+                <label for="email" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text">
                     Email
                 </label>
                 <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
@@ -35,12 +35,12 @@
 
             <div>
                 <div class="mb-1.5 flex items-center justify-between gap-3">
-                    <label for="password" class="block text-xs font-bold uppercase tracking-wide text-[#0B1F4B]">
+                    <label for="password" class="block text-xs font-semibold uppercase tracking-wide text-text">
                         Password
                     </label>
                     @if (Route::has('password.request'))
                         <a href="{{ route('password.request') }}"
-                            class="text-xs font-semibold text-[#1D4ED8] hover:text-[#1E40AF]">
+                            class="text-xs font-semibold text-brand-primary hover:text-brand-primary-strong">
                             Lupa password?
                         </a>
                     @endif
@@ -53,22 +53,22 @@
                 @enderror
             </div>
 
-            <label for="remember" class="flex items-center gap-2.5 text-sm text-[#52627F]">
+            <label for="remember" class="flex items-center gap-2.5 text-sm text-text-muted">
                 <input id="remember" name="remember" type="checkbox" value="1" @checked(old('remember'))
-                    class="size-4 rounded border-[#DBE5F5] text-[#1D4ED8] focus:ring-2 focus:ring-[#1D4ED8]/30">
+                    class="size-4 rounded border-border-strong text-brand-primary focus:ring-2 focus:ring-brand-primary/30">
                 <span>Ingat saya di perangkat ini</span>
             </label>
 
             <button type="submit"
-                class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#1D4ED8] px-4 py-2.5 text-sm font-bold text-white shadow-xs transition hover:bg-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D4ED8] focus-visible:ring-offset-2"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white shadow-xs transition hover:bg-brand-primary-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2"
                 data-test="login-button">
                 Masuk
             </button>
         </form>
 
-        <p class="text-center text-sm text-[#52627F]">
+        <p class="text-center text-sm text-text-muted">
             Belum punya akun?
-            <a href="{{ route('register') }}" class="font-semibold text-[#1D4ED8] hover:text-[#1E40AF]">Daftar akun faskes</a>
+            <a href="{{ route('facility-requests.create') }}" class="font-semibold text-brand-primary hover:text-brand-primary-strong">Ajukan fasilitas</a>
         </p>
     </div>
 </x-layouts::auth>

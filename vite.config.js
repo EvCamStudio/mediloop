@@ -11,6 +11,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/passkeys.js',
                 'resources/js/network-map.js',
+                'resources/js/facility-map-picker.js',
             ],
             refresh: true,
             fonts: [
