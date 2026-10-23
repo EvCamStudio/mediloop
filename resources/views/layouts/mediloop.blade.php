@@ -476,11 +476,12 @@
         /* Stat Cards */
         .ml-stat-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 20px;
             margin-bottom: 24px;
         }
         .ml-stat-card {
+            min-width: 0;
             background: #fff;
             border: 1px solid var(--ml-border);
             border-radius: 16px;
@@ -1400,7 +1401,7 @@
                 display: block;
             }
             .ml-stat-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 14px;
             }
             .ml-table-airy { min-width: 0; }
@@ -1590,7 +1591,7 @@
 
         @media (max-width: 480px) {
             .ml-stat-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 8px;
             }
             .ml-stat-card {
@@ -1856,7 +1857,7 @@
             font-size: 13px;
             line-height: 1.5;
             color: var(--ml-text);
-            overflow-wrap: anywhere;
+            overflow-wrap: break-word;
         }
         .ml-detail-value.is-mono {
             font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -2526,7 +2527,7 @@
             color: var(--ml-text);
             font-size: 12px;
             text-align: right;
-            overflow-wrap: anywhere;
+            overflow-wrap: break-word;
         }
         .ml-settings-list dd.is-mono {
             font-family: var(--font-code);

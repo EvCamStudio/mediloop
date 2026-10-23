@@ -28,7 +28,7 @@
     {{-- Clinical Telemetry Header --}}
     <header class="ml-page-head" style="margin-bottom: 26px;">
         <div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 6px;">
                 <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 99px; background: #EFF6FF; border: 1px solid #BFDBFE; font-size: 11px; font-weight: 700; color: #1D4ED8; text-transform: uppercase; letter-spacing: 0.04em;">
                     <span style="width: 7px; height: 7px; border-radius: 50%; background: #16A34A; box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);"></span>
                     Mesin Prediksi Aktif &bull; Algoritma Tri-Faktor

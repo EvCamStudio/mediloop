@@ -136,6 +136,11 @@ function initNetworkMap() {
 
     addZoomHint(map);
 
+    map.setView(
+        origin ? [origin.lat, origin.lng] : [-6.1754, 106.8272],
+        12,
+    );
+
     const markers = new Map();
     const bounds = L.latLngBounds([]);
 

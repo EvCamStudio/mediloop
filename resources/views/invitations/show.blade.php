@@ -82,23 +82,62 @@
 
             <div class="pub-field">
                 <label for="password" class="pub-label">Password <span class="pub-required">*</span></label>
-                <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    class="pub-input @error('password') is-invalid @enderror"
-                    required
-                    autocomplete="new-password"
-                    aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
-                    @if($errors->has('password')) aria-describedby="password-error" @endif
-                >
+                <div class="password-control">
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        class="pub-input password-input @error('password') is-invalid @enderror"
+                        required
+                        autocomplete="new-password"
+                        aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
+                        @if($errors->has('password')) aria-describedby="password-error" @endif
+                    >
+                    <button type="button" class="password-toggle" data-password-toggle
+                        data-password-target="password" data-label-show="Tampilkan password"
+                        data-label-hide="Sembunyikan password" aria-controls="password"
+                        aria-label="Tampilkan password" aria-pressed="false">
+                        <svg class="password-toggle-show" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" aria-hidden="true">
+                            <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z" />
+                            <circle cx="12" cy="12" r="2.8" />
+                        </svg>
+                        <svg class="password-toggle-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" aria-hidden="true">
+                            <path d="M3 3l18 18" />
+                            <path d="M10.6 6.2A10.8 10.8 0 0112 6c6 0 9.5 6 9.5 6a16.5 16.5 0 01-3 3.6" />
+                            <path d="M6.2 6.8C3.8 8.5 2.5 12 2.5 12s3.5 6 9.5 6c1.4 0 2.7-.3 3.8-.8" />
+                        </svg>
+                    </button>
+                </div>
                 <p class="pub-help">Gunakan password yang kuat dan tidak dipakai di layanan lain.</p>
                 @error('password')<p class="pub-error" id="password-error">{{ $message }}</p>@enderror
             </div>
 
             <div class="pub-field">
                 <label for="password_confirmation" class="pub-label">Ulangi password <span class="pub-required">*</span></label>
-                <input id="password_confirmation" name="password_confirmation" type="password" class="pub-input" required autocomplete="new-password">
+                <div class="password-control">
+                    <input id="password_confirmation" name="password_confirmation" type="password"
+                        class="pub-input password-input" required autocomplete="new-password">
+                    <button type="button" class="password-toggle" data-password-toggle
+                        data-password-target="password_confirmation"
+                        data-label-show="Tampilkan ulangi password"
+                        data-label-hide="Sembunyikan ulangi password"
+                        aria-controls="password_confirmation" aria-label="Tampilkan ulangi password"
+                        aria-pressed="false">
+                        <svg class="password-toggle-show" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" aria-hidden="true">
+                            <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z" />
+                            <circle cx="12" cy="12" r="2.8" />
+                        </svg>
+                        <svg class="password-toggle-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" aria-hidden="true">
+                            <path d="M3 3l18 18" />
+                            <path d="M10.6 6.2A10.8 10.8 0 0112 6c6 0 9.5 6 9.5 6a16.5 16.5 0 01-3 3.6" />
+                            <path d="M6.2 6.8C3.8 8.5 2.5 12 2.5 12s3.5 6 9.5 6c1.4 0 2.7-.3 3.8-.8" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <div class="pub-actions">

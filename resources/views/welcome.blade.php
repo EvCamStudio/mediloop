@@ -109,7 +109,7 @@
                     </div>
 
                     <!-- Hard Operational Constraints (No PHI, Decision-Support Only) -->
-                    <div class="grid grid-cols-3 gap-4 mt-10 pt-8 border-t border-[#DBE5F5] text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10 pt-8 border-t border-[#DBE5F5] text-xs">
                         <div>
                             <span class="block font-bold text-[#0B1F4B]">Zero Data Pasien</span>
                             <span class="text-[#52627F]">Logistik batch tanpa identitas rekam medis (PHI).</span>
@@ -128,13 +128,13 @@
                 <!-- Right: Visual Anchor (Pharmaceutical 3D Capsule & Ledger Stamp) -->
                 <div class="lg:col-span-5 flex justify-center">
                     <div class="w-full max-w-md p-6 bg-white rounded-2xl border border-[#DBE5F5] shadow-lg relative">
-                        <div class="flex items-center justify-between pb-4 border-b border-[#DBE5F5]">
-                            <div>
+                        <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#DBE5F5]">
+                            <div class="min-w-0">
                                 <span class="text-[11px] font-mono text-[#52627F]">KASUS BENCHMARK PRD</span>
                                 <h3 class="text-sm font-bold text-[#0B1F4B]">Ceftriaxone 1g Injeksi</h3>
                             </div>
                             <span
-                                class="px-2 py-0.5 text-xs font-bold text-[#D9480F] bg-orange-50 border border-orange-200 rounded">
+                                class="shrink-0 px-2 py-0.5 text-xs font-bold text-[#D9480F] bg-orange-50 border border-orange-200 rounded">
                                 [RISIKO TINGGI: 300 UNIT]
                             </span>
                         </div>
@@ -187,7 +187,7 @@
     </section>
 
     <!-- Interactive Live Waste & Risk Simulator (Client-Side Reactive) -->
-    <section id="simulator" class="py-16 bg-[#EAF1FF]/40 border-b border-[#DBE5F5]">
+    <section id="simulator" class="scroll-mt-20 py-16 bg-[#EAF1FF]/40 border-b border-[#DBE5F5]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-12">
                 <span class="text-xs font-bold text-[#1D4ED8] uppercase tracking-wider">Algoritma PRD Section 9</span>

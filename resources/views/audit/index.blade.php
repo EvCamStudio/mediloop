@@ -6,9 +6,9 @@
     <!-- Header & Regional Overview -->
     <div class="bg-white rounded-xl border border-[#DBE5F5] p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <div class="flex items-center gap-2 mb-1">
+            <div class="flex flex-wrap items-center gap-2 mb-1">
                 <span class="text-xs font-bold text-[#1D4ED8] uppercase tracking-wider">PORTAL PENGAWASAN REGIONAL</span>
-                <span class="text-[#52627F]">•</span>
+                <span class="hidden sm:inline text-[#52627F]">•</span>
                 <span class="text-xs text-[#52627F] font-mono">DINAS KESEHATAN PROVINSI DKI JAKARTA</span>
             </div>
             <h1 class="text-2xl font-extrabold text-[#0B1F4B]">Pengawasan Logistik & Audit Redistribusi Obat</h1>
@@ -25,7 +25,7 @@
     </div>
 
     <!-- 4 High-Level Impact Metrics -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Metric 1: Prevented Waste Units -->
         <div class="p-5 bg-white rounded-xl border border-[#DBE5F5] shadow-xs">
             <span class="text-xs font-medium text-[#52627F] block">Total Obat Berhasil Diselamatkan</span>
@@ -65,7 +65,7 @@
 
     <!-- Completed Rebalances Table -->
     <div class="bg-white rounded-xl border border-[#DBE5F5] shadow-xs overflow-hidden">
-        <div class="p-5 border-b border-[#DBE5F5] flex items-center justify-between">
+        <div class="p-5 border-b border-[#DBE5F5] flex flex-wrap items-center justify-between gap-3">
             <div>
                 <h2 class="text-base font-bold text-[#0B1F4B]">Rekap Transaksi Redistribusi Berhasil</h2>
                 <p class="text-xs text-[#52627F]">Transfer yang telah terkonfirmasi fisik dan selesai mutasi stok secara atomik.</p>
@@ -76,7 +76,7 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
+            <table class="w-full min-w-[980px] text-left text-xs border-collapse">
                 <thead>
                     <tr class="bg-slate-50 border-b border-[#DBE5F5] text-[#52627F] uppercase tracking-wider text-[11px]">
                         <th class="py-3 px-4 font-mono">Kode Transfer</th>
@@ -132,7 +132,7 @@
 
     <!-- Immutable Audit Trail Table -->
     <div class="bg-white rounded-xl border border-[#DBE5F5] shadow-xs overflow-hidden">
-        <div class="p-5 border-b border-[#DBE5F5] flex items-center justify-between bg-slate-50">
+        <div class="p-5 border-b border-[#DBE5F5] flex flex-wrap items-center justify-between gap-3 bg-slate-50">
             <div>
                 <h2 class="text-base font-bold text-[#0B1F4B]">Jejak Audit Sistem (Immutable Audit Logs)</h2>
                 <p class="text-xs text-[#52627F]">Catatan permanen setiap tindakan perubahan status atau mutasi inventaris.</p>
@@ -141,7 +141,7 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs border-collapse">
+            <table class="w-full min-w-[980px] text-left text-xs border-collapse">
                 <thead>
                     <tr class="bg-slate-100 border-b border-[#DBE5F5] text-[#52627F] uppercase tracking-wider text-[11px]">
                         <th class="py-3 px-4 font-mono">Waktu (WIB)</th>

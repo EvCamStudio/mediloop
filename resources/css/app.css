@@ -54,6 +54,7 @@
         font-family: var(--font-sans);
         -webkit-font-smoothing: antialiased;
         text-rendering: optimizeLegibility;
+        overflow-wrap: break-word;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -111,5 +112,63 @@
     }
     ::-webkit-scrollbar-corner {
         background: transparent;
+    }
+}
+
+@layer components {
+    .password-control {
+        position: relative;
+    }
+
+    .password-control > input,
+    .password-control > .password-input {
+        padding-right: 2.9rem;
+    }
+
+    .password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 0.35rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.35rem;
+        height: 2.35rem;
+        padding: 0;
+        border: 0;
+        border-radius: 0.5rem;
+        background: transparent;
+        color: var(--color-text-subtle);
+        cursor: pointer;
+        transform: translateY(-50%);
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .password-toggle:hover {
+        background-color: var(--color-surface-subtle);
+        color: var(--color-text);
+    }
+
+    .password-toggle:focus-visible {
+        outline: 2px solid var(--color-brand-primary);
+        outline-offset: 1px;
+    }
+
+    .password-toggle svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    .password-toggle-hide {
+        display: none;
+    }
+
+    .password-toggle.is-visible .password-toggle-show {
+        display: none;
+    }
+
+    .password-toggle.is-visible .password-toggle-hide {
+        display: block;
     }
 }

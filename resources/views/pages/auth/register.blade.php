@@ -109,9 +109,26 @@
                 <label for="password" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-[#0B1F4B]">
                     Password
                 </label>
-                <input id="password" name="password" type="password" required autocomplete="new-password"
-                    placeholder="Minimal 8 karakter" class="{{ $inputClass }}"
-                    @error('password') aria-invalid="true" aria-describedby="password-error" @enderror>
+                <div class="password-control">
+                    <input id="password" name="password" type="password" required autocomplete="new-password"
+                        placeholder="Minimal 8 karakter" class="{{ $inputClass }} password-input"
+                        @error('password') aria-invalid="true" aria-describedby="password-error" @enderror>
+                    <button type="button" class="password-toggle" data-password-toggle
+                        data-password-target="password" aria-controls="password" aria-label="Tampilkan password"
+                        aria-pressed="false">
+                        <svg class="password-toggle-show" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" aria-hidden="true">
+                            <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z" />
+                            <circle cx="12" cy="12" r="2.8" />
+                        </svg>
+                        <svg class="password-toggle-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" aria-hidden="true">
+                            <path d="M3 3l18 18" />
+                            <path d="M10.6 6.2A10.8 10.8 0 0112 6c6 0 9.5 6 9.5 6a16.5 16.5 0 01-3 3.6" />
+                            <path d="M6.2 6.8C3.8 8.5 2.5 12 2.5 12s3.5 6 9.5 6c1.4 0 2.7-.3 3.8-.8" />
+                        </svg>
+                    </button>
+                </div>
                 @error('password')
                     <p id="password-error" class="mt-1.5 text-xs font-medium text-[#B42318]">{{ $message }}</p>
                 @enderror
@@ -122,8 +139,29 @@
                     class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-[#0B1F4B]">
                     Konfirmasi Password
                 </label>
-                <input id="password_confirmation" name="password_confirmation" type="password" required
-                    autocomplete="new-password" placeholder="Ulangi password" class="{{ $inputClass }}">
+                <div class="password-control">
+                    <input id="password_confirmation" name="password_confirmation" type="password" required
+                        autocomplete="new-password" placeholder="Ulangi password"
+                        class="{{ $inputClass }} password-input">
+                    <button type="button" class="password-toggle" data-password-toggle
+                        data-password-target="password_confirmation"
+                        data-label-show="Tampilkan ulangi password"
+                        data-label-hide="Sembunyikan ulangi password"
+                        aria-controls="password_confirmation" aria-label="Tampilkan ulangi password"
+                        aria-pressed="false">
+                        <svg class="password-toggle-show" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" aria-hidden="true">
+                            <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z" />
+                            <circle cx="12" cy="12" r="2.8" />
+                        </svg>
+                        <svg class="password-toggle-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.8" aria-hidden="true">
+                            <path d="M3 3l18 18" />
+                            <path d="M10.6 6.2A10.8 10.8 0 0112 6c6 0 9.5 6 9.5 6a16.5 16.5 0 01-3 3.6" />
+                            <path d="M6.2 6.8C3.8 8.5 2.5 12 2.5 12s3.5 6 9.5 6c1.4 0 2.7-.3 3.8-.8" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <button type="submit"
