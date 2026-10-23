@@ -214,7 +214,7 @@
             cursor: pointer;
             font-family: var(--font-body);
             text-align: left;
-            transition: all 0.12s ease;
+            transition: background-color 0.12s ease, color 0.12s ease;
         }
         .ml-settings-menu .ml-menu-item:hover {
             background: rgba(255,255,255,0.1);
@@ -297,7 +297,7 @@
             cursor: pointer;
             font-family: var(--font-body);
             text-align: left;
-            transition: all 0.12s ease;
+            transition: background-color 0.12s ease, color 0.12s ease;
         }
         .ml-profile-menu .ml-menu-item:hover {
             background: var(--ml-surface);
@@ -372,7 +372,7 @@
             cursor: pointer;
             background: #fff;
             color: var(--ml-muted);
-            transition: all 0.15s;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
         .ml-icon-btn:hover { background: var(--ml-surface); }
         .ml-badge-dot {
@@ -392,7 +392,7 @@
             border: 1px solid var(--ml-border);
             background: #fff;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
             outline: none;
         }
         .ml-user-chip:hover { background: var(--ml-surface); }
@@ -734,7 +734,7 @@
             font-weight: 600;
             font-family: var(--font-body);
             cursor: pointer;
-            transition: all 0.15s;
+            transition: background-color 0.15s ease;
             text-decoration: none;
         }
         .ml-btn-primary:hover { background: #1e40af; }
@@ -752,7 +752,7 @@
             font-weight: 600;
             font-family: var(--font-body);
             cursor: pointer;
-            transition: all 0.15s;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
             text-decoration: none;
         }
         .ml-btn-ghost:hover { background: #EFF6FF; }
@@ -1339,7 +1339,7 @@
             font-size: 10.5px;
             font-weight: 600;
             font-family: var(--font-body);
-            transition: all 0.15s ease;
+            transition: background-color 0.15s ease, color 0.15s ease;
             position: relative;
         }
         .ml-bottom-item svg {
@@ -2979,6 +2979,297 @@
             .ml-map-picker { height: 300px; }
             .ml-toolbar { padding: 12px 16px; }
             .ml-card-head, .ml-card-body { padding: 16px; }
+        }
+
+        /* ============================================================
+           INVENTORY LEDGER
+           ============================================================ */
+        .ml-alert-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .ml-alert-row > span {
+            flex: 1;
+            min-width: 0;
+        }
+        .ml-alert-icon {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .ml-alert-close {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            min-width: 24px;
+            min-height: 24px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: currentColor;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        .ml-alert-close:hover { opacity: 1; }
+        .ml-alert-close:focus-visible {
+            outline: 2px solid currentColor;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+        .ml-inventory-legend {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+        .ml-recommendation-flag {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 6px;
+            padding: 3px 8px;
+            border: 1px solid var(--ml-border);
+            border-radius: 999px;
+            background: var(--ml-surface);
+            color: var(--ml-primary);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        .ml-rec-cta { margin-top: auto; }
+        .ml-rec-facts { flex-wrap: wrap; row-gap: 4px; }
+        .ml-batch-code {
+            display: inline-block;
+            max-width: 100%;
+            padding: 3px 8px;
+            border: 1px solid var(--ml-border);
+            border-radius: 6px;
+            background: var(--ml-surface);
+            color: var(--ml-text);
+            font-family: var(--font-code);
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.35;
+            overflow-wrap: break-word;
+        }
+        .ml-inline-icon {
+            margin-right: 2px;
+            vertical-align: -2px;
+        }
+        .ml-runway-mark.is-urgent { background: var(--ml-danger); }
+        .ml-simulator-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            min-height: 24px;
+            margin-top: 4px;
+            padding: 3px 0;
+            border: 0;
+            background: none;
+            color: var(--ml-primary);
+            font-family: var(--font-body);
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .ml-simulator-toggle:hover { text-decoration: underline; }
+        .ml-simulator-toggle:focus-visible {
+            outline: 2px solid var(--ml-primary);
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+        .ml-waste-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
+        }
+        .ml-waste-value {
+            color: var(--ml-danger);
+            font-family: var(--font-code);
+            font-size: 13px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+        .ml-waste-value.is-safe { color: var(--ml-text); }
+        .ml-inventory-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .ml-inventory-actions form {
+            display: inline-flex;
+            margin: 0;
+        }
+        .ml-btn-quiet.is-danger {
+            color: var(--ml-danger);
+            border-color: var(--ml-danger);
+        }
+        .ml-btn-quiet.is-danger:hover { background: var(--ml-surface); }
+        .ml-table-inventory { min-width: 960px; }
+        .ml-simulator-row[hidden] { display: none !important; }
+        .ml-simulator-row > td {
+            padding: 16px 24px;
+            background: var(--ml-surface);
+        }
+        .ml-simulator {
+            padding: 16px 18px;
+            border: 1px solid var(--ml-border);
+            border-radius: 12px;
+            background: var(--ml-card);
+        }
+        .ml-simulator-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .ml-simulator-title {
+            margin: 2px 0 0;
+            font-family: var(--font-heading);
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.35;
+            color: var(--ml-text);
+        }
+        .ml-simulator-sub {
+            margin: 4px 0 0;
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--ml-muted);
+        }
+        .ml-simulator-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+            gap: 20px;
+            align-items: center;
+        }
+        .ml-simulator-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--ml-text);
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .ml-simulator-current {
+            color: var(--ml-primary);
+            font-family: var(--font-code);
+            font-weight: 600;
+        }
+        .ml-range {
+            width: 100%;
+            cursor: pointer;
+            accent-color: var(--ml-primary);
+        }
+        .ml-simulator-scale {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 5px;
+            color: var(--ml-subtle);
+            font-size: 10.5px;
+        }
+        .ml-simulator-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1px;
+            overflow: hidden;
+            border: 1px solid var(--ml-border);
+            border-radius: 10px;
+            background: var(--ml-border);
+        }
+        .ml-simulator-metric {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 0;
+            padding: 11px 12px;
+            background: var(--ml-card);
+        }
+        .ml-simulator-metric-label {
+            color: var(--ml-muted);
+            font-size: 10.5px;
+            line-height: 1.35;
+        }
+        .ml-simulator-metric-value {
+            color: var(--ml-text);
+            font-family: var(--font-code);
+            font-size: 14px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+        .ml-simulator-metric-value.is-risk { color: var(--ml-danger); }
+        .ml-simulator-metric-value.is-safe { color: var(--ml-text); }
+
+        @media (max-width: 1023px) {
+            .ml-table-inventory { min-width: 0; }
+            .ml-table-inventory td:nth-child(1) {
+                grid-column: 1 / -1;
+                grid-row: 1;
+            }
+            .ml-table-inventory td:nth-child(2) {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            .ml-table-inventory td:nth-child(3) {
+                grid-column: 2;
+                grid-row: 2;
+                align-self: start;
+                padding-top: 1px;
+                text-align: right;
+            }
+            .ml-table-inventory td:nth-child(3)[data-label]::before { text-align: right; }
+            .ml-table-inventory td:nth-child(4) {
+                grid-column: 1 / -1;
+                grid-row: 3;
+            }
+            .ml-table-inventory td:nth-child(5) {
+                grid-column: 1 / -1;
+                grid-row: 4;
+                text-align: left;
+            }
+            .ml-table-inventory td:nth-child(6) {
+                grid-column: 1 / -1;
+                grid-row: 5;
+                text-align: left;
+            }
+            .ml-table-inventory .ml-waste-cell {
+                align-items: flex-start;
+                text-align: left;
+            }
+            .ml-table-inventory .ml-inventory-actions { justify-content: flex-start; }
+            .ml-table-airy tr.ml-simulator-row {
+                padding: 0;
+                border-bottom: 1px solid var(--ml-border);
+            }
+            .ml-simulator-row > td {
+                grid-column: 1 / -1;
+                grid-row: 1;
+                padding: 12px 14px;
+            }
+            .ml-simulator-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            .ml-inventory-legend { width: 100%; }
+            .ml-simulator { padding: 14px; }
+            .ml-simulator-head { gap: 10px; }
+            .ml-simulator-metrics { grid-template-columns: 1fr; }
+            .ml-simulator-metric {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .ml-inventory-actions { width: 100%; }
+            .ml-inventory-actions > .ml-btn-primary,
+            .ml-inventory-actions > .ml-btn-quiet { flex: 1; justify-content: center; }
+            .ml-inventory-actions form { flex: 1; }
+            .ml-inventory-actions form .ml-btn-quiet { width: 100%; justify-content: center; }
         }
     </style>
 </head>
