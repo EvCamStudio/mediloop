@@ -1,46 +1,61 @@
 @extends('layouts.mediloop', ['title' => 'Input Stok Obat & Batch Baru'])
 
 @section('content')
-<div class="space-y-6 max-w-4xl mx-auto">
+@php
+    $facilityLabel = $user->isSysadmin()
+        ? 'Akses administrator'
+        : ($user->facility?->name ?? 'Fasilitas terdaftar');
+    $selectedFacilityId = old('facility_id', $user->facility_id ?? $facilities->first()?->id);
+@endphp
 
-    <!-- Breadcrumb -->
-    <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ml-muted);">
-        <a href="{{ route('dashboard') }}" style="color: var(--ml-primary); text-decoration: none;">Dashboard</a>
-        <span style="color: var(--ml-subtle);">/</span>
-        <a href="{{ route('batches.index') }}" style="color: var(--ml-primary); text-decoration: none;">Inventaris Obat</a>
-        <span style="color: var(--ml-subtle);">/</span>
-        <span style="color: var(--ml-text); font-weight: 600;">Input Stok Obat &amp; Batch Baru</span>
-    </div>
+<div class="ml-page-admin">
+    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ route('dashboard') }}">Dashboard</a>
+        <span class="ml-breadcrumb-sep">/</span>
+        <a href="{{ route('batches.index') }}">Inventaris obat</a>
+        <span class="ml-breadcrumb-sep">/</span>
+        <span>Input batch baru</span>
+    </nav>
 
-    <!-- Header -->
-    <div style="padding-bottom: 16px; border-bottom: 1px solid var(--ml-border); display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px;">
+    <header class="ml-page-head">
         <div>
-            <h1 style="font-size: 20px; font-weight: 800; color: var(--ml-text); margin: 0; font-family: var(--font-heading); letter-spacing: -0.02em;">Input Data Stok Batch Obat</h1>
-            <p style="font-size: 12.5px; color: var(--ml-muted); margin: 4px 0 0;">
-                Catat batch obat masuk atau stok berjalan untuk fasilitas: <strong style="color: var(--ml-text);">{{ $user->facility?->name ?? 'Fasilitas Terdaftar' }}</strong>.
+            <p class="ml-page-eyebrow">Inventaris obat</p>
+            <div class="ml-page-title-row">
+                <h1 class="ml-page-title">Input Data Stok Batch Obat</h1>
+                <span class="ml-facility-chip">{{ $facilityLabel }}</span>
+            </div>
+            <p class="ml-page-sub">
+                Catat batch masuk atau stok berjalan. Data ini menjadi dasar proyeksi risiko dan rekomendasi redistribusi.
             </p>
         </div>
-        <a href="{{ route('batches.index') }}" class="ml-btn-ghost" style="padding: 7px 14px; font-size: 12px; flex-shrink: 0;">
-            &larr; Kembali ke Inventaris
-        </a>
-    </div>
+        <div class="ml-page-actions">
+            <a href="{{ route('batches.index') }}" class="ml-btn-quiet">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 12H5m0 0l7 7m-7-7l7-7" />
+                </svg>
+                Kembali ke inventaris
+            </a>
+        </div>
+    </header>
 
-    <!-- Regulatory & Zero PHI Banner -->
-    <div style="padding: 12px 16px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; display: flex; align-items: flex-start; gap: 10px;">
-        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--ml-primary); flex-shrink: 0; margin-top: 1px;">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <div class="ml-alert ml-alert-info ml-compliance-banner" role="note">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" />
+            <path d="M12 8v4m0 4h.01" />
         </svg>
-        <div style="font-size: 12.5px; color: var(--ml-text); line-height: 1.5;">
-            <strong style="font-weight: 700;">STANDAR KEFARMASIAN &amp; PRIVASI REKAM MEDIS:</strong>
-            Pencatatan hanya mengelola atribut logistik sediaan farmasi (SKU, nomor batch, stok fisik, laju pemakaian, dan tanggal kedaluwarsa). Sistem ini <strong>bebas data identitas pasien (Zero PHI)</strong> dan tidak memberikan rekomendasi dosis medis individu.
+        <div>
+            <strong>Hanya data logistik, tanpa data pasien</strong>
+            <p>
+                Formulir ini mencatat obat, batch, stok fisik, laju pemakaian, dan masa edar.
+                Tidak memuat identitas pasien atau rekomendasi dosis.
+            </p>
         </div>
     </div>
 
-    <!-- Form Errors Alert -->
     @if($errors->any())
-        <div style="padding: 12px 16px; background: #FEF2F2; border: 1px solid #FCA5A5; border-radius: 10px; font-size: 12.5px; color: #7F1D1D;">
-            <strong style="font-weight: 700; display: block; margin-bottom: 6px;">Terjadi kesalahan pada pengisian formulir:</strong>
-            <ul style="list-style: disc; padding-left: 18px; margin: 0;">
+        <div class="ml-alert ml-alert-error" role="alert">
+            <strong>Periksa kembali isian berikut:</strong>
+            <ul>
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -48,237 +63,357 @@
         </div>
     @endif
 
-    <!-- Main Input Form Card -->
-    <form method="POST" action="{{ route('batches.store') }}" id="batchForm" class="space-y-6">
+    <form method="POST" action="{{ route('batches.store') }}" id="batchForm">
         @csrf
 
-        @if($user->isSysadmin() && isset($facilities))
-            <div class="bg-white p-5 rounded-xl border border-[#DBE5F5] shadow-xs">
-                <label for="facility_id" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                    Fasilitas Kesehatan Penampung Stok:
-                </label>
-                <select name="facility_id" id="facility_id" class="w-full px-3 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-semibold text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                    @foreach($facilities as $f)
-                        <option value="{{ $f->id }}" {{ old('facility_id', $user->facility_id) == $f->id ? 'selected' : '' }}>
-                            {{ $f->name }} ({{ $f->type }})
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-        @endif
-
-        <!-- STEP 1: Medicine Selection -->
-        <div class="bg-white p-6 rounded-xl border border-[#DBE5F5] shadow-xs space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-[#DBE5F5]">
-                <h2 class="text-sm font-bold text-[#0B1F4B] uppercase tracking-wider flex items-center gap-2">
-                    <span class="w-5 h-5 rounded-full bg-[#1D4ED8] text-white flex items-center justify-center text-[11px] font-mono">1</span>
-                    Identitas &amp; Jenis Sediaan Obat
-                </h2>
-
-                <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#1D4ED8]">
-                    <input type="checkbox" id="toggleNewMedicine" name="is_new_medicine" value="1" {{ old('is_new_medicine') ? 'checked' : '' }} class="rounded border-[#DBE5F5] text-[#1D4ED8] focus:ring-[#1D4ED8]">
-                    <span>Obat Belum Terdaftar di Master?</span>
-                </label>
-            </div>
-
-            <!-- Existing Medicine Picker -->
-            <div id="existingMedicineSection" style="{{ old('is_new_medicine') ? 'display: none;' : 'display: block;' }}">
-                <label for="medicine_id" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                    Pilih Obat dari Master Formularium: <span class="text-red-500">*</span>
-                </label>
-                <select name="medicine_id" id="medicine_id" class="w-full px-3 py-2.5 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                    <option value="">-- Pilih Obat yang Tersedia di Sistem --</option>
-                    @foreach($medicines as $m)
-                        <option value="{{ $m->id }}" 
-                            data-price="{{ $m->unit_price_idr }}" 
-                            data-unit="{{ $m->unit }}"
-                            data-cold="{{ $m->requires_cold_chain ? '1' : '0' }}"
-                            {{ old('medicine_id') == $m->id ? 'selected' : '' }}>
-                            {{ $m->name }} ({{ $m->dosage_form }}) — Satuan: {{ $m->unit }} — Rp {{ number_format($m->unit_price_idr, 0, ',', '.') }} {{ $m->requires_cold_chain ? '[Rantai Dingin]' : '' }}
-                        </option>
-                    @endforeach
-                </select>
-                <span class="text-[11px] text-[#52627F] block mt-1">
-                    Jika nama obat belum tersedia di daftar di atas, centang opsi <em>"Obat Belum Terdaftar di Master?"</em> untuk menambahkan jenis obat baru.
-                </span>
-            </div>
-
-            <!-- New Medicine Creation Fields -->
-            <div id="newMedicineSection" style="{{ old('is_new_medicine') ? 'display: block;' : 'display: none;' }}" class="space-y-4 p-4 bg-slate-50 rounded-lg border border-[#DBE5F5]">
-                <div class="text-xs font-bold text-[#0B1F4B] border-b border-slate-200 pb-2">
-                    Formulir Registrasi Master Obat Baru
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="new_medicine_name" class="block text-xs font-bold text-[#0B1F4B] mb-1">Nama Dagang Obat: <span class="text-red-500">*</span></label>
-                        <input type="text" name="new_medicine_name" id="new_medicine_name" value="{{ old('new_medicine_name') }}" placeholder="Contoh: Ceftriaxone 1g Injeksi" class="w-full px-3 py-2 bg-white border border-[#DBE5F5] rounded-lg text-xs">
-                    </div>
-                    <div>
-                        <label for="new_generic_name" class="block text-xs font-bold text-[#0B1F4B] mb-1">Nama Generik / Zat Aktif: <span class="text-red-500">*</span></label>
-                        <input type="text" name="new_generic_name" id="new_generic_name" value="{{ old('new_generic_name') }}" placeholder="Contoh: Ceftriaxone Sodium Serbuk Injeksi" class="w-full px-3 py-2 bg-white border border-[#DBE5F5] rounded-lg text-xs">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label for="new_category" class="block text-xs font-bold text-[#0B1F4B] mb-1">Kategori Terapeutik: <span class="text-red-500">*</span></label>
-                        <select name="new_category" id="new_category" class="w-full px-3 py-2 bg-white border border-[#DBE5F5] rounded-lg text-xs">
-                            <option value="Antibiotic" {{ old('new_category') == 'Antibiotic' ? 'selected' : '' }}>Antibiotic</option>
-                            <option value="Cardiovascular" {{ old('new_category') == 'Cardiovascular' ? 'selected' : '' }}>Cardiovascular</option>
-                            <option value="Endocrine" {{ old('new_category') == 'Endocrine' ? 'selected' : '' }}>Endocrine</option>
-                            <option value="Analgesic" {{ old('new_category') == 'Analgesic' ? 'selected' : '' }}>Analgesic</option>
-                            <option value="Emergency" {{ old('new_category') == 'Emergency' ? 'selected' : '' }}>Emergency</option>
-                            <option value="Respiratory" {{ old('new_category') == 'Respiratory' ? 'selected' : '' }}>Respiratory</option>
-                            <option value="Other" {{ old('new_category') == 'Other' ? 'selected' : '' }}>Lainnya</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="new_dosage_form" class="block text-xs font-bold text-[#0B1F4B] mb-1">Bentuk Sediaan: <span class="text-red-500">*</span></label>
-                        <input type="text" name="new_dosage_form" id="new_dosage_form" value="{{ old('new_dosage_form') }}" placeholder="Vial, Tablet, Sirup, Infus" class="w-full px-3 py-2 bg-white border border-[#DBE5F5] rounded-lg text-xs">
-                    </div>
-
-                    <div>
-                        <label for="new_unit" class="block text-xs font-bold text-[#0B1F4B] mb-1">Satuan Kemasan: <span class="text-red-500">*</span></label>
-                        <input type="text" name="new_unit" id="new_unit" value="{{ old('new_unit', 'Box') }}" placeholder="Box, Vial, Botol, Ampul" class="w-full px-3 py-2 bg-white border border-[#DBE5F5] rounded-lg text-xs">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label for="new_unit_price_idr" class="block text-xs font-bold text-[#0B1F4B] mb-1">Harga Acuan Satuan (Rp): <span class="text-red-500">*</span></label>
-                        <input type="number" name="new_unit_price_idr" id="new_unit_price_idr" value="{{ old('new_unit_price_idr', 50000) }}" min="0" class="w-full px-3 py-2 bg-white border border-[#DBE5F5] rounded-lg text-xs font-mono">
-                    </div>
-
-                    <div class="flex items-center pt-5">
-                        <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-[#0B1F4B]">
-                            <input type="checkbox" name="new_requires_cold_chain" id="new_requires_cold_chain" value="1" {{ old('new_requires_cold_chain') ? 'checked' : '' }} class="rounded border-[#DBE5F5] text-[#1D4ED8]">
-                            <span>Wajib Rantai Dingin / Cold Chain (2°C - 8°C)?</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div>
-                    <label for="new_handling_instructions" class="block text-xs font-bold text-[#0B1F4B] mb-1">Petunjuk Khusus Penyimpanan (Opsional):</label>
-                    <input type="text" name="new_handling_instructions" id="new_handling_instructions" value="{{ old('new_handling_instructions') }}" placeholder="Simpan pada suhu ruang kering di bawah 25°C." class="w-full px-3 py-2 bg-white border border-[#DBE5F5] rounded-lg text-xs">
-                </div>
-            </div>
-        </div>
-
-        <!-- STEP 2: Batch Ledger Details -->
-        <div class="bg-white p-6 rounded-xl border border-[#DBE5F5] shadow-xs space-y-4">
-            <h2 class="text-sm font-bold text-[#0B1F4B] uppercase tracking-wider pb-3 border-b border-[#DBE5F5] flex items-center gap-2">
-                <span class="w-5 h-5 rounded-full bg-[#1D4ED8] text-white flex items-center justify-center text-[11px] font-mono">2</span>
-                Informasi Batch, Stok &amp; Kedaluwarsa
-            </h2>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Batch Number -->
-                <div>
-                    <label for="batch_number" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                        Nomor Batch / Lot Pabrik: <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" name="batch_number" id="batch_number" value="{{ old('batch_number') }}" placeholder="Contoh: CFT-2026-X89" required class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-mono font-bold uppercase focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                    <span class="text-[11px] text-[#52627F] block mt-1">Sesuai yang tertera pada kemasan fisik obat.</span>
-                </div>
-
-                <!-- Expiry Date -->
-                <div>
-                    <label for="expiry_date" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                        Tanggal Kedaluwarsa (Expired Date): <span class="text-red-500">*</span>
-                    </label>
-                    <input type="date" name="expiry_date" id="expiry_date" value="{{ old('expiry_date') }}" required class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-semibold focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                    <span class="text-[11px] text-[#52627F] block mt-1">Tanggal berakhir masa edar obat.</span>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <!-- Current Stock -->
-                <div>
-                    <label for="current_stock" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                        Jumlah Stok Fisik Aktif: <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number" name="current_stock" id="current_stock" value="{{ old('current_stock', 100) }}" min="1" required class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                    <span class="text-[11px] text-[#52627F] block mt-1">Stok yang ada di gudang saat ini.</span>
-                </div>
-
-                <!-- Daily Burn Rate -->
-                <div>
-                    <label for="daily_burn_rate" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                        Laju Pakai Harian (Burn Rate): <span class="text-red-500">*</span>
-                    </label>
-                    <input type="number" step="0.1" name="daily_burn_rate" id="daily_burn_rate" value="{{ old('daily_burn_rate', 2.0) }}" min="0" required class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                    <span class="text-[11px] text-[#52627F] block mt-1">Rata-rata resep/unit per hari di faskes.</span>
-                </div>
-
-                <!-- Unit Price Override -->
-                <div>
-                    <label for="unit_price_idr" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                        Harga Satuan Batch (Rp):
-                    </label>
-                    <input type="number" name="unit_price_idr" id="unit_price_idr" value="{{ old('unit_price_idr') }}" placeholder="Gunakan harga master jika kosong" min="0" class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-mono focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                    <span class="text-[11px] text-[#52627F] block mt-1">Kosongkan jika sama dengan harga master.</span>
-                </div>
-            </div>
-
-            <!-- Storage Location -->
+        <div class="ml-two-col">
             <div>
-                <label for="storage_location" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                    Lokasi Fisik di Apotek/Gudang (Opsional):
-                </label>
-                <input type="text" name="storage_location" id="storage_location" value="{{ old('storage_location') }}" placeholder="Contoh: Gudang Farmasi - Rak Injeksi B-02" class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
+                @if($user->isSysadmin())
+                    <section class="ml-card" aria-labelledby="placement-title">
+                        <div class="ml-card-head">
+                            <h2 class="ml-card-title" id="placement-title">Fasilitas penampung</h2>
+                            <p class="ml-card-sub">Stok akan dicatat atas nama fasilitas ini.</p>
+                        </div>
+                        <div class="ml-card-body">
+                            <div class="ml-field is-last">
+                                <label for="facility_id" class="ml-label">Fasilitas kesehatan <span class="ml-required">*</span></label>
+                                <select id="facility_id" name="facility_id" class="ml-select @error('facility_id') is-invalid @enderror" required>
+                                    @foreach($facilities as $facility)
+                                        <option value="{{ $facility->id }}" @selected((string) $selectedFacilityId === (string) $facility->id)>
+                                            {{ $facility->name }} ({{ $facility->type_label }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('facility_id')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Pilih fasilitas yang akan menyimpan batch ini.</p>
+                            </div>
+                        </div>
+                    </section>
+                @endif
+
+                <section class="ml-card" aria-labelledby="medicine-title">
+                    <div class="ml-card-head">
+                        <div class="ml-step-head">
+                            <div class="ml-step-title">
+                                <span class="ml-step-index" aria-hidden="true">1</span>
+                                <div>
+                                    <h2 class="ml-card-title" id="medicine-title">Identitas &amp; jenis sediaan</h2>
+                                    <p class="ml-card-sub">Pilih obat dari master formularium atau daftarkan obat baru.</p>
+                                </div>
+                            </div>
+                            <label class="ml-form-toggle" for="toggleNewMedicine">
+                                <input
+                                    type="checkbox"
+                                    id="toggleNewMedicine"
+                                    name="is_new_medicine"
+                                    value="1"
+                                    aria-controls="existingMedicineSection newMedicineSection"
+                                    @checked(old('is_new_medicine'))
+                                >
+                                <span>Obat belum terdaftar di master</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="ml-card-body">
+                        <div class="ml-form-stack">
+                            <div id="existingMedicineSection" @if(old('is_new_medicine')) hidden @endif>
+                                <label for="medicine_id" class="ml-label">Pilih obat dari master formularium <span class="ml-required">*</span></label>
+                                <select id="medicine_id" name="medicine_id" class="ml-select @error('medicine_id') is-invalid @enderror">
+                                    <option value="">Pilih obat yang tersedia</option>
+                                    @foreach($medicines as $medicine)
+                                        <option
+                                            value="{{ $medicine->id }}"
+                                            data-price="{{ $medicine->unit_price_idr }}"
+                                            data-unit="{{ $medicine->unit }}"
+                                            data-cold="{{ $medicine->requires_cold_chain ? '1' : '0' }}"
+                                            @selected((string) old('medicine_id') === (string) $medicine->id)
+                                        >
+                                            {{ $medicine->name }} ({{ $medicine->dosage_form }}), {{ $medicine->unit }}, Rp {{ number_format($medicine->unit_price_idr, 0, ',', '.') }}@if($medicine->requires_cold_chain), rantai dingin @endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('medicine_id')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Jika obat belum tersedia di daftar, aktifkan “Obat belum terdaftar di master”.</p>
+                            </div>
+
+                            <div id="newMedicineSection" class="ml-subpanel" @if(! old('is_new_medicine')) hidden @endif>
+                                <div class="ml-subpanel-head">
+                                    <span class="ml-subpanel-title">Master obat baru</span>
+                                </div>
+
+                                <div class="ml-form-grid is-tight">
+                                    <div class="ml-field">
+                                        <label for="new_medicine_name" class="ml-label">Nama obat <span class="ml-required">*</span></label>
+                                        <input
+                                            type="text"
+                                            id="new_medicine_name"
+                                            name="new_medicine_name"
+                                            class="ml-input @error('new_medicine_name') is-invalid @enderror"
+                                            value="{{ old('new_medicine_name') }}"
+                                            placeholder="Contoh: Ceftriaxone 1g Injeksi"
+                                        >
+                                        @error('new_medicine_name')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                    </div>
+
+                                    <div class="ml-field">
+                                        <label for="new_generic_name" class="ml-label">Nama generik / zat aktif <span class="ml-required">*</span></label>
+                                        <input
+                                            type="text"
+                                            id="new_generic_name"
+                                            name="new_generic_name"
+                                            class="ml-input @error('new_generic_name') is-invalid @enderror"
+                                            value="{{ old('new_generic_name') }}"
+                                            placeholder="Contoh: Ceftriaxone Sodium"
+                                        >
+                                        @error('new_generic_name')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                    </div>
+
+                                    <div class="ml-field">
+                                        <label for="new_category" class="ml-label">Kategori terapeutik <span class="ml-required">*</span></label>
+                                        <select id="new_category" name="new_category" class="ml-select @error('new_category') is-invalid @enderror">
+                                            <option value="Antibiotic" @selected(old('new_category') === 'Antibiotic')>Antibiotik</option>
+                                            <option value="Cardiovascular" @selected(old('new_category') === 'Cardiovascular')>Kardiovaskular</option>
+                                            <option value="Endocrine" @selected(old('new_category') === 'Endocrine')>Endokrin</option>
+                                            <option value="Analgesic" @selected(old('new_category') === 'Analgesic')>Analgesik</option>
+                                            <option value="Emergency" @selected(old('new_category') === 'Emergency')>Emergensi</option>
+                                            <option value="Respiratory" @selected(old('new_category') === 'Respiratory')>Respirasi</option>
+                                            <option value="Other" @selected(old('new_category') === 'Other')>Lainnya</option>
+                                        </select>
+                                        @error('new_category')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                    </div>
+
+                                    <div class="ml-field">
+                                        <label for="new_dosage_form" class="ml-label">Bentuk sediaan <span class="ml-required">*</span></label>
+                                        <input
+                                            type="text"
+                                            id="new_dosage_form"
+                                            name="new_dosage_form"
+                                            class="ml-input @error('new_dosage_form') is-invalid @enderror"
+                                            value="{{ old('new_dosage_form') }}"
+                                            placeholder="Vial, tablet, sirup, infus"
+                                        >
+                                        @error('new_dosage_form')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                    </div>
+
+                                    <div class="ml-field">
+                                        <label for="new_unit" class="ml-label">Satuan kemasan <span class="ml-required">*</span></label>
+                                        <input
+                                            type="text"
+                                            id="new_unit"
+                                            name="new_unit"
+                                            class="ml-input @error('new_unit') is-invalid @enderror"
+                                            value="{{ old('new_unit', 'Box') }}"
+                                            placeholder="Box, vial, botol, ampul"
+                                        >
+                                        @error('new_unit')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                    </div>
+
+                                    <div class="ml-field">
+                                        <label for="new_unit_price_idr" class="ml-label">Harga acuan satuan (Rp) <span class="ml-required">*</span></label>
+                                        <input
+                                            type="number"
+                                            id="new_unit_price_idr"
+                                            name="new_unit_price_idr"
+                                            class="ml-input is-mono @error('new_unit_price_idr') is-invalid @enderror"
+                                            value="{{ old('new_unit_price_idr', 50000) }}"
+                                            min="0"
+                                        >
+                                        @error('new_unit_price_idr')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                    </div>
+
+                                    <div class="ml-field is-full">
+                                        <label class="ml-checkbox-row">
+                                            <input
+                                                type="checkbox"
+                                                id="new_requires_cold_chain"
+                                                name="new_requires_cold_chain"
+                                                value="1"
+                                                @checked(old('new_requires_cold_chain'))
+                                            >
+                                            <span>Wajib rantai dingin / cold chain (2–8°C)</span>
+                                        </label>
+                                    </div>
+
+                                    <div class="ml-field is-full">
+                                        <label for="new_handling_instructions" class="ml-label">Petunjuk penyimpanan <span class="ml-optional">(opsional)</span></label>
+                                        <input
+                                            type="text"
+                                            id="new_handling_instructions"
+                                            name="new_handling_instructions"
+                                            class="ml-input @error('new_handling_instructions') is-invalid @enderror"
+                                            value="{{ old('new_handling_instructions') }}"
+                                            placeholder="Contoh: Simpan pada suhu ruang kering di bawah 25°C."
+                                        >
+                                        @error('new_handling_instructions')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="ml-card" aria-labelledby="batch-title">
+                    <div class="ml-card-head">
+                        <div class="ml-step-head">
+                            <div class="ml-step-title">
+                                <span class="ml-step-index" aria-hidden="true">2</span>
+                                <div>
+                                    <h2 class="ml-card-title" id="batch-title">Batch, stok &amp; masa edar</h2>
+                                    <p class="ml-card-sub">Catat identitas batch dan parameter pemakaian yang akan dipantau.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ml-card-body">
+                        <div class="ml-form-grid is-tight">
+                            <div class="ml-field">
+                                <label for="batch_number" class="ml-label">Nomor batch / lot pabrik <span class="ml-required">*</span></label>
+                                <input
+                                    type="text"
+                                    id="batch_number"
+                                    name="batch_number"
+                                    class="ml-input is-mono is-uppercase @error('batch_number') is-invalid @enderror"
+                                    value="{{ old('batch_number') }}"
+                                    placeholder="Contoh: CFT-2026-X89"
+                                    autocomplete="off"
+                                    spellcheck="false"
+                                    required
+                                >
+                                @error('batch_number')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Sesuai yang tertera pada kemasan fisik obat.</p>
+                            </div>
+
+                            <div class="ml-field">
+                                <label for="expiry_date" class="ml-label">Tanggal kedaluwarsa <span class="ml-required">*</span></label>
+                                <input
+                                    type="date"
+                                    id="expiry_date"
+                                    name="expiry_date"
+                                    class="ml-input @error('expiry_date') is-invalid @enderror"
+                                    value="{{ old('expiry_date') }}"
+                                    required
+                                >
+                                @error('expiry_date')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Tanggal berakhir masa edar obat.</p>
+                            </div>
+
+                            <div class="ml-field">
+                                <label for="current_stock" class="ml-label">Stok fisik aktif <span class="ml-required">*</span></label>
+                                <input
+                                    type="number"
+                                    id="current_stock"
+                                    name="current_stock"
+                                    class="ml-input is-mono @error('current_stock') is-invalid @enderror"
+                                    value="{{ old('current_stock', 100) }}"
+                                    min="1"
+                                    required
+                                >
+                                @error('current_stock')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Jumlah yang tersedia di gudang saat ini.</p>
+                            </div>
+
+                            <div class="ml-field">
+                                <label for="daily_burn_rate" class="ml-label">Laju pakai harian <span class="ml-required">*</span></label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    id="daily_burn_rate"
+                                    name="daily_burn_rate"
+                                    class="ml-input is-mono @error('daily_burn_rate') is-invalid @enderror"
+                                    value="{{ old('daily_burn_rate', 2.0) }}"
+                                    min="0"
+                                    required
+                                >
+                                @error('daily_burn_rate')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Rata-rata unit yang dipakai per hari.</p>
+                            </div>
+
+                            <div class="ml-field">
+                                <label for="unit_price_idr" class="ml-label">Harga satuan batch (Rp)</label>
+                                <input
+                                    type="number"
+                                    id="unit_price_idr"
+                                    name="unit_price_idr"
+                                    class="ml-input is-mono @error('unit_price_idr') is-invalid @enderror"
+                                    value="{{ old('unit_price_idr') }}"
+                                    min="0"
+                                    placeholder="Gunakan harga master jika kosong"
+                                >
+                                @error('unit_price_idr')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Kosongkan untuk memakai harga acuan obat.</p>
+                            </div>
+
+                            <div class="ml-field">
+                                <label for="storage_location" class="ml-label">Lokasi fisik <span class="ml-optional">(opsional)</span></label>
+                                <input
+                                    type="text"
+                                    id="storage_location"
+                                    name="storage_location"
+                                    class="ml-input @error('storage_location') is-invalid @enderror"
+                                    value="{{ old('storage_location') }}"
+                                    placeholder="Contoh: Gudang farmasi, rak injeksi B-02"
+                                >
+                                @error('storage_location')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Rak, lemari, atau chiller tempat batch disimpan.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </div>
 
-        <!-- STEP 3: Real-Time Engine Forecast Preview Box -->
-        <div class="bg-gradient-to-r from-slate-900 to-blue-950 text-white p-5 rounded-xl border border-slate-800 shadow-md">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                <span class="text-xs font-bold tracking-wider text-blue-300 uppercase">
-                    Prediksi Risiko Klinis &amp; Estimasi Limbah (Otomatis)
-                </span>
-                <span class="text-[10px] font-mono text-slate-400">Algoritma Redistribusi MediLoop</span>
-            </div>
+            <aside>
+                <section class="ml-card ml-sticky" aria-labelledby="forecast-title">
+                    <div class="ml-card-head">
+                        <h2 class="ml-card-title" id="forecast-title">Proyeksi batch</h2>
+                        <p class="ml-card-sub">Perkiraan sebelum data disimpan.</p>
+                    </div>
+                    <div class="ml-card-body">
+                        <div class="ml-forecast-grid">
+                            <div class="ml-forecast-cell">
+                                <span class="ml-forecast-label">Sisa masa edar</span>
+                                <span id="previewDaysExpiry" class="ml-forecast-value">- <small>hari</small></span>
+                            </div>
+                            <div class="ml-forecast-cell">
+                                <span class="ml-forecast-label">Hari hingga habis</span>
+                                <span id="previewDaysDeplete" class="ml-forecast-value">- <small>hari</small></span>
+                            </div>
+                            <div class="ml-forecast-cell is-wide">
+                                <span class="ml-forecast-label">Potensi terbuang</span>
+                                <span id="previewWaste" class="ml-forecast-value">- <small>unit</small></span>
+                            </div>
+                        </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 text-xs font-mono">
-                <div>
-                    <span class="text-slate-400 block text-[11px]">Sisa Hari Expiry:</span>
-                    <span id="previewDaysExpiry" class="text-base font-bold text-white mt-0.5 block">- hari</span>
-                </div>
-                <div>
-                    <span class="text-slate-400 block text-[11px]">Hari Hingga Habis:</span>
-                    <span id="previewDaysDeplete" class="text-base font-bold text-white mt-0.5 block">- hari</span>
-                </div>
-                <div>
-                    <span class="text-slate-400 block text-[11px]">Potensi Terbuang:</span>
-                    <span id="previewWaste" class="text-base font-bold text-amber-300 mt-0.5 block">- unit</span>
-                </div>
-                <div>
-                    <span class="text-slate-400 block text-[11px]">Klasifikasi Risiko:</span>
-                    <span id="previewRisk" class="mt-0.5 inline-block px-2 py-0.5 rounded text-[11px] font-black bg-slate-800 text-slate-300">
-                        MEMERIKSA...
-                    </span>
-                </div>
-            </div>
-        </div>
+                        <div class="ml-forecast-risk" aria-live="polite">
+                            <span class="ml-forecast-label">Klasifikasi risiko</span>
+                            <span id="previewRisk" class="ml-risk ml-risk-low">Rendah</span>
+                            <p id="previewRiskNote" class="ml-forecast-hint">Isi parameter batch untuk melihat proyeksi.</p>
+                        </div>
 
-        <!-- Form Submit & Action Bar -->
-        <div class="pt-2 flex items-center justify-between">
-            <a href="{{ route('batches.index') }}" class="px-4 py-2 text-xs font-semibold text-[#52627F] hover:text-[#0B1F4B]">
-                Batal
-            </a>
+                        <div class="ml-forecast-note">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <path d="M4 19V5m0 14h16M8 15l3-4 3 2 4-6" />
+                            </svg>
+                            <span>Dihitung dari stok, laju pakai, dan tanggal kedaluwarsa. Bukan rekomendasi dosis.</span>
+                        </div>
 
-            <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-md transition">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Simpan Data Stok Batch</span>
-            </button>
+                        <div class="ml-action-row">
+                            <a href="{{ route('batches.index') }}" class="ml-btn-quiet">Batal</a>
+                            <button type="submit" class="ml-btn-primary">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M5 13l4 4L19 7" />
+                                </svg>
+                                Simpan batch
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </aside>
         </div>
     </form>
-
 </div>
+@endsection
 
+@section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const toggleNewMedicine = document.getElementById('toggleNewMedicine');
@@ -295,73 +430,115 @@
         const previewDaysDeplete = document.getElementById('previewDaysDeplete');
         const previewWaste = document.getElementById('previewWaste');
         const previewRisk = document.getElementById('previewRisk');
+        const previewRiskNote = document.getElementById('previewRiskNote');
 
-        // Toggle existing vs new medicine
-        toggleNewMedicine.addEventListener('change', function () {
-            if (this.checked) {
-                existingSection.style.display = 'none';
-                newSection.style.display = 'block';
-                medicineSelect.removeAttribute('required');
-            } else {
-                existingSection.style.display = 'block';
-                newSection.style.display = 'none';
-                medicineSelect.setAttribute('required', 'required');
-            }
+        const numberFormatter = new Intl.NumberFormat('id-ID');
+        const decimalFormatter = new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
         });
 
-        // Set default expiry date to 60 days from now if empty
-        if (!expiryDateInput.value) {
-            const defaultDate = new Date();
-            defaultDate.setDate(defaultDate.getDate() + 60);
-            expiryDateInput.value = defaultDate.toISOString().split('T')[0];
+        function syncMedicineMode() {
+            const isNewMedicine = toggleNewMedicine.checked;
+
+            existingSection.hidden = isNewMedicine;
+            newSection.hidden = ! isNewMedicine;
+
+            if (isNewMedicine) {
+                medicineSelect.removeAttribute('required');
+            } else {
+                medicineSelect.setAttribute('required', 'required');
+            }
         }
 
-        // Auto-fill price on medicine select
+        function localDateFromInput(value) {
+            const [year, month, day] = value.split('-').map(Number);
+
+            return new Date(year, month - 1, day);
+        }
+
+        function formatLocalDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+
+            return `${year}-${month}-${day}`;
+        }
+
+        toggleNewMedicine.addEventListener('change', syncMedicineMode);
+        syncMedicineMode();
+
+        if (! expiryDateInput.value) {
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() + 60);
+            expiryDateInput.value = formatLocalDate(defaultDate);
+        }
+
         medicineSelect.addEventListener('change', function () {
             const selected = medicineSelect.options[medicineSelect.selectedIndex];
-            if (selected && selected.dataset.price && !unitPriceInput.value) {
+
+            if (selected && selected.dataset.price && ! unitPriceInput.value) {
                 unitPriceInput.value = selected.dataset.price;
             }
         });
 
-        // Dynamic recalculation
         function updatePreview() {
-            const stock = parseInt(currentStockInput.value) || 0;
+            const stock = parseInt(currentStockInput.value, 10) || 0;
             const burnRate = parseFloat(dailyBurnRateInput.value) || 0;
-            const expiryVal = expiryDateInput.value;
+            const expiryValue = expiryDateInput.value;
 
-            if (!expiryVal) return;
+            if (! expiryValue) {
+                return;
+            }
 
-            const expiryDate = new Date(expiryVal);
+            const expiryDate = localDateFromInput(expiryValue);
             const today = new Date();
-            today.setHours(0,0,0,0);
+            today.setHours(0, 0, 0, 0);
 
-            const diffTime = expiryDate.getTime() - today.getTime();
-            const daysToExpiry = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-
-            const daysToDeplete = burnRate > 0 ? (stock / burnRate).toFixed(1) : 'Tak Hingga';
+            const daysToExpiry = Math.max(0, Math.ceil((expiryDate.getTime() - today.getTime()) / 86400000));
             const expectedConsumption = Math.floor(burnRate * daysToExpiry);
             const projectedWaste = Math.max(0, stock - expectedConsumption);
-            const wasteRatio = stock > 0 ? (projectedWaste / stock) : 0;
+            const wasteRatio = stock > 0 ? projectedWaste / stock : 0;
 
-            previewDaysExpiry.textContent = `${daysToExpiry} hari`;
-            previewDaysDeplete.textContent = burnRate > 0 ? `${daysToDeplete} hari` : '∞ (0/hari)';
-            previewWaste.textContent = `${projectedWaste} unit (${(wasteRatio * 100).toFixed(0)}%)`;
+            previewDaysExpiry.innerHTML = `${numberFormatter.format(daysToExpiry)} <small>hari</small>`;
 
-            // Determine Risk Level matching PRD
-            if (projectedWaste <= 0) {
-                previewRisk.textContent = 'RENDAH (STOK AMAN)';
-                previewRisk.className = 'mt-0.5 inline-block px-2 py-0.5 rounded text-[11px] font-black bg-emerald-900 text-emerald-200 border border-emerald-700';
-            } else if (daysToExpiry <= 30) {
-                previewRisk.textContent = 'KRITIS (SEGERA REDISTRIBUSI)';
-                previewRisk.className = 'mt-0.5 inline-block px-2 py-0.5 rounded text-[11px] font-black bg-red-900 text-red-200 border border-red-700';
-            } else if (daysToExpiry <= 60 || wasteRatio >= 0.25) {
-                previewRisk.textContent = 'TINGGI (REKOMENDASI TRANSFER)';
-                previewRisk.className = 'mt-0.5 inline-block px-2 py-0.5 rounded text-[11px] font-black bg-orange-900 text-orange-200 border border-orange-700';
+            if (burnRate > 0) {
+                previewDaysDeplete.innerHTML = `${decimalFormatter.format(stock / burnRate)} <small>hari</small>`;
             } else {
-                previewRisk.textContent = 'SEDANG (PERHATIAN)';
-                previewRisk.className = 'mt-0.5 inline-block px-2 py-0.5 rounded text-[11px] font-black bg-amber-900 text-amber-200 border border-amber-700';
+                previewDaysDeplete.innerHTML = 'Tidak habis <small>0/hari</small>';
             }
+
+            previewWaste.innerHTML = `${numberFormatter.format(projectedWaste)} <small>unit (${Math.round(wasteRatio * 100)}%)</small>`;
+
+            let risk = {
+                label: 'Rendah',
+                className: 'ml-risk ml-risk-low',
+                note: 'Stok diproyeksikan habis sebelum kedaluwarsa.',
+            };
+
+            if (projectedWaste > 0 && daysToExpiry <= 30) {
+                risk = {
+                    label: 'Kritis',
+                    className: 'ml-risk ml-risk-critical',
+                    note: 'Sisa masa edar ≤30 hari; prioritaskan redistribusi.',
+                };
+            } else if (projectedWaste > 0 && (daysToExpiry <= 60 || wasteRatio >= 0.25)) {
+                risk = {
+                    label: 'Tinggi',
+                    className: 'ml-risk ml-risk-high',
+                    note: 'Risiko tinggi; evaluasi kebutuhan redistribusi.',
+                };
+            } else if (projectedWaste > 0) {
+                risk = {
+                    label: 'Sedang',
+                    className: 'ml-risk ml-risk-medium',
+                    note: 'Pantau laju pakai dan sisa masa edar.',
+                };
+            }
+
+            previewRisk.textContent = risk.label;
+            previewRisk.className = risk.className;
+            previewRiskNote.textContent = risk.note;
         }
 
         currentStockInput.addEventListener('input', updatePreview);

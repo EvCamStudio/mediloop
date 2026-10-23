@@ -1,51 +1,64 @@
 @extends('layouts.mediloop', ['title' => 'Edit Batch #'.$batch->batch_number])
 
 @section('content')
-<div class="space-y-6 max-w-3xl mx-auto">
+@php
+    $statusTone = match ($batch->status) {
+        'ACTIVE' => 'active',
+        'RESERVED' => 'pending',
+        'DEPLETED' => 'inactive',
+        'EXPIRED' => 'suspended',
+        default => 'inactive',
+    };
+    $statusLabel = match ($batch->status) {
+        'ACTIVE' => 'Aktif',
+        'RESERVED' => 'Dialokasikan',
+        'DEPLETED' => 'Habis',
+        'EXPIRED' => 'Kedaluwarsa',
+        default => $batch->status,
+    };
+@endphp
 
-    <!-- Breadcrumb -->
-    <div class="flex items-center gap-2 text-xs text-[#52627F]">
-        <a href="{{ route('dashboard') }}" class="hover:underline text-[#1D4ED8]">Dashboard</a>
-        <span>/</span>
-        <a href="{{ route('batches.index') }}" class="hover:underline text-[#1D4ED8]">Inventaris Obat</a>
-        <span>/</span>
-        <span class="text-[#0B1F4B] font-semibold">Edit Batch #{{ $batch->batch_number }}</span>
-    </div>
+<div class="ml-page-admin">
+    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ route('dashboard') }}">Dashboard</a>
+        <span class="ml-breadcrumb-sep">/</span>
+        <a href="{{ route('batches.index') }}">Inventaris obat</a>
+        <span class="ml-breadcrumb-sep">/</span>
+        <span>Edit batch {{ $batch->batch_number }}</span>
+    </nav>
 
-    <!-- Header -->
-    <div class="pb-4 border-b border-[#DBE5F5] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <header class="ml-page-head">
         <div>
-            <h1 class="text-2xl font-extrabold text-[#0B1F4B]">Edit Data Batch Stok</h1>
-            <p class="text-xs text-[#52627F] mt-1">
-                Perbarui jumlah fisik, laju pemakaian, atau tanggal masa simpan batch obat.
+            <p class="ml-page-eyebrow">Inventaris obat</p>
+            <div class="ml-page-title-row">
+                <h1 class="ml-page-title">Edit Data Batch Stok</h1>
+                <span class="ml-facility-chip">{{ $batch->facility->name }}</span>
+            </div>
+            <p class="ml-page-sub">
+                Perbarui stok fisik, laju pakai, atau masa edar batch {{ $batch->batch_number }}.
             </p>
         </div>
-        <a href="{{ route('batches.index') }}" class="text-xs font-semibold text-[#52627F] hover:text-[#0B1F4B] px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg border border-[#DBE5F5] transition">
-            &larr; Kembali
-        </a>
+        <div class="ml-page-actions">
+            <a href="{{ route('batches.index') }}" class="ml-btn-quiet">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 12H5m0 0l7 7m-7-7l7-7" />
+                </svg>
+                Kembali ke inventaris
+            </a>
+        </div>
+    </header>
+
+    <div class="ml-alert ml-alert-info" role="note">
+        <strong>Perubahan akan tercatat di jejak audit</strong>
+        <p class="ml-alert-copy">
+            Setiap perubahan data batch dicatat atas nama {{ $user->name }}.
+        </p>
     </div>
 
-    <!-- Medicine Summary Card -->
-    <div class="bg-white p-5 rounded-xl border border-[#DBE5F5] shadow-xs flex items-center justify-between">
-        <div>
-            <span class="text-xs font-mono text-[#52627F]">SEDIAAN FARMASI</span>
-            <div class="text-lg font-bold text-[#0B1F4B]">{{ $batch->medicine->name }}</div>
-            <div class="text-xs text-[#52627F]">
-                {{ $batch->medicine->dosage_form }} • Satuan: {{ $batch->medicine->unit }} • Faskes: {{ $batch->facility->name }}
-            </div>
-        </div>
-        <div class="text-right">
-            <span class="px-3 py-1 font-mono font-bold text-xs rounded bg-slate-100 text-[#0B1F4B] border border-slate-200">
-                BATCH: {{ $batch->batch_number }}
-            </span>
-        </div>
-    </div>
-
-    <!-- Form Errors Alert -->
     @if($errors->any())
-        <div class="p-4 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800">
-            <strong class="font-bold block mb-1">Terjadi kesalahan:</strong>
-            <ul class="list-disc list-inside space-y-0.5">
+        <div class="ml-alert ml-alert-error" role="alert">
+            <strong>Periksa kembali isian berikut:</strong>
+            <ul>
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -53,80 +66,170 @@
         </div>
     @endif
 
-    <!-- Edit Form Card -->
-    <form method="POST" action="{{ route('batches.update', $batch) }}" class="bg-white p-6 rounded-xl border border-[#DBE5F5] shadow-xs space-y-5">
+    <form method="POST" action="{{ route('batches.update', $batch) }}">
         @csrf
         @method('PUT')
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Current Stock -->
+        <div class="ml-two-col">
             <div>
-                <label for="current_stock" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                    Jumlah Stok Fisik Aktif: <span class="text-red-500">*</span>
-                </label>
-                <input type="number" name="current_stock" id="current_stock" value="{{ old('current_stock', $batch->current_stock) }}" min="0" required class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
+                <section class="ml-card" aria-labelledby="edit-batch-title">
+                    <div class="ml-card-head">
+                        <h2 class="ml-card-title" id="edit-batch-title">Perbarui data batch</h2>
+                        <p class="ml-card-sub">Perubahan langsung berlaku setelah disimpan.</p>
+                    </div>
+                    <div class="ml-card-body">
+                        <div class="ml-form-grid is-tight">
+                            <div class="ml-field">
+                                <label for="current_stock" class="ml-label">Stok fisik aktif <span class="ml-required">*</span></label>
+                                <input
+                                    type="number"
+                                    id="current_stock"
+                                    name="current_stock"
+                                    class="ml-input is-mono @error('current_stock') is-invalid @enderror"
+                                    value="{{ old('current_stock', $batch->current_stock) }}"
+                                    min="0"
+                                    required
+                                >
+                                @error('current_stock')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Jumlah yang tersedia di gudang saat ini.</p>
+                            </div>
+
+                            <div class="ml-field">
+                                <label for="daily_burn_rate" class="ml-label">Laju pakai harian <span class="ml-required">*</span></label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    id="daily_burn_rate"
+                                    name="daily_burn_rate"
+                                    class="ml-input is-mono @error('daily_burn_rate') is-invalid @enderror"
+                                    value="{{ old('daily_burn_rate', $batch->daily_burn_rate) }}"
+                                    min="0"
+                                    required
+                                >
+                                @error('daily_burn_rate')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Rata-rata unit yang dipakai per hari.</p>
+                            </div>
+
+                            <div class="ml-field">
+                                <label for="expiry_date" class="ml-label">Tanggal kedaluwarsa <span class="ml-required">*</span></label>
+                                <input
+                                    type="date"
+                                    id="expiry_date"
+                                    name="expiry_date"
+                                    class="ml-input @error('expiry_date') is-invalid @enderror"
+                                    value="{{ old('expiry_date', $batch->expiry_date->toDateString()) }}"
+                                    required
+                                >
+                                @error('expiry_date')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Tanggal berakhir masa edar obat.</p>
+                            </div>
+
+                            <div class="ml-field">
+                                <label for="unit_price_idr" class="ml-label">Harga satuan batch (Rp) <span class="ml-required">*</span></label>
+                                <input
+                                    type="number"
+                                    id="unit_price_idr"
+                                    name="unit_price_idr"
+                                    class="ml-input is-mono @error('unit_price_idr') is-invalid @enderror"
+                                    value="{{ old('unit_price_idr', $batch->unit_price_idr) }}"
+                                    min="0"
+                                    required
+                                >
+                                @error('unit_price_idr')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Dipakai untuk estimasi nilai stok dan potensi limbah.</p>
+                            </div>
+
+                            <div class="ml-field">
+                                <label for="storage_location" class="ml-label">Lokasi fisik <span class="ml-optional">(opsional)</span></label>
+                                <input
+                                    type="text"
+                                    id="storage_location"
+                                    name="storage_location"
+                                    class="ml-input @error('storage_location') is-invalid @enderror"
+                                    value="{{ old('storage_location', $batch->storage_location) }}"
+                                    placeholder="Contoh: Rak baru 9 atau chiller 2–8°C"
+                                >
+                                @error('storage_location')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Rak, lemari, atau chiller tempat batch disimpan.</p>
+                            </div>
+
+                            <div class="ml-field">
+                                <label for="status" class="ml-label">Status siklus batch <span class="ml-required">*</span></label>
+                                <select id="status" name="status" class="ml-select @error('status') is-invalid @enderror" required>
+                                    <option value="ACTIVE" @selected(old('status', $batch->status) === 'ACTIVE')>Aktif (tersedia)</option>
+                                    <option value="RESERVED" @selected(old('status', $batch->status) === 'RESERVED')>Dialokasikan</option>
+                                    <option value="DEPLETED" @selected(old('status', $batch->status) === 'DEPLETED')>Habis</option>
+                                    <option value="EXPIRED" @selected(old('status', $batch->status) === 'EXPIRED')>Kedaluwarsa</option>
+                                </select>
+                                @error('status')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <p class="ml-help">Status tidak mengubah jumlah stok secara otomatis.</p>
+                            </div>
+                        </div>
+
+                        <div class="ml-action-row">
+                            <a href="{{ route('batches.index') }}" class="ml-btn-quiet">Batal</a>
+                            <button type="submit" class="ml-btn-primary">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M5 13l4 4L19 7" />
+                                </svg>
+                                Simpan perubahan
+                            </button>
+                        </div>
+                    </div>
+                </section>
             </div>
 
-            <!-- Daily Burn Rate -->
-            <div>
-                <label for="daily_burn_rate" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                    Laju Pakai Harian (Burn Rate): <span class="text-red-500">*</span>
-                </label>
-                <input type="number" step="0.1" name="daily_burn_rate" id="daily_burn_rate" value="{{ old('daily_burn_rate', $batch->daily_burn_rate) }}" min="0" required class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-mono font-bold focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-            </div>
-        </div>
+            <aside>
+                <section class="ml-card ml-sticky" aria-labelledby="batch-summary-title">
+                    <div class="ml-card-head">
+                        <h2 class="ml-card-title" id="batch-summary-title">Ringkasan batch</h2>
+                        <p class="ml-card-sub">Identitas dan posisi stok saat ini.</p>
+                    </div>
+                    <div class="ml-card-body">
+                        <div class="ml-summary-medicine">{{ $batch->medicine->name }}</div>
+                        <p class="ml-cell-meta">
+                            {{ $batch->medicine->dosage_form }}, satuan {{ $batch->medicine->unit }}@if($batch->medicine->requires_cold_chain), wajib rantai dingin @endif
+                        </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Expiry Date -->
-            <div>
-                <label for="expiry_date" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                    Tanggal Kedaluwarsa: <span class="text-red-500">*</span>
-                </label>
-                <input type="date" name="expiry_date" id="expiry_date" value="{{ old('expiry_date', $batch->expiry_date->toDateString()) }}" required class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-semibold focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-            </div>
+                        <div class="ml-detail-grid ml-summary-details">
+                            <div>
+                                <div class="ml-detail-label">Nomor batch</div>
+                                <div class="ml-detail-value is-mono">{{ $batch->batch_number }}</div>
+                            </div>
+                            <div>
+                                <div class="ml-detail-label">Status</div>
+                                <div class="ml-detail-value">
+                                    <span class="ml-status ml-status-{{ $statusTone }}">{{ $statusLabel }}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="ml-detail-label">Fasilitas</div>
+                                <div class="ml-detail-value">{{ $batch->facility->name }}</div>
+                            </div>
+                            <div>
+                                <div class="ml-detail-label">Kedaluwarsa</div>
+                                <div class="ml-detail-value">{{ $batch->expiry_date->format('d M Y') }}</div>
+                            </div>
+                            <div>
+                                <div class="ml-detail-label">Stok saat ini</div>
+                                <div class="ml-detail-value">{{ number_format($batch->current_stock, 0, ',', '.') }} {{ $batch->medicine->unit }}</div>
+                            </div>
+                            <div>
+                                <div class="ml-detail-label">Harga satuan</div>
+                                <div class="ml-detail-value">Rp {{ number_format($batch->unit_price_idr, 0, ',', '.') }}</div>
+                            </div>
+                        </div>
 
-            <!-- Unit Price -->
-            <div>
-                <label for="unit_price_idr" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                    Harga Satuan (IDR): <span class="text-red-500">*</span>
-                </label>
-                <input type="number" name="unit_price_idr" id="unit_price_idr" value="{{ old('unit_price_idr', $batch->unit_price_idr) }}" min="0" required class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-mono focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Storage Location -->
-            <div>
-                <label for="storage_location" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                    Lokasi Fisik di Rak/Chiller:
-                </label>
-                <input type="text" name="storage_location" id="storage_location" value="{{ old('storage_location', $batch->storage_location) }}" class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-            </div>
-
-            <!-- Status -->
-            <div>
-                <label for="status" class="block text-xs font-bold text-[#0B1F4B] mb-1">
-                    Status Siklus Batch: <span class="text-red-500">*</span>
-                </label>
-                <select name="status" id="status" class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-xs font-semibold focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                    <option value="ACTIVE" {{ old('status', $batch->status) === 'ACTIVE' ? 'selected' : '' }}>ACTIVE (Tersedia)</option>
-                    <option value="RESERVED" {{ old('status', $batch->status) === 'RESERVED' ? 'selected' : '' }}>RESERVED (Dialokasikan)</option>
-                    <option value="DEPLETED" {{ old('status', $batch->status) === 'DEPLETED' ? 'selected' : '' }}>DEPLETED (Habis)</option>
-                    <option value="EXPIRED" {{ old('status', $batch->status) === 'EXPIRED' ? 'selected' : '' }}>EXPIRED (Kedaluwarsa)</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="pt-4 border-t border-[#DBE5F5] flex items-center justify-between">
-            <a href="{{ route('batches.index') }}" class="text-xs font-semibold text-[#52627F] hover:text-[#0B1F4B]">
-                Batal
-            </a>
-
-            <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
-                <span>Simpan Perubahan</span>
-            </button>
+                        <div class="ml-forecast-note">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Stok dan status diperbarui terpisah. Setiap perubahan masuk ke jejak audit.</span>
+                        </div>
+                    </div>
+                </section>
+            </aside>
         </div>
     </form>
-
 </div>
 @endsection

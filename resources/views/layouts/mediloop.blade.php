@@ -1726,6 +1726,11 @@
             font-family: var(--font-code);
             font-size: 12px;
         }
+        .ml-input::placeholder,
+        .ml-textarea::placeholder {
+            color: var(--ml-muted);
+            opacity: 1;
+        }
         .ml-input:focus,
         .ml-select:focus,
         .ml-textarea:focus {
@@ -1759,9 +1764,12 @@
             display: flex;
             align-items: flex-start;
             gap: 9px;
+            min-height: 32px;
+            padding: 4px 0;
             font-size: 12.5px;
             line-height: 1.5;
             color: var(--ml-text);
+            cursor: pointer;
         }
         .ml-checkbox-row input {
             margin-top: 2px;
@@ -1769,6 +1777,11 @@
             width: 16px;
             height: 16px;
             flex-shrink: 0;
+        }
+        .ml-checkbox-row input:focus-visible,
+        .ml-form-toggle input:focus-visible {
+            outline: 2px solid var(--ml-primary);
+            outline-offset: 2px;
         }
 
         .ml-card {
@@ -1816,6 +1829,7 @@
         .ml-alert-success { background: #EFF6FF; border-color: #BFDBFE; color: #1E3A8A; }
         .ml-alert-error { background: #FEF2F2; border-color: #FECACA; color: #7F1D1D; }
         .ml-alert-info { background: #F8FAFC; border-color: var(--ml-border); color: var(--ml-muted); }
+        .ml-alert-info strong { color: var(--ml-text); }
         .ml-alert ul { margin: 6px 0 0; padding-left: 18px; }
 
         .ml-status {
@@ -3270,6 +3284,245 @@
             .ml-inventory-actions > .ml-btn-quiet { flex: 1; justify-content: center; }
             .ml-inventory-actions form { flex: 1; }
             .ml-inventory-actions form .ml-btn-quiet { width: 100%; justify-content: center; }
+        }
+        /* ============================================================
+           AUDIT REGISTER
+           ============================================================ */
+        .ml-audit-count {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 9px;
+            border: 1px solid var(--ml-border);
+            border-radius: 999px;
+            background: var(--ml-surface);
+            color: var(--ml-muted);
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.35;
+            white-space: nowrap;
+        }
+        .ml-audit-link {
+            display: inline-block;
+            max-width: 100%;
+            color: var(--ml-primary);
+            font-family: var(--font-code);
+            font-size: 11.5px;
+            font-weight: 600;
+            line-height: 1.35;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .ml-audit-link:hover { text-decoration: underline; }
+        .ml-audit-link:focus-visible {
+            outline: 2px solid var(--ml-primary);
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+        .ml-audit-amount {
+            color: var(--ml-text);
+            font-family: var(--font-code);
+            font-size: 12px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+        .ml-audit-action {
+            display: inline-block;
+            max-width: 100%;
+            padding: 3px 7px;
+            border: 1px solid var(--ml-border);
+            border-radius: 6px;
+            background: var(--ml-surface);
+            color: var(--ml-text);
+            font-family: var(--font-code);
+            font-size: 10.5px;
+            font-weight: 600;
+            line-height: 1.35;
+            overflow-wrap: break-word;
+        }
+        .ml-audit-description {
+            display: block;
+            max-width: 460px;
+            color: var(--ml-text);
+            line-height: 1.55;
+        }
+        .ml-table-audit { min-width: 960px; }
+        .ml-table-audit th,
+        .ml-table-audit td {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+        .ml-table-audit th:first-child,
+        .ml-table-audit td:first-child { padding-left: 18px; }
+        .ml-table-audit th:last-child,
+        .ml-table-audit td:last-child { padding-right: 18px; }
+        .ml-table-responsive:focus-visible {
+            outline: 2px solid var(--ml-primary);
+            outline-offset: -2px;
+        }
+        /* ============================================================
+           BATCH FORM
+           ============================================================ */
+        .ml-step-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+        }
+        .ml-step-title {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            min-width: 0;
+        }
+        .ml-step-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 24px;
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            background: #EAF1FF;
+            color: var(--ml-primary);
+            font-family: var(--font-code);
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .ml-step-title .ml-card-title { line-height: 1.3; }
+        .ml-form-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 32px;
+            padding: 6px 0;
+            color: var(--ml-text);
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.4;
+            cursor: pointer;
+        }
+        .ml-form-toggle input {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+            accent-color: var(--ml-primary);
+            flex-shrink: 0;
+        }
+        .ml-form-stack {
+            display: grid;
+            gap: 18px;
+        }
+        .ml-form-grid.is-tight > .ml-field { margin-bottom: 0; }
+        .ml-field.is-last { margin-bottom: 0; }
+        .ml-optional {
+            color: var(--ml-muted);
+            font-weight: 500;
+        }
+        .ml-input.is-uppercase { text-transform: uppercase; }
+        .ml-subpanel {
+            padding: 16px;
+            border: 1px solid var(--ml-border);
+            border-radius: 10px;
+            background: var(--ml-surface);
+        }
+        .ml-subpanel-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--ml-border);
+        }
+        .ml-subpanel-title {
+            color: var(--ml-text);
+            font-size: 12.5px;
+            font-weight: 700;
+        }
+        .ml-alert-copy {
+            margin: 3px 0 0;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+        .ml-summary-medicine {
+            color: var(--ml-text);
+            font-family: var(--font-heading);
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+        .ml-summary-details { margin-top: 16px; }
+        .ml-forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .ml-forecast-cell {
+            padding: 11px 12px;
+            border-radius: 10px;
+            background: var(--ml-surface);
+        }
+        .ml-forecast-cell.is-wide { grid-column: 1 / -1; }
+        .ml-forecast-cell.is-wide .ml-forecast-value { font-size: 20px; }
+        .ml-forecast-label {
+            display: block;
+            color: var(--ml-muted);
+            font-size: 10.5px;
+            line-height: 1.35;
+        }
+        .ml-forecast-value {
+            display: block;
+            margin-top: 5px;
+            color: var(--ml-text);
+            font-family: var(--font-heading);
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.2;
+            font-variant-numeric: tabular-nums;
+        }
+        .ml-forecast-value small {
+            color: var(--ml-muted);
+            font-family: var(--font-body);
+            font-size: 10.5px;
+            font-weight: 500;
+        }
+        .ml-forecast-risk {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .ml-forecast-risk .ml-forecast-label {
+            width: 100%;
+            margin-bottom: -2px;
+        }
+        .ml-forecast-hint {
+            width: 100%;
+            margin: 0;
+            color: var(--ml-muted);
+            font-size: 11px;
+            line-height: 1.45;
+        }
+        .ml-forecast-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--ml-border);
+            color: var(--ml-muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+        .ml-forecast-note svg {
+            flex-shrink: 0;
+            margin-top: 1px;
+            color: var(--ml-subtle);
         }
     </style>
 </head>
