@@ -224,7 +224,7 @@
                 </p>
             </div>
             @if(! $batches->isEmpty())
-                <div class="ml-inventory-legend" aria-label="Klasifikasi risiko batch">
+                <div class="ml-inventory-legend" role="group" aria-label="Klasifikasi risiko batch">
                     <span class="ml-risk ml-risk-critical">Kritis &le;30 hari</span>
                     <span class="ml-risk ml-risk-high">Tinggi &le;60 hari</span>
                     <span class="ml-risk ml-risk-medium">Sedang &le;90 hari</span>
@@ -325,7 +325,7 @@
                                     <div class="ml-cell-meta">
                                         {{ $batch->medicine->dosage_form }} &middot; {{ $batch->medicine->category }}
                                         @if($batch->medicine->requires_cold_chain)
-                                            <span class="ml-cold-chain" title="Perlu rantai dingin" aria-label="Perlu rantai dingin">
+                                            <span class="ml-cold-chain" role="img" title="Perlu rantai dingin" aria-label="Perlu rantai dingin">
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                                     <path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1" />
                                                 </svg>

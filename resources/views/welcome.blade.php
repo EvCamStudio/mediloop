@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="MediLoop membantu fasilitas kesehatan mencegah pemusnahan obat kedaluwarsa melalui koordinasi redistribusi stok yang aman, terdokumentasi, dan berbasis keputusan petugas.">
     <title>MediLoop — Platform Pendukung Keputusan Redistribusi Obat Antarfaskes</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +21,7 @@
             --brand-sky: #EAF1FF;
             --brand-border: #DBE5F5;
             --brand-muted: #52627F;
-            --brand-risk: #D9480F;
+            --brand-risk: #B33A0A;
             --brand-warning: #B7791F;
         }
 
@@ -70,6 +71,7 @@
         </div>
     </header>
 
+    <main id="main-content" class="flex-1">
     <!-- Hero Section with 3D Capsule Vector Focal Anchor -->
     <section class="relative bg-white border-b border-[#DBE5F5] py-16 lg:py-24 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -131,10 +133,10 @@
                         <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#DBE5F5]">
                             <div class="min-w-0">
                                 <span class="text-[11px] font-mono text-[#52627F]">KASUS BENCHMARK PRD</span>
-                                <h3 class="text-sm font-bold text-[#0B1F4B]">Ceftriaxone 1g Injeksi</h3>
+                                <div class="text-sm font-bold text-[#0B1F4B]">Ceftriaxone 1g Injeksi</div>
                             </div>
                             <span
-                                class="shrink-0 px-2 py-0.5 text-xs font-bold text-[#D9480F] bg-orange-50 border border-orange-200 rounded">
+                                class="shrink-0 px-2 py-0.5 text-xs font-bold text-[#B33A0A] bg-orange-50 border border-orange-200 rounded">
                                 [RISIKO TINGGI: 300 UNIT]
                             </span>
                         </div>
@@ -171,7 +173,7 @@
                             </div>
                             <div>
                                 <span class="text-[#52627F] block">Proyeksi Limbah:</span>
-                                <span class="font-bold text-[#D9480F]">300 Unit (62.5%)</span>
+                                <span class="font-bold text-[#B33A0A]">300 Unit (62.5%)</span>
                             </div>
                         </div>
 
@@ -209,7 +211,7 @@
                         Benchmark PRD: Ceftriaxone (480 stok, 4/hari, 45 hari)
                     </button>
                     <button type="button" onclick="setPreset(120, 1.0, 28)"
-                        class="px-3 py-1.5 text-xs font-medium rounded-md bg-orange-50 text-[#D9480F] hover:bg-orange-100 border border-orange-200">
+                        class="px-3 py-1.5 text-xs font-medium rounded-md bg-orange-50 text-[#B33A0A] hover:bg-orange-100 border border-orange-200">
                         Kritis: Insulin Cold-Chain (120 stok, 1/hari, 28 hari)
                     </button>
                     <button type="button" onclick="setPreset(300, 8.0, 80)"
@@ -259,8 +261,8 @@
 
                 <!-- Simulation Output Matrix -->
                 <div class="bg-slate-50 border border-[#DBE5F5] rounded-xl p-6">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-[#52627F] mb-4">Hasil Evaluasi Algoritma:
-                    </h4>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#52627F] mb-4">Hasil Evaluasi Algoritma:
+                    </h3>
 
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                         <div class="p-3 bg-white rounded-lg border border-[#DBE5F5]">
@@ -273,11 +275,11 @@
                         </div>
                         <div class="p-3 bg-white rounded-lg border border-[#DBE5F5]">
                             <span class="block text-[11px] text-[#52627F]">Proyeksi Limbah (W):</span>
-                            <span id="outWaste" class="text-lg font-mono font-bold text-[#D9480F]">300 unit</span>
+                            <span id="outWaste" class="text-lg font-mono font-bold text-[#B33A0A]">300 unit</span>
                         </div>
                         <div class="p-3 bg-white rounded-lg border border-[#DBE5F5]">
                             <span class="block text-[11px] text-[#52627F]">Rasio Limbah:</span>
-                            <span id="outRatio" class="text-lg font-mono font-bold text-[#D9480F]">62.5%</span>
+                            <span id="outRatio" class="text-lg font-mono font-bold text-[#B33A0A]">62.5%</span>
                         </div>
                     </div>
 
@@ -287,7 +289,7 @@
                         <div>
                             <span class="text-xs text-[#52627F] block">Klasifikasi Tingkat Risiko Klinis:</span>
                             <span id="outRiskBadge"
-                                class="inline-block mt-1 px-3 py-1 text-xs font-bold rounded bg-orange-100 text-[#D9480F] border border-orange-300">
+                                class="inline-block mt-1 px-3 py-1 text-xs font-bold rounded bg-orange-100 text-[#B33A0A] border border-orange-300">
                                 [HIGH RISK: 300 unit proyeksi terbuang]
                             </span>
                         </div>
@@ -401,6 +403,7 @@
             </div>
         </div>
     </section>
+    </main>
 
     <!-- Footer -->
     <footer class="bg-white border-t border-[#DBE5F5] py-6 text-center text-xs text-[#52627F]">
@@ -442,12 +445,12 @@
                 action.textContent = 'Stok aman, tidak memerlukan tindakan redistribusi.';
                 action.className = 'text-xs font-bold text-slate-700';
             } else if (days <= 30) {
-                badge.className = 'inline-block mt-1 px-3 py-1 text-xs font-bold rounded bg-red-100 text-[#D9480F] border border-red-300';
+                badge.className = 'inline-block mt-1 px-3 py-1 text-xs font-bold rounded bg-red-100 text-[#B33A0A] border border-red-300';
                 badge.textContent = '[CRITICAL: Kedaluwarsa <= 30 Hari, ' + projectedWaste + ' unit terancam musnah]';
                 action.textContent = 'Mendesak! Segera koordinasikan transfer hari ini.';
-                action.className = 'text-xs font-bold text-[#D9480F]';
+                action.className = 'text-xs font-bold text-[#B33A0A]';
             } else if (days <= 60 || parseFloat(wasteRatio) >= 25) {
-                badge.className = 'inline-block mt-1 px-3 py-1 text-xs font-bold rounded bg-orange-100 text-[#D9480F] border border-orange-300';
+                badge.className = 'inline-block mt-1 px-3 py-1 text-xs font-bold rounded bg-orange-100 text-[#B33A0A] border border-orange-300';
                 badge.textContent = '[HIGH RISK: ' + projectedWaste + ' unit (' + wasteRatio + '%) proyeksi limbah]';
                 action.textContent = 'Wajib diajukan usulan redistribusi ke faskes kandidat.';
                 action.className = 'text-xs font-bold text-[#1D4ED8]';

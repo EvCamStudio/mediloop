@@ -20,6 +20,14 @@ test('public landing page renders with clinical decision-support content and sim
     $response->assertSee('Benchmark PRD: Ceftriaxone');
 });
 
+test('public landing page exposes a main landmark and meta description', function () {
+    $response = $this->get('/');
+
+    $response->assertOk();
+    $response->assertSee('<main id="main-content"', false);
+    $response->assertSee('<meta name="description"', false);
+});
+
 test('landing call-to-action sends guests to login and demo shortcut is removed', function () {
     $response = $this->get('/');
 
