@@ -9,7 +9,6 @@ use App\Models\Medicine;
 use App\Services\RedistributionEngine;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -43,10 +42,10 @@ class BatchController extends Controller
         $baseFacilityQuery = clone $query;
         $countAll = (clone $baseFacilityQuery)->count();
         $countRisk = (clone $baseFacilityQuery)
-            ->whereRaw("current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))")
+            ->whereRaw('current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))')
             ->where(function ($sub) {
-                $sub->whereRaw("DATEDIFF(expiry_date, CURDATE()) <= 60")
-                    ->orWhereRaw("(current_stock - FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))) / current_stock >= 0.25");
+                $sub->whereRaw('DATEDIFF(expiry_date, CURDATE()) <= 60')
+                    ->orWhereRaw('(current_stock - FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))) / current_stock >= 0.25');
             })->count();
         $countExpiring = (clone $baseFacilityQuery)
             ->whereDate('expiry_date', '<=', now()->addDays(60))
@@ -58,10 +57,10 @@ class BatchController extends Controller
         // 1. Quick Tab Filtering
         $currentTab = $request->get('tab', 'all');
         if ($currentTab === 'risk') {
-            $query->whereRaw("current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))")
+            $query->whereRaw('current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))')
                 ->where(function ($sub) {
-                    $sub->whereRaw("DATEDIFF(expiry_date, CURDATE()) <= 60")
-                        ->orWhereRaw("(current_stock - FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))) / current_stock >= 0.25");
+                    $sub->whereRaw('DATEDIFF(expiry_date, CURDATE()) <= 60')
+                        ->orWhereRaw('(current_stock - FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))) / current_stock >= 0.25');
                 });
         } elseif ($currentTab === 'expiring') {
             $query->whereDate('expiry_date', '<=', now()->addDays(60));
@@ -72,13 +71,13 @@ class BatchController extends Controller
         // 2. Risk Level Filter (Dropdown)
         $currentRisk = $request->get('risk', '');
         if ($currentRisk === 'CRITICAL') {
-            $query->whereRaw("current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))) AND DATEDIFF(expiry_date, CURDATE()) <= 30");
+            $query->whereRaw('current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))) AND DATEDIFF(expiry_date, CURDATE()) <= 30');
         } elseif ($currentRisk === 'HIGH') {
-            $query->whereRaw("current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))) AND (DATEDIFF(expiry_date, CURDATE()) BETWEEN 31 AND 60 OR (current_stock > 0 AND (current_stock - FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))) / current_stock >= 0.25))");
+            $query->whereRaw('current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))) AND (DATEDIFF(expiry_date, CURDATE()) BETWEEN 31 AND 60 OR (current_stock > 0 AND (current_stock - FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))) / current_stock >= 0.25))');
         } elseif ($currentRisk === 'MEDIUM') {
-            $query->whereRaw("current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))) AND (DATEDIFF(expiry_date, CURDATE()) BETWEEN 61 AND 90 OR current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))))");
+            $query->whereRaw('current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))) AND (DATEDIFF(expiry_date, CURDATE()) BETWEEN 61 AND 90 OR current_stock > FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE()))))');
         } elseif ($currentRisk === 'LOW') {
-            $query->whereRaw("current_stock <= FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))");
+            $query->whereRaw('current_stock <= FLOOR(daily_burn_rate * GREATEST(0, DATEDIFF(expiry_date, CURDATE())))');
         }
 
         // 3. Search Query
@@ -405,7 +404,10 @@ class BatchController extends Controller
 
         return response()->stream(function () {
             $handle = fopen('php://output', 'w');
-            
+            if (! is_resource($handle)) {
+                return;
+            }
+
             // UTF-8 BOM for Excel compatibility
             fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
 
@@ -519,7 +521,7 @@ class BatchController extends Controller
                 if (count($data) === 1 && str_contains($data[0], ';')) {
                     $data = str_getcsv($data[0], ';');
                 }
-                $rows[] = array_map('trim', $data);
+                $rows[] = array_map(fn ($val) => is_string($val) ? trim($val) : '', $data);
             }
             fclose($handle);
         }
@@ -535,18 +537,42 @@ class BatchController extends Controller
 
         $headerMap = [];
         foreach ($rawHeaders as $idx => $h) {
-            if (in_array($h, ['nama_obat', 'medicine_name', 'nama', 'name', 'obat'])) $headerMap['medicine_name'] = $idx;
-            if (in_array($h, ['nama_generik', 'generic_name', 'generik'])) $headerMap['generic_name'] = $idx;
-            if (in_array($h, ['kategori', 'category', 'golongan'])) $headerMap['category'] = $idx;
-            if (in_array($h, ['bentuk_sediaan', 'dosage_form', 'sediaan'])) $headerMap['dosage_form'] = $idx;
-            if (in_array($h, ['satuan', 'unit', 'kemasan'])) $headerMap['unit'] = $idx;
-            if (in_array($h, ['nomor_batch', 'batch_number', 'batch_no', 'no_batch', 'batch'])) $headerMap['batch_number'] = $idx;
-            if (in_array($h, ['stok_saat_ini', 'current_stock', 'stok', 'stock', 'jumlah', 'qty'])) $headerMap['current_stock'] = $idx;
-            if (in_array($h, ['laju_pemakaian_harian', 'daily_burn_rate', 'burn_rate', 'pemakaian_harian', 'laju_harian'])) $headerMap['daily_burn_rate'] = $idx;
-            if (in_array($h, ['tanggal_kadaluwarsa', 'expiry_date', 'kadaluwarsa', 'expired_date', 'exp_date', 'expired'])) $headerMap['expiry_date'] = $idx;
-            if (in_array($h, ['harga_satuan_idr', 'harga_satuan', 'unit_price_idr', 'harga', 'price'])) $headerMap['unit_price_idr'] = $idx;
-            if (in_array($h, ['perlu_rantai_dingin', 'requires_cold_chain', 'cold_chain', 'rantai_dingin'])) $headerMap['requires_cold_chain'] = $idx;
-            if (in_array($h, ['lokasi_simpan', 'storage_location', 'lokasi', 'rak', 'gudang'])) $headerMap['storage_location'] = $idx;
+            if (in_array($h, ['nama_obat', 'medicine_name', 'nama', 'name', 'obat'])) {
+                $headerMap['medicine_name'] = $idx;
+            }
+            if (in_array($h, ['nama_generik', 'generic_name', 'generik'])) {
+                $headerMap['generic_name'] = $idx;
+            }
+            if (in_array($h, ['kategori', 'category', 'golongan'])) {
+                $headerMap['category'] = $idx;
+            }
+            if (in_array($h, ['bentuk_sediaan', 'dosage_form', 'sediaan'])) {
+                $headerMap['dosage_form'] = $idx;
+            }
+            if (in_array($h, ['satuan', 'unit', 'kemasan'])) {
+                $headerMap['unit'] = $idx;
+            }
+            if (in_array($h, ['nomor_batch', 'batch_number', 'batch_no', 'no_batch', 'batch'])) {
+                $headerMap['batch_number'] = $idx;
+            }
+            if (in_array($h, ['stok_saat_ini', 'current_stock', 'stok', 'stock', 'jumlah', 'qty'])) {
+                $headerMap['current_stock'] = $idx;
+            }
+            if (in_array($h, ['laju_pemakaian_harian', 'daily_burn_rate', 'burn_rate', 'pemakaian_harian', 'laju_harian'])) {
+                $headerMap['daily_burn_rate'] = $idx;
+            }
+            if (in_array($h, ['tanggal_kadaluwarsa', 'expiry_date', 'kadaluwarsa', 'expired_date', 'exp_date', 'expired'])) {
+                $headerMap['expiry_date'] = $idx;
+            }
+            if (in_array($h, ['harga_satuan_idr', 'harga_satuan', 'unit_price_idr', 'harga', 'price'])) {
+                $headerMap['unit_price_idr'] = $idx;
+            }
+            if (in_array($h, ['perlu_rantai_dingin', 'requires_cold_chain', 'cold_chain', 'rantai_dingin'])) {
+                $headerMap['requires_cold_chain'] = $idx;
+            }
+            if (in_array($h, ['lokasi_simpan', 'storage_location', 'lokasi', 'rak', 'gudang'])) {
+                $headerMap['storage_location'] = $idx;
+            }
         }
 
         if (! isset($headerMap['medicine_name']) || ! isset($headerMap['batch_number']) || ! isset($headerMap['current_stock']) || ! isset($headerMap['expiry_date'])) {
@@ -572,6 +598,7 @@ class BatchController extends Controller
 
             if (empty($medName) || empty($batchNum) || $stock <= 0 || empty($rawExp)) {
                 $failedCount++;
+
                 continue;
             }
 
@@ -584,6 +611,7 @@ class BatchController extends Controller
                     $expiryDate = $d->format('Y-m-d');
                 } else {
                     $failedCount++;
+
                     continue;
                 }
             } else {
@@ -591,7 +619,9 @@ class BatchController extends Controller
             }
 
             $burnRate = isset($headerMap['daily_burn_rate']) ? (float) ($row[$headerMap['daily_burn_rate']] ?? 1.0) : 1.0;
-            if ($burnRate <= 0) $burnRate = 1.0;
+            if ($burnRate <= 0) {
+                $burnRate = 1.0;
+            }
 
             $unitPrice = isset($headerMap['unit_price_idr']) ? (float) ($row[$headerMap['unit_price_idr']] ?? 0) : 0;
             $genericName = isset($headerMap['generic_name']) ? trim($row[$headerMap['generic_name']]) : $medName;
@@ -599,7 +629,7 @@ class BatchController extends Controller
             $dosageForm = isset($headerMap['dosage_form']) ? trim($row[$headerMap['dosage_form']]) : 'Tablet';
             $unit = isset($headerMap['unit']) ? trim($row[$headerMap['unit']]) : 'Satuan';
             $storageLoc = isset($headerMap['storage_location']) ? trim($row[$headerMap['storage_location']]) : 'Gudang Farmasi Utama';
-            
+
             $coldChainRaw = isset($headerMap['requires_cold_chain']) ? strtolower(trim($row[$headerMap['requires_cold_chain']])) : 'tidak';
             $requiresColdChain = in_array($coldChainRaw, ['ya', 'yes', 'true', '1']);
 

@@ -33,7 +33,7 @@ class MapController extends Controller
         $facilities = $facilitiesQuery->get()->map(function ($f) use ($userFacility) {
             $activeBatches = Batch::where('facility_id', $f->id)->where('status', 'ACTIVE')->get();
             $atRiskCount = $activeBatches->filter(fn ($b) => in_array($b->risk_level, ['CRITICAL', 'HIGH']))->count();
-            
+
             $distKm = null;
             if ($userFacility && $userFacility->id !== $f->id) {
                 $distKm = RedistributionEngine::calculateHaversineDistance(

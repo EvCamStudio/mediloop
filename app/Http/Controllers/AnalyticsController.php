@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Batch;
 use App\Models\Facility;
-use App\Models\Medicine;
 use App\Models\Transfer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AnalyticsController extends Controller
@@ -126,7 +124,7 @@ class AnalyticsController extends Controller
         $totalWasteUnits = $batches->sum('projected_waste');
         $totalWasteValueIdr = $batches->sum(fn ($b) => $b->projected_waste * (float) $b->unit_price_idr);
         $totalInventoryValueIdr = $batches->sum(fn ($b) => $b->current_stock * (float) $b->unit_price_idr);
-        
+
         $wasteRatio = $totalStockUnits > 0 ? round(($totalWasteUnits / $totalStockUnits) * 100, 1) : 0;
         $efficiencyScore = 100 - $wasteRatio;
 
