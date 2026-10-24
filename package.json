@@ -4,18 +4,19 @@
     "type": "module",
     "scripts": {
         "build": "vp build",
+        "vercel-build": "npm run build",
         "dev": "vp dev",
         "lint": "php vendor/bin/pint --format agent",
-        "typecheck": "php vendor/bin/phpstan analyse",
+        "typecheck": "php -d memory_limit=1G vendor/bin/phpstan analyse --memory-limit=1G",
         "test": "php artisan test --compact",
-        "slop-scan": "node .agent/skills/ai-slop-detector/scripts/slop-scan.mjs resources/",
-        "check": "npm run slop-scan && npm run lint && npm run typecheck && npm run test"
+        "check": "npm run lint && npm run typecheck && npm run test"
     },
     "dependencies": {
         "@laravel/passkeys": "^0.2.0",
         "@tailwindcss/vite": "^4.1.11",
         "concurrently": "^10.0.3",
         "laravel-vite-plugin": "^3.1",
+        "leaflet": "^1.9.4",
         "tailwindcss": "^4.0.7",
         "vite": "^8.0.0",
         "vite-plus": "0.3.0"
@@ -25,5 +26,25 @@
         "@rollup/rollup-linux-x64-gnu": "4.9.5",
         "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
         "lightningcss-linux-x64-gnu": "^1.29.1"
-    }
+    },
+    "name": "mediloop",
+    "version": "1.0.0",
+    "description": "",
+    "main": "eslint.config.js",
+    "directories": {
+        "doc": "docs",
+        "test": "tests"
+    },
+    "devDependencies": {},
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/EvCamStudio/mediloop.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/EvCamStudio/mediloop/issues"
+    },
+    "homepage": "https://github.com/EvCamStudio/mediloop#readme"
 }

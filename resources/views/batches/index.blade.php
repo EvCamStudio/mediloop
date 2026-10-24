@@ -1,65 +1,191 @@
-@extends('layouts.mediloop', ['title' => 'Inventaris & Data Stok Obat — MediLoop'])
+@extends('layouts.mediloop', ['title' => 'Stok & Batch Obat'])
 
 @section('content')
-<div class="space-y-6">
+@php
+    $riskLabels = [
+        'CRITICAL' => 'Kritis',
+        'HIGH' => 'Tinggi',
+        'MEDIUM' => 'Sedang',
+        'LOW' => 'Rendah',
+    ];
 
-    <!-- Flash Alerts -->
+    $filterParams = array_filter([
+        'search' => $currentSearch !== '' ? $currentSearch : null,
+        'facility_id' => $user->isDinkesAuditor() ? request('facility_id') : null,
+        'tab' => ($currentTab && $currentTab !== 'all') ? $currentTab : null,
+        'sort' => ($currentSort && $currentSort !== 'expiry_asc') ? $currentSort : null,
+        'status' => $currentStatus !== '' ? $currentStatus : null,
+    ], fn ($value) => $value !== null && $value !== '');
+
+    $hasFilters = $currentSearch !== ''
+        || $currentStatus !== ''
+        || ($currentTab && $currentTab !== 'all')
+        || ($currentSort && $currentSort !== 'expiry_asc')
+        || ($user->isDinkesAuditor() && request()->filled('facility_id'));
+@endphp
+
+<div class="ml-page-admin">
     @if(session('status'))
-        <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between gap-3 text-emerald-900 text-xs font-semibold">
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        <div class="ml-alert ml-alert-success" role="status">
+            <div class="ml-alert-row">
+                <svg class="ml-alert-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span>{{ session('status') }}</span>
+                <button type="button" class="ml-alert-close" onclick="this.closest('.ml-alert').remove()" aria-label="Tutup notifikasi">&times;</button>
             </div>
-            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-700 hover:text-emerald-900">&times;</button>
         </div>
     @endif
 
     @if($errors->has('delete_error'))
-        <div class="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-900 text-xs font-semibold">
-            <svg class="w-5 h-5 text-red-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{{ $errors->first('delete_error') }}</span>
+        <div class="ml-alert ml-alert-error" role="alert">
+            <div class="ml-alert-row">
+                <svg class="ml-alert-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span>{{ $errors->first('delete_error') }}</span>
+            </div>
         </div>
     @endif
 
-    <!-- Header & Action -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#DBE5F5] gap-4">
+    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
+        <a href="{{ route('dashboard') }}">Dashboard</a>
+        <span class="ml-breadcrumb-sep">/</span>
+        <span>Stok &amp; batch</span>
+    </nav>
+
+    <header class="ml-page-head">
         <div>
-            <div class="flex items-center gap-2">
-                <h1 class="text-2xl font-extrabold text-[#0B1F4B]">Inventaris &amp; Data Stok Batch Obat</h1>
-                <span class="px-2.5 py-0.5 text-[11px] font-bold rounded-full bg-blue-100 text-[#1D4ED8]">
-                    {{ $facility?->name ?? 'Fasilitas Terhubung' }}
-                </span>
+            <p class="ml-page-eyebrow">Inventaris farmasi</p>
+            <div class="ml-page-title-row">
+                <h1 class="ml-page-title">Stok &amp; batch obat</h1>
+                <span class="ml-facility-chip">{{ $facility?->name ?? 'Fasilitas kesehatan' }}</span>
             </div>
-            <p class="text-xs text-[#52627F] mt-1">
-                Kelola dan input stok aktif faskes untuk pelacakan masa kedaluwarsa serta rekomendasi redistribusi surplus.
-            </p>
+            <p class="ml-page-sub">Pantau sisa umur batch, proyeksi limbah, dan kandidat redistribusi sebelum obat kedaluwarsa.</p>
         </div>
 
         @if(! $user->isDinkesAuditor())
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="document.getElementById('ml-csv-modal').classList.remove('hidden')" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-bold text-[#1D4ED8] bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg shadow-xs transition">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div class="ml-page-actions flex items-center gap-2">
+                <button type="button" onclick="document.getElementById('ml-csv-modal').classList.remove('hidden')" class="ml-btn-quiet inline-flex items-center gap-1.5">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
                     <span>Import Stok (CSV)</span>
                 </button>
-                <a href="{{ route('batches.create') }}" class="inline-flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                <a href="{{ route('batches.create') }}" class="ml-btn-primary">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M12 4v16m8-8H4" />
                     </svg>
-                    <span>Input Stok Manual</span>
+                    <span>Input batch</span>
                 </a>
             </div>
         @endif
+    </header>
+
+    <div class="ml-kpi-grid">
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Batch berisiko</span>
+                <span class="ml-kpi-icon is-risk" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M12 9v4M12 17h.01" />
+                        <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                    </svg>
+                </span>
+            </div>
+            <div class="ml-kpi-value">{{ number_format($atRiskCount ?? 0, 0, ',', '.') }} <span>batch</span></div>
+            <div class="ml-kpi-meta">Kritis &le;30 hari atau tinggi &le;60 hari</div>
+        </article>
+
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Stok tercatat</span>
+                <span class="ml-kpi-icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </span>
+            </div>
+            <div class="ml-kpi-value">{{ number_format($totalStockUnits ?? 0, 0, ',', '.') }} <span>unit</span></div>
+            <div class="ml-kpi-meta">{{ number_format($totalBatchesCount ?? 0, 0, ',', '.') }} batch dalam tampilan ini</div>
+        </article>
+
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Nilai surplus</span>
+                <span class="ml-kpi-icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+                    </svg>
+                </span>
+            </div>
+            <div class="ml-kpi-value ml-kpi-value-currency">Rp {{ number_format($totalWasteValue ?? 0, 0, ',', '.') }}</div>
+            <div class="ml-kpi-meta">{{ number_format($totalWasteUnits ?? 0, 0, ',', '.') }} unit berpotensi tidak terserap</div>
+        </article>
+
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Potensi limbah dicegah</span>
+                <span class="ml-kpi-icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M19 11H5m14 0a7 7 0 01-7 7m7-7a7 7 0 00-7-7m-7 7a7 7 0 007 7m-7-7a7 7 0 017-7" />
+                    </svg>
+                </span>
+            </div>
+            <div class="ml-kpi-value">~{{ number_format($estimatedWasteKg ?? 0, 1, ',', '.') }} <span>kg</span></div>
+            <div class="ml-kpi-meta">Estimasi 0,085 kg per unit surplus</div>
+        </article>
     </div>
+
+    @if($topRiskBatch && ! empty($topCandidates))
+        <section class="ml-rec-banner" aria-labelledby="rec-banner-title">
+            <div class="ml-rec-banner-head">
+                <div>
+                    <span class="ml-rec-eyebrow">Peluang redistribusi prioritas</span>
+                    <h2 class="ml-rec-title" id="rec-banner-title">
+                        {{ $topRiskBatch->medicine->name }} &middot; Batch {{ $topRiskBatch->batch_number }}
+                    </h2>
+                    <p class="ml-rec-sub">
+                        {{ number_format($topRiskBatch->projected_waste) }} unit berisiko kedaluwarsa dalam {{ $topRiskBatch->days_to_expiry }} hari.
+                        Berikut faskes terdekat yang dapat menyerap:
+                    </p>
+                </div>
+                <span class="ml-risk ml-risk-critical">Kritis</span>
+            </div>
+
+            <div class="ml-rec-grid">
+                @foreach(array_slice($topCandidates, 0, 3) as $candidate)
+                    @php
+                        $intakeCap = $candidate['recipient_intake_cap'] ?? $candidate['recommended_quantity'];
+                    @endphp
+                    <article class="ml-rec-card">
+                        <div class="ml-rec-top">
+                            <span class="ml-rec-name">{{ $candidate['facility']->name }}</span>
+                            <span class="ml-rec-score">{{ $candidate['match_score'] }}% cocok</span>
+                        </div>
+                        <div class="ml-rec-meta">
+                            <span>Jarak {{ $candidate['distance_km'] }} km</span>
+                            <span>Batas Alokasi: <strong>{{ number_format($intakeCap) }} {{ $topRiskBatch->medicine->unit }}</strong></span>
+                        </div>
+
+                        @if(! $user->isDinkesAuditor())
+                            <a href="{{ route('transfers.propose', $topRiskBatch) }}" class="ml-btn-primary ml-btn-sm ml-rec-cta">
+                                <span>Kirim usulan</span>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M5 12h14M13 6l6 6-6 6" />
+                                </svg>
+                            </a>
+                        @endif
+                    </article>
+                @endforeach
+            </div>
+
+            <p class="ml-rec-note">Rekomendasi dihitung dari kebutuhan penerima, jarak, dan kesiapan logistik. Keputusan akhir tetap berada pada petugas fasilitas.</p>
+        </section>
+    @endif
 
     <!-- Quick Filter Tabs (Bebas Emot & Selalu Terlihat Jelas Saat Ditekan) -->
     <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs select-none">
-        <!-- Tab: Semua -->
         @php $isAllActive = ($currentTab === 'all' || !$currentTab); @endphp
         <a href="{{ request()->fullUrlWithQuery(['tab' => 'all', 'page' => 1]) }}"
            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0"
@@ -67,11 +193,10 @@
             <span>Semua Batch</span>
             <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold"
                   style="{{ $isAllActive ? 'background: rgba(255,255,255,0.25); color: #ffffff;' : 'background: #F1F5F9; color: #52627F;' }}">
-                {{ $counts['all'] }}
+                {{ $counts['all'] ?? 0 }}
             </span>
         </a>
 
-        <!-- Tab: Berisiko Kritis & Tinggi -->
         @php $isRiskActive = ($currentTab === 'risk'); @endphp
         <a href="{{ request()->fullUrlWithQuery(['tab' => 'risk', 'page' => 1]) }}"
            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0"
@@ -79,306 +204,345 @@
             <span>Berisiko Kritis &amp; Tinggi</span>
             <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold"
                   style="{{ $isRiskActive ? 'background: rgba(255,255,255,0.25); color: #ffffff;' : 'background: #FFF4EC; color: #D9480F;' }}">
-                {{ $counts['risk'] }}
+                {{ $counts['risk'] ?? 0 }}
             </span>
         </a>
 
-        <!-- Tab: Expired <= 60 Hari -->
         @php $isExpActive = ($currentTab === 'expiring'); @endphp
         <a href="{{ request()->fullUrlWithQuery(['tab' => 'expiring', 'page' => 1]) }}"
            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0"
            style="{{ $isExpActive ? 'background: #D97706; color: #ffffff; border-color: #D97706;' : 'background: #ffffff; color: #0B1F4B; border-color: #DBE5F5;' }}">
-            <span>Expired &le; 60 Hari</span>
+            <span>Segera Kedaluwarsa (&le; 60 Hari)</span>
             <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold"
-                  style="{{ $isExpActive ? 'background: rgba(255,255,255,0.25); color: #ffffff;' : 'background: #FEF3C7; color: #B45309;' }}">
-                {{ $counts['expiring'] }}
+                  style="{{ $isExpActive ? 'background: rgba(255,255,255,0.25); color: #ffffff;' : 'background: #FFFBEB; color: #D97706;' }}">
+                {{ $counts['expiring'] ?? 0 }}
             </span>
         </a>
 
-        <!-- Tab: Rantai Dingin (Cold Chain) -->
-        @php $isCCActive = ($currentTab === 'cold_chain'); @endphp
+        @php $isColdActive = ($currentTab === 'cold_chain'); @endphp
         <a href="{{ request()->fullUrlWithQuery(['tab' => 'cold_chain', 'page' => 1]) }}"
            class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-bold border transition shrink-0"
-           style="{{ $isCCActive ? 'background: #0284C7; color: #ffffff; border-color: #0284C7;' : 'background: #ffffff; color: #0B1F4B; border-color: #DBE5F5;' }}">
+           style="{{ $isColdActive ? 'background: #0284C7; color: #ffffff; border-color: #0284C7;' : 'background: #ffffff; color: #0B1F4B; border-color: #DBE5F5;' }}">
             <span>Rantai Dingin</span>
             <span class="px-2 py-0.5 rounded-full text-[10.5px] font-extrabold"
-                  style="{{ $isCCActive ? 'background: rgba(255,255,255,0.25); color: #ffffff;' : 'background: #E0F2FE; color: #0369A1;' }}">
-                {{ $counts['cold_chain'] }}
+                  style="{{ $isColdActive ? 'background: rgba(255,255,255,0.25); color: #ffffff;' : 'background: #F0F9FF; color: #0284C7;' }}">
+                {{ $counts['cold_chain'] ?? 0 }}
             </span>
         </a>
     </div>
 
-    <!-- Search, Risk, Status & Sort Filter Bar -->
-    <div class="bg-white p-4 rounded-xl border border-[#DBE5F5] shadow-xs">
-        <form method="GET" action="{{ route('batches.index') }}" class="grid grid-cols-1 md:grid-cols-12 gap-2.5 items-center">
-            <!-- Retain current tab -->
-            <input type="hidden" name="tab" value="{{ $currentTab }}">
+    <section class="ml-registry-panel" aria-labelledby="inventory-title">
+        <div class="ml-section-header ml-section-header-split">
+            <div>
+                <h2 class="ml-section-title" id="inventory-title">Matriks inventaris</h2>
+                <p class="ml-section-sub">
+                    {{ number_format($batches->total(), 0, ',', '.') }} batch pada tampilan ini.
+                </p>
+            </div>
+            @if(! $batches->isEmpty())
+                <div class="ml-inventory-legend" role="group" aria-label="Klasifikasi risiko batch">
+                    <span class="ml-risk ml-risk-critical">Kritis &le;30 hari</span>
+                    <span class="ml-risk ml-risk-high">Tinggi &le;60 hari</span>
+                    <span class="ml-risk ml-risk-medium">Sedang &le;90 hari</span>
+                    <span class="ml-risk ml-risk-low">Rendah</span>
+                </div>
+            @endif
+        </div>
 
-            @if(($user->isDinkesAuditor() || $user->role === 'SYSADMIN') && isset($facilitiesList))
-                <div class="md:col-span-12 lg:col-span-3">
-                    <select name="facility_id" onchange="this.form.submit()" class="w-full px-3 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                        <option value="">Semua Fasilitas Kesehatan</option>
-                        @foreach($facilitiesList as $f)
-                            <option value="{{ $f->id }}" {{ request('facility_id') == $f->id ? 'selected' : '' }}>
-                                {{ $f->name }}
+        <form method="GET" action="{{ route('batches.index') }}" class="ml-registry-toolbar flex flex-wrap items-center gap-2" aria-label="Cari dan filter batch">
+            @if($currentTab && $currentTab !== 'all')
+                <input type="hidden" name="tab" value="{{ $currentTab }}">
+            @endif
+
+            <div class="ml-registry-search flex-1 min-w-[220px]">
+                <label for="filter-search" class="ml-sr-only">Cari batch obat</label>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="M20 20l-3.5-3.5" />
+                </svg>
+                <input id="filter-search" name="search" type="search" class="ml-input" value="{{ $currentSearch }}" placeholder="Cari obat, nomor batch, atau lokasi rak">
+            </div>
+
+            @if($user->isDinkesAuditor() && isset($facilitiesList))
+                <div class="ml-registry-filter">
+                    <label for="filter-facility" class="ml-sr-only">Pilih fasilitas</label>
+                    <select id="filter-facility" name="facility_id" class="ml-select" onchange="this.form.submit()">
+                        <option value="">Semua fasilitas</option>
+                        @foreach($facilitiesList as $facilityOption)
+                            <option value="{{ $facilityOption->id }}" @selected((string) request('facility_id') === (string) $facilityOption->id)>
+                                {{ $facilityOption->name }}
                             </option>
                         @endforeach
                     </select>
                 </div>
             @endif
 
-            <!-- Search input -->
-            <div class="{{ ($user->isDinkesAuditor() || $user->role === 'SYSADMIN') ? 'md:col-span-12 lg:col-span-3' : 'md:col-span-12 lg:col-span-4' }}">
-                <div class="relative">
-                    <input type="text" name="search" value="{{ $currentSearch }}" placeholder="Cari obat, generik, batch, rak..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Risk Level Filter -->
-            <div class="md:col-span-4 lg:col-span-2">
-                <select name="risk" onchange="this.form.submit()" class="w-full px-2.5 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                    <option value="">Risiko: Semua</option>
-                    <option value="CRITICAL" {{ $currentRisk === 'CRITICAL' ? 'selected' : '' }}>Kritis</option>
-                    <option value="HIGH" {{ $currentRisk === 'HIGH' ? 'selected' : '' }}>Tinggi</option>
-                    <option value="MEDIUM" {{ $currentRisk === 'MEDIUM' ? 'selected' : '' }}>Sedang</option>
-                    <option value="LOW" {{ $currentRisk === 'LOW' ? 'selected' : '' }}>Rendah</option>
-                </select>
-            </div>
-
-            <!-- Status Filter -->
-            <div class="md:col-span-4 lg:col-span-2">
-                <select name="status" onchange="this.form.submit()" class="w-full px-2.5 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
+            <div class="ml-registry-filter">
+                <label for="filter-status" class="ml-sr-only">Status batch</label>
+                <select id="filter-status" name="status" class="ml-select" onchange="this.form.submit()">
                     <option value="">Status: Semua</option>
-                    <option value="ACTIVE" {{ $currentStatus === 'ACTIVE' ? 'selected' : '' }}>ACTIVE</option>
-                    <option value="RESERVED" {{ $currentStatus === 'RESERVED' ? 'selected' : '' }}>RESERVED</option>
-                    <option value="DEPLETED" {{ $currentStatus === 'DEPLETED' ? 'selected' : '' }}>DEPLETED</option>
-                    <option value="EXPIRED" {{ $currentStatus === 'EXPIRED' ? 'selected' : '' }}>EXPIRED</option>
+                    <option value="ACTIVE" @selected($currentStatus === 'ACTIVE')>Aktif</option>
+                    <option value="RESERVED" @selected($currentStatus === 'RESERVED')>Dicadangkan</option>
+                    <option value="DEPLETED" @selected($currentStatus === 'DEPLETED')>Habis</option>
+                    <option value="EXPIRED" @selected($currentStatus === 'EXPIRED')>Kedaluwarsa</option>
                 </select>
             </div>
 
-            <!-- Sorting Filter -->
-            <div class="md:col-span-4 lg:col-span-2">
-                <select name="sort" onchange="this.form.submit()" class="w-full px-2.5 py-2 bg-slate-50 border border-[#DBE5F5] rounded-lg text-xs font-medium text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                    <option value="expiry_asc" {{ $currentSort === 'expiry_asc' ? 'selected' : '' }}>Sort: Expired Terdekat (FEFO)</option>
-                    <option value="expiry_desc" {{ $currentSort === 'expiry_desc' ? 'selected' : '' }}>Sort: Expired Terjauh</option>
-                    <option value="stock_desc" {{ $currentSort === 'stock_desc' ? 'selected' : '' }}>Sort: Stok Terbanyak</option>
-                    <option value="stock_asc" {{ $currentSort === 'stock_asc' ? 'selected' : '' }}>Sort: Stok Tersedikit</option>
-                    <option value="burn_rate_desc" {{ $currentSort === 'burn_rate_desc' ? 'selected' : '' }}>Sort: Laju Pakai Tertinggi</option>
+            <div class="ml-registry-filter">
+                <label for="filter-sort" class="ml-sr-only">Urutan batch</label>
+                <select id="filter-sort" name="sort" class="ml-select" onchange="this.form.submit()">
+                    <option value="expiry_asc" @selected($currentSort === 'expiry_asc')>Sort: Kedaluwarsa Terdekat (FEFO)</option>
+                    <option value="expiry_desc" @selected($currentSort === 'expiry_desc')>Sort: Kedaluwarsa Terjauh</option>
+                    <option value="stock_desc" @selected($currentSort === 'stock_desc')>Sort: Stok Terbanyak</option>
+                    <option value="stock_asc" @selected($currentSort === 'stock_asc')>Sort: Stok Tersedikit</option>
+                    <option value="burn_rate_desc" @selected($currentSort === 'burn_rate_desc')>Sort: Laju Pakai Tertinggi</option>
                 </select>
             </div>
 
-            <!-- Action Buttons: Cari & Reset -->
-            <div class="md:col-span-12 lg:col-span-2 flex items-center gap-1.5">
-                <button type="submit" class="w-full px-3 py-2 bg-[#1D4ED8] hover:bg-blue-800 text-white text-xs font-semibold rounded-lg shadow-2xs transition text-center">
-                    Terapkan
-                </button>
-                @if(request()->filled('search') || request()->filled('status') || request()->filled('risk') || ($currentTab && $currentTab !== 'all') || ($currentSort && $currentSort !== 'expiry_asc'))
-                    <a href="{{ route('batches.index') }}" title="Reset Semua Filter" class="px-3 py-2 bg-slate-100 hover:bg-red-50 text-slate-600 hover:text-red-700 text-xs font-bold rounded-lg border border-[#DBE5F5] transition text-center shrink-0">
-                        Reset
-                    </a>
+            <button type="submit" class="ml-btn-primary ml-btn-sm">Terapkan</button>
+
+            @if($hasFilters)
+                <a href="{{ route('batches.index') }}" class="ml-btn-quiet ml-btn-sm" title="Hapus semua filter">Reset</a>
+            @endif
+        </form>
+
+        @if($batches->isEmpty())
+            <div class="ml-empty-state">
+                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <p class="ml-empty-title">Belum ada batch pada filter ini</p>
+                <p class="ml-empty-copy">
+                    @if($hasFilters)
+                        Tidak ada batch yang cocok dengan pencarian atau status yang dipilih. Ubah filter untuk melihat data lain.
+                    @else
+                        Data batch yang Anda input akan langsung dianalisis untuk mendeteksi risiko limbah kedaluwarsa.
+                    @endif
+                </p>
+                @if($hasFilters)
+                    <a href="{{ route('batches.index') }}" class="ml-btn-quiet">Hapus filter</a>
+                @elseif(! $user->isDinkesAuditor())
+                    <a href="{{ route('batches.create') }}" class="ml-btn-primary">Input batch</a>
                 @endif
             </div>
-        </form>
-    </div>
-
-    <!-- Inventory Batches Table (With Sticky Header & Max Height Scrolling) -->
-    <div class="bg-white rounded-xl border border-[#DBE5F5] shadow-xs overflow-hidden">
-        <div class="overflow-x-auto max-h-[640px] relative">
-            <table class="w-full text-left text-xs border-collapse">
-                <thead class="sticky top-0 z-10 bg-slate-100/95 backdrop-blur-xs border-b border-[#DBE5F5] shadow-2xs">
-                    <tr class="text-[#52627F] uppercase tracking-wider text-[11px]">
-                        <th class="py-3.5 px-4 font-bold">Nama Obat &amp; Bentuk Sediaan</th>
-                        <th class="py-3.5 px-4 font-mono font-bold">No. Batch</th>
-                        <th class="py-3.5 px-4 text-right font-bold">Stok Aktif</th>
-                        <th class="py-3.5 px-4 text-center font-bold">Laju Pakai / Hari</th>
-                        <th class="py-3.5 px-4 text-center font-bold">Sisa Waktu vs Habis Stok</th>
-                        <th class="py-3.5 px-4 text-right font-mono font-bold">Proyeksi Limbah</th>
-                        <th class="py-3.5 px-4 text-center font-bold">Tingkat Risiko</th>
-                        <th class="py-3.5 px-4 text-right font-bold">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-[#DBE5F5]">
-                    @forelse($batches as $b)
-                        @php
-                            $risk = $b->risk_level;
-                            $daysToExpiry = $b->days_to_expiry;
-                            $daysToDeplete = $b->days_to_deplete;
-                            $projectedWaste = $b->projected_waste;
-                        @endphp
-                        <tr class="hover:bg-slate-50/70 transition">
-                            <!-- Medicine Info -->
-                            <td class="py-3.5 px-4">
-                                <div class="font-bold text-[#0B1F4B] text-[13px]">
-                                    {{ $b->medicine->name }}
-                                </div>
-                                <div class="text-[11px] text-[#52627F] flex items-center gap-2 mt-0.5">
-                                    <span>{{ $b->medicine->dosage_form }}</span>
-                                    <span>•</span>
-                                    <span>{{ $b->medicine->category }}</span>
-                                    @if($b->medicine->requires_cold_chain)
-                                        <span class="px-1.5 py-0.2 rounded bg-cyan-100 text-cyan-800 text-[10px] font-bold">Rantai Dingin</span>
-                                    @endif
-                                </div>
-                                <div class="text-[10px] text-slate-400 mt-0.5">
-                                    Lokasi: {{ $b->storage_location ?? 'Gudang Farmasi' }}
-                                </div>
-                            </td>
-
-                            <!-- Batch Number -->
-                            <td class="py-3.5 px-4 font-mono font-semibold text-[#0B1F4B]">
-                                <span class="bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                                    {{ $b->batch_number }}
-                                </span>
-                                <span class="block text-[10px] text-[#52627F] mt-1">
-                                    Exp: {{ $b->expiry_date->format('d/m/Y') }}
-                                </span>
-                            </td>
-
-                            <!-- Stock -->
-                            <td class="py-3.5 px-4 text-right">
-                                <span class="font-extrabold text-[#0B1F4B] text-sm">
-                                    {{ number_format($b->current_stock) }}
-                                </span>
-                                <span class="text-[11px] text-[#52627F] block">
-                                    {{ $b->medicine->unit }}
-                                </span>
-                            </td>
-
-                            <!-- Burn Rate -->
-                            <td class="py-3.5 px-4 text-center font-mono font-bold text-[#0B1F4B]">
-                                {{ $b->daily_burn_rate }}
-                                <span class="text-[10px] font-normal text-[#52627F] block">unit/hari</span>
-                            </td>
-
-                            <!-- Days comparison -->
-                            <td class="py-3.5 px-4 text-center">
-                                <div class="inline-flex items-center gap-1.5 text-[11px]">
-                                    <span class="px-2 py-0.5 rounded font-bold {{ $daysToExpiry <= 45 ? 'bg-orange-100 text-[#D9480F]' : 'bg-slate-100 text-slate-700' }}">
-                                        {{ $daysToExpiry }}h Exp
-                                    </span>
-                                    <span class="text-slate-400">vs</span>
-                                    <span class="px-2 py-0.5 rounded font-bold bg-blue-50 text-[#1D4ED8]">
-                                        {{ is_finite($daysToDeplete) ? $daysToDeplete.'h' : '∞' }} Habis
-                                    </span>
-                                </div>
-                            </td>
-
-                            <!-- Projected Waste -->
-                            <td class="py-3.5 px-4 text-right font-mono">
-                                @if($projectedWaste > 0)
-                                    <span class="font-extrabold text-[#D9480F] text-xs">
-                                        {{ number_format($projectedWaste) }} unit
-                                    </span>
-                                    <span class="block text-[10px] text-slate-500">
-                                        Rp {{ number_format($projectedWaste * (float) $b->unit_price_idr, 0, ',', '.') }}
-                                    </span>
-                                @else
-                                    <span class="text-emerald-600 font-bold text-xs">0 (Aman)</span>
-                                @endif
-                            </td>
-
-                            <!-- Risk Badge -->
-                            <td class="py-3.5 px-4 text-center">
-                                @if($risk === 'CRITICAL')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-red-100 text-red-800 border border-red-300">
-                                        KRITIS
-                                    </span>
-                                @elseif($risk === 'HIGH')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-orange-100 text-[#D9480F] border border-orange-300">
-                                        TINGGI
-                                    </span>
-                                @elseif($risk === 'MEDIUM')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-300">
-                                        SEDANG
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
-                                        RENDAH
-                                    </span>
-                                @endif
-                            </td>
-
-                            <!-- Actions -->
-                            <td class="py-3.5 px-4 text-right whitespace-nowrap">
-                                <div class="flex items-center justify-end gap-1.5">
-                                    @if($projectedWaste > 0 && $b->current_stock > 0 && ! $user->isDinkesAuditor())
-                                        <a href="{{ route('transfers.propose', $b) }}" class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded text-white bg-[#1D4ED8] hover:bg-blue-800 transition">
-                                            <span>Usulkan</span>
-                                        </a>
-                                    @endif
-
-                                    @if(! $user->isDinkesAuditor())
-                                        <a href="{{ route('batches.edit', $b) }}" class="px-2 py-1 text-xs font-medium rounded text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition">
-                                            Edit
-                                        </a>
-
-                                        <form method="POST" action="{{ route('batches.destroy', $b) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus batch {{ $b->batch_number }}?');" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="px-2 py-1 text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 transition">
-                                                Hapus
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
+        @else
+            <div class="ml-table-responsive">
+                <table class="ml-table ml-table-airy ml-table-inventory">
+                    <caption class="ml-sr-only">
+                        Daftar batch obat beserta stok, sisa umur, proyeksi limbah, dan aksi redistribusi.
+                    </caption>
+                    <thead>
                         <tr>
-                            <td colspan="8" class="py-12 text-center text-[#52627F]">
-                                <div class="max-w-md mx-auto">
-                                    <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                    </svg>
-                                    <p class="font-bold text-[#0B1F4B] text-sm">Tidak ada data batch obat</p>
-                                    <p class="text-xs text-slate-500 mt-1 mb-4">
-                                        Belum ada batch obat yang sesuai dengan filter pencarian ini. Tambahkan stok batch obat baru ke inventaris faskes Anda.
-                                    </p>
-                                    @if(! $user->isDinkesAuditor())
-                                        <a href="{{ route('batches.create') }}" class="inline-flex items-center gap-1 px-4 py-2 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
-                                            Input Stok Obat Baru
-                                        </a>
-                                    @endif
-                                </div>
-                            </td>
+                            <th scope="col">Obat &amp; spesifikasi</th>
+                            <th scope="col">Batch &amp; lokasi</th>
+                            <th scope="col" class="is-right">Stok</th>
+                            <th scope="col">Kedaluwarsa &amp; runway</th>
+                            <th scope="col" class="is-right">Proyeksi limbah</th>
+                            <th scope="col" class="is-right"><span class="ml-sr-only">Aksi</span></th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        @foreach($batches as $batch)
+                            @php
+                                $risk = (string) $batch->risk_level;
+                                $riskLabel = $riskLabels[$risk] ?? ucfirst(strtolower($risk));
+                                $riskTone = strtolower($risk);
+                                $daysToExpiry = (int) $batch->days_to_expiry;
+                                $daysToDeplete = is_finite($batch->days_to_deplete) ? max(0, (float) $batch->days_to_deplete) : null;
+                                $projectedWaste = (int) $batch->projected_waste;
+                                $timelineDays = max(abs($daysToExpiry), (int) round($daysToDeplete ?? 0), 1);
+                                $depletePercent = $daysToDeplete === null ? 100 : min(100, round($daysToDeplete / $timelineDays * 100, 1));
+                                $expiryPercent = min(100, round(max(0, $daysToExpiry) / $timelineDays * 100, 1));
+                                $isUrgent = in_array($risk, ['CRITICAL', 'HIGH'], true);
+                                $simId = 'sim-'.$batch->id;
+                            @endphp
+                            <tr>
+                                <td data-label="Obat">
+                                    <div class="ml-cell-title">{{ $batch->medicine->name }}</div>
+                                    <div class="ml-cell-meta">
+                                        {{ $batch->medicine->dosage_form }} &middot; {{ $batch->medicine->category }}
+                                        @if($batch->medicine->requires_cold_chain)
+                                            <span class="ml-cold-chain" role="img" title="Perlu rantai dingin" aria-label="Perlu rantai dingin">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                    <path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1" />
+                                                </svg>
+                                            </span>
+                                        @endif
+                                    </div>
+                                </td>
 
-        @if($batches->hasPages())
-            <div class="p-4 border-t border-[#DBE5F5]">
+                                <td data-label="Batch &amp; lokasi">
+                                    <span class="ml-batch-code">{{ $batch->batch_number }}</span>
+                                    <div class="ml-cell-meta">
+                                        <svg class="ml-inline-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                            <path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        {{ $batch->storage_location ?? 'Gudang Farmasi Utama' }}
+                                    </div>
+                                </td>
+
+                                <td class="ml-cell-stock" data-label="Stok">
+                                    <span class="ml-stock-value">{{ number_format($batch->current_stock) }}</span>
+                                    <span class="ml-stock-unit">{{ $batch->medicine->unit }}</span>
+                                    <div class="ml-cell-meta">~{{ $batch->daily_burn_rate }} unit/hari</div>
+                                </td>
+
+                                <td data-label="Kedaluwarsa &amp; runway">
+                                    <div class="ml-runway-text">
+                                        <span class="{{ $isUrgent ? 'is-risk' : 'is-safe' }}">
+                                            {{ $daysToExpiry <= 0 ? 'Sudah kedaluwarsa' : number_format($daysToExpiry).' hari lagi' }}
+                                        </span>
+                                        <span class="ml-runway-dot">&middot;</span>
+                                        <span class="ml-runway-deplete">
+                                            {{ $daysToDeplete === null ? 'Stok tidak habis' : 'Habis ~'.number_format($daysToDeplete, 0).' hari' }}
+                                        </span>
+                                    </div>
+                                    <div class="ml-runway-bar" aria-hidden="true">
+                                        <div class="ml-runway-fill {{ $isUrgent ? 'is-risk' : '' }}" style="width: {{ $expiryPercent }}%;"></div>
+                                        <div class="ml-runway-marker" style="left: {{ $depletePercent }}%;" title="Proyeksi stok habis"></div>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        class="ml-simulator-toggle"
+                                        id="sim-trigger-{{ $simId }}"
+                                        aria-expanded="false"
+                                        aria-controls="{{ $simId }}"
+                                        onclick="toggleSimulator('{{ $simId }}')"
+                                    >
+                                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                                            <path d="M12 5v14M5 12h14" />
+                                        </svg>
+                                        Simulasi laju konsumsi
+                                    </button>
+                                </td>
+
+                                <td class="is-right" data-label="Proyeksi limbah">
+                                    <div class="ml-waste-cell">
+                                        <span class="ml-risk ml-risk-{{ $riskTone }}">{{ $riskLabel }}</span>
+                                        @if($projectedWaste > 0)
+                                            <span class="ml-waste-value">{{ number_format($projectedWaste) }} unit</span>
+                                            <span class="ml-cell-meta">Rp {{ number_format($projectedWaste * (float) $batch->unit_price_idr, 0, ',', '.') }}</span>
+                                        @else
+                                            <span class="ml-waste-value is-safe">0 unit</span>
+                                            <span class="ml-cell-meta">Tidak ada proyeksi limbah</span>
+                                        @endif
+                                    </div>
+                                </td>
+
+                                <td class="is-right" data-label="Aksi">
+                                    <div class="ml-inventory-actions">
+                                        @if($projectedWaste > 0 && $batch->current_stock > 0 && ! $user->isDinkesAuditor())
+                                            <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-primary ml-btn-sm">
+                                                <span>Usulkan</span>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                                                    <path d="M5 12h14M13 6l6 6-6 6" />
+                                                </svg>
+                                            </a>
+                                        @endif
+
+                                        @if(! $user->isDinkesAuditor())
+                                            <a href="{{ route('batches.edit', $batch) }}" class="ml-btn-quiet ml-btn-sm">Edit</a>
+
+                                            <form method="POST" action="{{ route('batches.destroy', $batch) }}" onsubmit='return confirm(@js("Apakah Anda yakin ingin menghapus data batch {$batch->batch_number}?"))'>
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="ml-btn-quiet ml-btn-sm is-danger">Hapus</button>
+                                            </form>
+                                        @else
+                                            <span class="ml-cell-meta">Hanya baca</span>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr class="ml-simulator-row" id="{{ $simId }}" hidden>
+                                <td colspan="6">
+                                    <div class="ml-simulator">
+                                        <div class="ml-simulator-head">
+                                            <div>
+                                                <p class="ml-page-eyebrow">Simulator keputusan</p>
+                                                <h3 class="ml-simulator-title">Uji laju konsumsi {{ $batch->medicine->name }}</h3>
+                                                <p class="ml-simulator-sub">Geser laju pemakaian untuk melihat dampaknya pada proyeksi limbah dan sisa umur stok.</p>
+                                            </div>
+                                            <button type="button" class="ml-icon-btn" onclick="toggleSimulator('{{ $simId }}')" aria-label="Tutup simulator">
+                                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                    <path d="M18 6L6 18M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <div class="ml-simulator-grid">
+                                            <div>
+                                                <label for="rate-{{ $simId }}" class="ml-simulator-label">
+                                                    Laju konsumsi harian:
+                                                    <output id="label-{{ $simId }}" class="ml-simulator-current">{{ $batch->daily_burn_rate }}</output>
+                                                    unit/hari
+                                                </label>
+                                                <input
+                                                    id="rate-{{ $simId }}"
+                                                    type="range"
+                                                    class="ml-range"
+                                                    min="0.5"
+                                                    max="{{ max(20, (float) $batch->daily_burn_rate * 3) }}"
+                                                    step="0.5"
+                                                    value="{{ $batch->daily_burn_rate }}"
+                                                    aria-describedby="scale-{{ $simId }}"
+                                                    oninput="runSimulation('{{ $simId }}', {{ (int) $batch->current_stock }}, {{ $daysToExpiry }}, this.value)"
+                                                >
+                                                <div class="ml-simulator-scale" id="scale-{{ $simId }}">
+                                                    <span>0,5 unit/hari</span>
+                                                    <span>{{ $batch->daily_burn_rate }} saat ini</span>
+                                                    <span>{{ max(20, (float) $batch->daily_burn_rate * 3) }} unit/hari</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="ml-simulator-metrics">
+                                                <div class="ml-simulator-metric">
+                                                    <span class="ml-simulator-metric-label">Proyeksi limbah</span>
+                                                    <span id="waste-{{ $simId }}" class="ml-simulator-metric-value {{ $projectedWaste > 0 ? 'is-risk' : 'is-safe' }}">
+                                                        {{ number_format($projectedWaste) }} unit
+                                                    </span>
+                                                </div>
+                                                <div class="ml-simulator-metric">
+                                                    <span class="ml-simulator-metric-label">Sisa umur stok</span>
+                                                    <span id="deplete-{{ $simId }}" class="ml-simulator-metric-value">
+                                                        {{ $daysToDeplete === null ? 'Tidak habis' : number_format($daysToDeplete, 0).' hari' }}
+                                                    </span>
+                                                </div>
+                                                <div class="ml-simulator-metric">
+                                                    <span class="ml-simulator-metric-label">Status risiko</span>
+                                                    <span id="risk-{{ $simId }}" class="ml-risk ml-risk-{{ $riskTone }}">{{ $riskLabel }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="ml-pagination-wrap">
                 {{ $batches->links() }}
             </div>
         @endif
-    </div>
+    </section>
 
-    <!-- CSV Import Modal -->
+    <!-- Modal CSV Import -->
     <div id="ml-csv-modal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-[#0B1F4B]/60 backdrop-blur-xs transition-opacity" onclick="document.getElementById('ml-csv-modal').classList.add('hidden')"></div>
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs transition-opacity" onclick="document.getElementById('ml-csv-modal').classList.add('hidden')"></div>
 
-        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-[#DBE5F5]">
-                
-                <!-- Modal Header -->
-                <div class="bg-gradient-to-r from-blue-900 to-[#1D4ED8] p-5 text-white flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-base font-bold" id="modal-title">Import Stok Batch via CSV</h3>
-                            <p class="text-xs text-blue-100">Unggah laporan inventaris obat dari SIMRS / SIMPUS</p>
-                        </div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-200">
+                <!-- Header -->
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-base font-extrabold text-[#0B1F4B]" id="modal-title">Impor Data Stok Obat (CSV)</h3>
+                        <p class="text-xs text-[#52627F] mt-0.5">Unggah berkas spreadsheet/CSV inventaris untuk sinkronisasi massal</p>
                     </div>
-                    <button type="button" onclick="document.getElementById('ml-csv-modal').classList.add('hidden')" class="text-white/70 hover:text-white p-1 rounded-lg hover:bg-white/10">
+                    <button type="button" onclick="document.getElementById('ml-csv-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
@@ -431,6 +595,68 @@
             </div>
         </div>
     </div>
-
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    function toggleSimulator(id) {
+        const row = document.getElementById(id);
+        if (!row) {
+            return;
+        }
+
+        const trigger = document.getElementById('sim-trigger-' + id);
+        const isOpening = row.hidden;
+
+        row.hidden = !isOpening;
+
+        if (trigger) {
+            trigger.setAttribute('aria-expanded', String(isOpening));
+        }
+    }
+
+    function runSimulation(id, currentStock, daysToExpiry, newBurnRate) {
+        const burnRate = Number.parseFloat(newBurnRate);
+        const numberFormatter = new Intl.NumberFormat('id-ID');
+        const decimalFormatter = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 1 });
+
+        document.getElementById('label-' + id).textContent = decimalFormatter.format(burnRate);
+
+        const remainingDays = Math.max(0, daysToExpiry);
+        const expectedConsumption = Math.floor(burnRate * remainingDays);
+        const projectedWaste = Math.max(0, currentStock - expectedConsumption);
+        const daysToDeplete = burnRate > 0 ? currentStock / burnRate : null;
+        const wasteRatio = currentStock > 0 ? projectedWaste / currentStock : 0;
+
+        let newRisk = 'LOW';
+        let newRiskLabel = 'Rendah';
+
+        if (projectedWaste > 0) {
+            if (remainingDays <= 30) {
+                newRisk = 'CRITICAL';
+                newRiskLabel = 'Kritis';
+            } else if (remainingDays <= 60 || wasteRatio >= 0.25) {
+                newRisk = 'HIGH';
+                newRiskLabel = 'Tinggi';
+            } else if (remainingDays <= 90) {
+                newRisk = 'MEDIUM';
+                newRiskLabel = 'Sedang';
+            }
+        }
+
+        const wasteElement = document.getElementById('waste-' + id);
+        wasteElement.textContent = numberFormatter.format(projectedWaste) + ' unit';
+        wasteElement.className = 'ml-simulator-metric-value ' + (projectedWaste > 0 ? 'is-risk' : 'is-safe');
+
+        const depleteElement = document.getElementById('deplete-' + id);
+        depleteElement.textContent = daysToDeplete === null
+            ? 'Tidak habis'
+            : decimalFormatter.format(daysToDeplete) + ' hari';
+
+        const riskElement = document.getElementById('risk-' + id);
+        riskElement.textContent = newRiskLabel;
+        riskElement.className = 'ml-risk ml-risk-' + newRisk.toLowerCase();
+    }
+</script>
 @endsection

@@ -9,11 +9,12 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-sans: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Instrument Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-    /* MediLoop Brief Design Tokens (PRD Section 10.1) */
+    /* MediLoop design tokens (PRD Section 10.1) */
     --color-brand-primary: #1D4ED8;
+    --color-brand-primary-strong: #1E40AF;
     --color-brand-navy: #0B1F4B;
     --color-brand-sky: #EAF1FF;
     --color-brand-border: #DBE5F5;
@@ -21,15 +22,46 @@
     --color-brand-risk: #D9480F;
     --color-brand-warning: #B7791F;
 
+    /* Facility marker colours; white labels meet WCAG AA contrast. */
+    --color-facility-rsud: #1D4ED8;
+    --color-facility-puskesmas: #0F766E;
+    --color-facility-klinik: #047857;
+    --color-facility-rs-swasta: #6D28D9;
+    --color-facility-other: #64748B;
+
+    --color-surface-canvas: #F6F8FB;
+    --color-surface-raised: #FFFFFF;
+    --color-surface-subtle: #F1F5F9;
+    --color-border: #DBE5F5;
+    --color-border-strong: #8FA0B8;
+    --color-text: #0B1F4B;
+    --color-text-muted: #52627F;
+    --color-text-subtle: #5F6F88;
+    --color-focus: #1D4ED8;
+
+    --radius-sm: 0.5rem;
+    --radius-md: 0.625rem;
+    --radius-lg: 0.875rem;
+    --shadow-panel: 0 1px 2px rgba(11, 31, 75, 0.04);
+    --shadow-overlay: 0 18px 48px rgba(11, 31, 75, 0.14);
+
     --color-accent: var(--color-brand-primary);
     --color-accent-content: var(--color-brand-primary);
     --color-accent-foreground: #ffffff;
 }
 
 @layer base {
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
     body {
-        color: var(--color-brand-navy);
-        background-color: #F8FAFC;
+        color: var(--color-text);
+        background-color: var(--color-surface-canvas);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        overflow-wrap: break-word;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -39,5 +71,111 @@
             transition-duration: 0.01ms !important;
             scroll-behavior: auto !important;
         }
+    }
+
+    /* Custom Auto-Hiding MediLoop Scrollbar */
+    html, body, * {
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+        transition: scrollbar-color 0.3s ease;
+    }
+    html.is-scrolling, body.is-scrolling,
+    html:hover, body:hover,
+    .ml-table-responsive.is-scrolling,
+    .ml-table-responsive:hover {
+        scrollbar-color: rgba(82, 98, 127, 0.35) transparent;
+    }
+
+    ::-webkit-scrollbar {
+        width: 7px;
+        height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: transparent;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        background-clip: padding-box;
+        transition: background-color 0.25s ease;
+    }
+
+    html:hover::-webkit-scrollbar-thumb,
+    body:hover::-webkit-scrollbar-thumb,
+    .ml-table-responsive:hover::-webkit-scrollbar-thumb,
+    .ml-sidebar:hover::-webkit-scrollbar-thumb,
+    html.is-scrolling::-webkit-scrollbar-thumb,
+    body.is-scrolling::-webkit-scrollbar-thumb,
+    .is-scrolling::-webkit-scrollbar-thumb {
+        background-color: rgba(82, 98, 127, 0.35);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #1D4ED8 !important;
+    }
+    ::-webkit-scrollbar-thumb:active {
+        background-color: #1E40AF !important;
+    }
+    ::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+}
+
+@layer components {
+    .password-control {
+        position: relative;
+    }
+
+    .password-control > input,
+    .password-control > .password-input {
+        padding-right: 2.9rem;
+    }
+
+    .password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 0.35rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.35rem;
+        height: 2.35rem;
+        padding: 0;
+        border: 0;
+        border-radius: 0.5rem;
+        background: transparent;
+        color: var(--color-text-subtle);
+        cursor: pointer;
+        transform: translateY(-50%);
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .password-toggle:hover {
+        background-color: var(--color-surface-subtle);
+        color: var(--color-text);
+    }
+
+    .password-toggle:focus-visible {
+        outline: 2px solid var(--color-brand-primary);
+        outline-offset: 1px;
+    }
+
+    .password-toggle svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    .password-toggle-hide {
+        display: none;
+    }
+
+    .password-toggle.is-visible .password-toggle-show {
+        display: none;
+    }
+
+    .password-toggle.is-visible .password-toggle-hide {
+        display: block;
     }
 }

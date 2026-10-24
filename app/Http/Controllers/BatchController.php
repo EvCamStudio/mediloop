@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Batch;
 use App\Models\Facility;
 use App\Models\Medicine;
+use App\Services\RedistributionEngine;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -24,7 +25,7 @@ class BatchController extends Controller
         $user = Auth::user();
         $facilityId = $user->facility_id;
 
-        if (($user->isDinkesAuditor() || $user->role === 'SYSADMIN') && $request->filled('facility_id')) {
+        if ($user->isDinkesAuditor() && $request->filled('facility_id')) {
             $facilityId = (int) $request->get('facility_id');
         }
 
@@ -99,6 +100,20 @@ class BatchController extends Controller
             $query->where('status', $request->get('status'));
         }
 
+        $statsBatches = (clone $query)->get();
+        $totalBatchesCount = $statsBatches->count();
+        $totalStockUnits = (int) $statsBatches->sum('current_stock');
+        $atRiskCount = $statsBatches->filter(fn ($b) => in_array($b->risk_level, ['CRITICAL', 'HIGH']))->count();
+        $totalWasteValue = (float) $statsBatches->sum(fn ($b) => $b->projected_waste * (float) $b->unit_price_idr);
+        $totalWasteUnits = (int) $statsBatches->sum('projected_waste');
+        $estimatedWasteKg = round($totalWasteUnits * 0.085, 1);
+
+        $topRiskBatch = $statsBatches->first(fn ($b) => in_array($b->risk_level, ['CRITICAL', 'HIGH']) && $b->projected_waste > 0 && $b->current_stock > 0);
+        $topCandidates = [];
+        if ($topRiskBatch) {
+            $topCandidates = array_slice(RedistributionEngine::findCandidateRecipients($topRiskBatch), 0, 3);
+        }
+
         // 5. Sorting
         $currentSort = $request->get('sort', 'expiry_asc');
         switch ($currentSort) {
@@ -122,7 +137,7 @@ class BatchController extends Controller
 
         $batches = $query->paginate(15)->withQueryString();
 
-        $facilitiesList = Facility::where('type', '!=', 'DINKES')->get();
+        $facilitiesList = Facility::where('type', '!=', 'DINKES')->where('status', 'ACTIVE')->get();
 
         return view('batches.index', [
             'batches' => $batches,
@@ -140,6 +155,14 @@ class BatchController extends Controller
                 'expiring' => $countExpiring,
                 'cold_chain' => $countColdChain,
             ],
+            'totalBatchesCount' => $totalBatchesCount,
+            'totalStockUnits' => $totalStockUnits,
+            'atRiskCount' => $atRiskCount,
+            'totalWasteValue' => $totalWasteValue,
+            'totalWasteUnits' => $totalWasteUnits,
+            'estimatedWasteKg' => $estimatedWasteKg,
+            'topRiskBatch' => $topRiskBatch,
+            'topCandidates' => $topCandidates,
         ]);
     }
 
@@ -150,7 +173,7 @@ class BatchController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->isDinkesAuditor()) {
+        if ($user->isDinkesAuditor() && ! $user->isSysadmin()) {
             abort(403, 'Auditor Dinas Kesehatan hanya memiliki hak akses pantau (Read-Only).');
         }
 
@@ -171,12 +194,12 @@ class BatchController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->isDinkesAuditor()) {
+        if ($user->isDinkesAuditor() && ! $user->isSysadmin()) {
             abort(403, 'Auditor Dinas Kesehatan hanya memiliki hak akses pantau.');
         }
 
         $facilityId = $user->facility_id;
-        if ($user->role === 'SYSADMIN' && $request->filled('facility_id')) {
+        if ($user->isSysadmin() && $request->filled('facility_id')) {
             $facilityId = (int) $request->get('facility_id');
         }
 
@@ -278,7 +301,7 @@ class BatchController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isDinkesAuditor() && $user->role !== 'SYSADMIN' && $user->facility_id !== $batch->facility_id) {
+        if (! $user->isDinkesAuditor() && $user->facility_id !== $batch->facility_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengedit batch fasilitas lain.');
         }
 
@@ -297,7 +320,7 @@ class BatchController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isDinkesAuditor() && $user->role !== 'SYSADMIN' && $user->facility_id !== $batch->facility_id) {
+        if (! $user->isDinkesAuditor() && $user->facility_id !== $batch->facility_id) {
             abort(403, 'Anda tidak berwenang mengedit batch ini.');
         }
 
@@ -334,7 +357,7 @@ class BatchController extends Controller
     {
         $user = Auth::user();
 
-        if (! $user->isDinkesAuditor() && $user->role !== 'SYSADMIN' && $user->facility_id !== $batch->facility_id) {
+        if (! $user->isDinkesAuditor() && $user->facility_id !== $batch->facility_id) {
             abort(403, 'Anda tidak berwenang menghapus batch ini.');
         }
 

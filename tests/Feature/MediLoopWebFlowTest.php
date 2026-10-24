@@ -20,30 +20,24 @@ test('public landing page renders with clinical decision-support content and sim
     $response->assertSee('Benchmark PRD: Ceftriaxone');
 });
 
-test('1-click demo role switcher logs in user and redirects to dashboard', function () {
-    $facility = Facility::create([
-        'name' => 'RSUD Tarakan Jakarta',
-        'code' => 'FSK-RSUD-TRK',
-        'type' => 'RSUD',
-        'address' => 'Jl. Kyai Caringin No. 7',
-        'city' => 'Jakarta Pusat',
-        'latitude' => -6.1729000,
-        'longitude' => 106.8122000,
-        'cold_chain_ready' => true,
-        'contact_person' => 'Apt. Hendra Wijaya',
-        'phone' => '021-3842934',
-    ]);
+test('public landing page exposes a main landmark and meta description', function () {
+    $response = $this->get('/');
 
-    $user = User::factory()->create([
-        'email' => 'donor@mediloop.test',
-        'facility_id' => $facility->id,
-        'role' => 'DONOR_STAFF',
-    ]);
+    $response->assertOk();
+    $response->assertSee('<main id="main-content"', false);
+    $response->assertSee('<meta name="description"', false);
+});
 
-    $response = $this->get('/demo/donor-staff');
+test('landing call-to-action sends guests to login and demo shortcut is removed', function () {
+    $response = $this->get('/');
 
-    $response->assertRedirect('/dashboard');
-    $this->assertAuthenticatedAs($user);
+    $response->assertOk();
+    $response->assertSee('Buka Dashboard');
+    $response->assertSee('Mulai Simulasi');
+    $response->assertSee('href="'.route('login').'"', false);
+    $response->assertDontSee('/demo/donor-staff', false);
+
+    $this->get('/demo/donor-staff')->assertNotFound();
 });
 
 test('dashboard displays inventory ledger and risk badges', function () {
@@ -62,7 +56,7 @@ test('dashboard displays inventory ledger and risk badges', function () {
 
     $user = User::factory()->create([
         'facility_id' => $facility->id,
-        'role' => 'DONOR_STAFF',
+        'role' => 'FACILITY_STAFF',
     ]);
 
     $medicine = Medicine::create([
@@ -90,8 +84,8 @@ test('dashboard displays inventory ledger and risk badges', function () {
     $response->assertStatus(200);
     $response->assertSee('CFT-2026-X89');
     $response->assertSee('Ceftriaxone 1g Injeksi');
-    $response->assertSee('HIGH');
-    $response->assertSee('Find Match');
+    $response->assertSee('Tinggi');
+    $response->assertSee('Cari penerima');
 });
 
 test('complete transfer lifecycle and invariant verification', function () {
@@ -121,10 +115,10 @@ test('complete transfer lifecycle and invariant verification', function () {
         'phone' => '021-3501234',
     ]);
 
-    $donorStaff = User::factory()->create(['facility_id' => $donor->id, 'role' => 'DONOR_STAFF']);
-    $donorApprover = User::factory()->create(['facility_id' => $donor->id, 'role' => 'DONOR_APPROVER']);
-    $recipientStaff = User::factory()->create(['facility_id' => $recipient->id, 'role' => 'RECIPIENT_STAFF']);
-    $recipientApprover = User::factory()->create(['facility_id' => $recipient->id, 'role' => 'RECIPIENT_APPROVER']);
+    $donorStaff = User::factory()->create(['facility_id' => $donor->id, 'role' => 'FACILITY_STAFF']);
+    $donorApprover = User::factory()->create(['facility_id' => $donor->id, 'role' => 'FACILITY_APPROVER']);
+    $recipientStaff = User::factory()->create(['facility_id' => $recipient->id, 'role' => 'FACILITY_STAFF']);
+    $recipientApprover = User::factory()->create(['facility_id' => $recipient->id, 'role' => 'FACILITY_APPROVER']);
 
     $medicine = Medicine::create([
         'name' => 'Ceftriaxone 1g Injeksi',

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "functions": {
+    "api/index.php": {
+      "runtime": "vercel-php@0.9.0",
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
+  "routes": [
+    {
+      "src": "/build/(.*)",
+      "dest": "/public/build/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/public/favicon.ico"
+    },
+    {
+      "src": "/favicon.svg",
+      "dest": "/public/favicon.svg"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "dest": "/public/apple-touch-icon.png"
+    },
+    {
+      "src": "/robots.txt",
+      "dest": "/public/robots.txt"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.php"
+    }
+  ],
+  "env": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "LARAVEL_STORAGE_PATH": "/tmp/storage",
+    "VIEW_COMPILED_PATH": "/tmp/views",
+    "DB_CONNECTION": "sqlite",
+    "CACHE_STORE": "array",
+    "SESSION_DRIVER": "cookie",
+    "QUEUE_CONNECTION": "sync",
+    "MAIL_MAILER": "log",
+    "LOG_CHANNEL": "stderr",
+    "LOG_LEVEL": "error"
+  }
+}
