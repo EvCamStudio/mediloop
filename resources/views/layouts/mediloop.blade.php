@@ -653,7 +653,8 @@
         .ml-runway-text .is-risk { color: #B45309; font-weight: 600; }
         .ml-runway-text .is-safe { color: var(--ml-text); font-weight: 600; }
         .ml-runway-sep { color: var(--ml-subtle); }
-        .ml-runway {
+        .ml-runway,
+        .ml-runway-bar {
             position: relative;
             width: 100%;
             max-width: 240px;
@@ -672,7 +673,11 @@
             background: var(--ml-primary);
             opacity: 0.5;
         }
-        .ml-runway-mark {
+        .ml-runway-fill.is-risk {
+            background: var(--ml-risk);
+        }
+        .ml-runway-mark,
+        .ml-runway-marker {
             position: absolute;
             top: 0;
             bottom: 0;
@@ -3578,7 +3583,6 @@
         <a href="{{ route('analytics.index') }}" class="ml-nav-item {{ request()->routeIs('analytics.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
             Analitik &amp; Statistik
-        </a>
         </a>
         <a href="{{ route('transfers.index') }}" class="ml-nav-item {{ request()->routeIs('transfers.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>

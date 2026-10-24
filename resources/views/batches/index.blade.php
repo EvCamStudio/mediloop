@@ -398,9 +398,9 @@
                                             {{ $daysToDeplete === null ? 'Stok tidak habis' : 'Habis ~'.number_format($daysToDeplete, 0).' hari' }}
                                         </span>
                                     </div>
-                                    <div class="ml-runway-bar" aria-hidden="true">
-                                        <div class="ml-runway-fill {{ $isUrgent ? 'is-risk' : '' }}" style="width: {{ $expiryPercent }}%;"></div>
-                                        <div class="ml-runway-marker" style="left: {{ $depletePercent }}%;" title="Proyeksi stok habis"></div>
+                                    <div class="ml-runway" aria-hidden="true">
+                                        <span class="ml-runway-fill {{ $isUrgent ? 'is-risk' : '' }}" style="width: {{ $expiryPercent }}%;"></span>
+                                        <span class="ml-runway-mark" style="left: {{ $depletePercent }}%;" title="Proyeksi stok habis"></span>
                                     </div>
                                     <button
                                         type="button"
