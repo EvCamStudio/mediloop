@@ -245,8 +245,13 @@
                                     'LOW' => 'Rendah',
                                     default => ucfirst(strtolower((string) $batch->risk_level)),
                                 };
+                                $isSelectedBatch = isset($selectedBatch) && $selectedBatch->id === $batch->id;
                             @endphp
-                            <tr>
+                            <tr id="dashboard-batch-row-{{ $batch->id }}"
+                                class="ml-dashboard-batch-row {{ $isSelectedBatch ? 'is-selected-batch' : '' }}"
+                                onclick="selectRecBatch({{ $batch->id }})"
+                                style="cursor: pointer;"
+                                title="Klik untuk melihat rekomendasi redistribusi obat {{ $batch->medicine->name }}">
                                 <td>
                                     <div class="ml-cell-title">{{ $batch->medicine->name }}</div>
                                     <div class="ml-cell-meta">
@@ -286,12 +291,15 @@
                                         </span>
 
                                         @if(! $user->isDinkesAuditor() && $batch->projected_waste > 0 && $batch->current_stock > 0)
-                                            <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-quiet ml-btn-sm">
-                                                <span>Cari penerima</span>
-                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                                            </a>
+                                            <button type="button"
+                                                class="ml-btn-primary ml-btn-sm"
+                                                onclick="event.stopPropagation(); selectRecBatch({{ $batch->id }}); document.getElementById('match-title').scrollIntoView({ behavior: 'smooth', block: 'start' });"
+                                                title="Lihat faskes yang membutuhkan obat ini">
+                                                <span>Rekomendasi</span>
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                                            </button>
                                         @else
-                                            <a href="{{ route('batches.edit', $batch) }}" class="ml-btn-quiet ml-btn-sm">
+                                            <a href="{{ route('batches.edit', $batch) }}" class="ml-btn-quiet ml-btn-sm" onclick="event.stopPropagation();">
                                                 Detail
                                             </a>
                                         @endif
@@ -438,87 +446,209 @@
         </aside>
     </div>
 
-    @if(isset($topRiskBatch))
-        <section class="ml-section ml-rec-band" aria-labelledby="match-title">
+    @if(isset($selectedBatch) && count($batchRecommendations) > 0)
+        <section class="ml-section ml-rec-band" id="match-section" aria-labelledby="match-title">
             <div class="ml-section-header">
                 <div>
                     <h2 class="ml-section-title" id="match-title">Rekomendasi Redistribusi Obat</h2>
                     <p class="ml-section-sub">
-                        Kandidat faskes penerima yang paling cocok untuk obat <strong>{{ $topRiskBatch->medicine->name }}</strong>
-                        (Nomor batch: <code>{{ $topRiskBatch->batch_number }}</code>).
-                        Skor kecocokan dihitung dari: Kebutuhan riil (50%) &middot; Jarak terdekat (30%) &middot; Kesiapan rantai dingin (20%).
+                        Sistem mencocokkan faskes penerima yang memiliki <strong>kebutuhan riil obat yang sama</strong>, <strong>jarak tempuh terdekat</strong>, dan <strong>kesiapan logistik/rantai dingin</strong>.
                     </p>
                 </div>
             </div>
 
-            <div class="ml-rec-grid">
-                @forelse($matchCandidates ?? [] as $index => $candidate)
-                    @php
-                        $facilityType = match (strtoupper($candidate['facility']->type)) {
-                            'RSUD' => 'RSUD',
-                            'PUSKESMAS' => 'Puskesmas',
-                            'KLINIK' => 'Klinik',
-                            'DINKES' => 'Dinkes',
-                            default => ucwords(strtolower(str_replace('_', ' ', $candidate['facility']->type))),
-                        };
-                        $cap = (int) ($candidate['recipient_intake_cap'] ?? 0);
-                    @endphp
-                    <article class="ml-rec-card" style="display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <!-- Header Obat pada Kartu -->
-                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.06);">
-                                <span style="font-size: 11px; font-weight: 700; color: #1d4ed8; background: #eaf1ff; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
-                                    {{ $topRiskBatch->medicine->name }}
-                                </span>
-                                <span style="font-size: 10.5px; color: #64748b; font-family: monospace;">Batch {{ $topRiskBatch->batch_number }}</span>
-                            </div>
-
-                            <div class="ml-rec-top">
-                                <span class="ml-rec-rank" aria-hidden="true">{{ $index + 1 }}</span>
-                                <div class="ml-rec-body">
-                                    <div class="ml-rec-name" style="font-weight: 700; color: #0b1f4b;">{{ $candidate['facility']->name }}</div>
-                                    <div class="ml-rec-meta">
-                                        {{ $facilityType }}
-                                        &middot; {{ $candidate['distance_km'] }} km dari lokasi Anda
-                                    </div>
-                                </div>
-                                <span class="ml-rec-score" title="Skor = kebutuhan 50% + jarak 30% + logistik 20%">
-                                    {{ $candidate['match_score'] }}% Cocok
-                                </span>
-                            </div>
-
-                            <div class="ml-rec-facts" style="margin-top: 10px;">
-                                @if($cap > 0)
-                                    <span style="font-weight: 600; color: #0f766e;">Kapasitas serap: {{ number_format($cap) }} unit</span>
-                                @else
-                                    <span style="font-weight: 500; color: #64748b;">Siap menerima transfer antar-faskes</span>
-                                @endif
-                            </div>
-                        </div>
-
-                        @if(! $user->isDinkesAuditor())
-                            <a href="{{ route('transfers.propose', ['batch' => $topRiskBatch, 'recipient_id' => $candidate['facility']->id]) }}" class="ml-btn-primary ml-btn-sm ml-rec-cta" style="margin-top: 14px;">
-                                <span>Ajukan transfer ke faskes ini</span>
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-                            </a>
-                        @endif
-                    </article>
-                @empty
-                    <div class="ml-rec-empty">
-                        @if(isset($topRiskBatch))
-                            Belum ada kandidat faskes penerima yang memenuhi syarat rantai dingin dan jarak.
-                        @else
-                            Belum ada batch berisiko kedaluwarsa. Tambahkan stok batch untuk mendapatkan rekomendasi transfer otomatis.
-                        @endif
-                    </div>
-                @endforelse
+            <!-- Interactive Medicine Selector Tabs -->
+            <div class="ml-rec-selector-wrap">
+                <div class="ml-rec-selector-label">
+                    <span>Pilih Obat Berisiko untuk Melihat Faskes yang Membutuhkan:</span>
+                </div>
+                <div class="ml-rec-batch-tabs">
+                    @foreach($batchRecommendations as $bId => $recData)
+                        @php
+                            $b = $recData['batch'];
+                            $isActive = ($b->id === $selectedBatch->id);
+                        @endphp
+                        <button type="button"
+                            class="ml-rec-tab-btn {{ $isActive ? 'is-active' : '' }}"
+                            id="tab-btn-{{ $b->id }}"
+                            data-batch-id="{{ $b->id }}"
+                            onclick="selectRecBatch({{ $b->id }})">
+                            <span class="ml-rec-tab-dot is-{{ strtolower($b->risk_level) }}" aria-hidden="true"></span>
+                            <span class="ml-rec-tab-name">{{ $b->medicine->name }}</span>
+                            <span class="ml-rec-tab-badge">Batch {{ $b->batch_number }}</span>
+                        </button>
+                    @endforeach
+                </div>
             </div>
 
+            <!-- Batch Recommendation Panels -->
+            @foreach($batchRecommendations as $bId => $recData)
+                @php
+                    $curBatch = $recData['batch'];
+                    $curCandidates = $recData['candidates'];
+                    $isCurActive = ($curBatch->id === $selectedBatch->id);
+                @endphp
+                <div class="ml-rec-batch-panel" id="rec-panel-{{ $bId }}" style="{{ $isCurActive ? '' : 'display: none;' }}">
+                    <div class="ml-rec-panel-header">
+                        <div class="ml-rec-panel-info">
+                            <span class="ml-rec-panel-badge">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+                                {{ $curBatch->medicine->name }}
+                            </span>
+                            <span class="ml-rec-panel-meta">Nomor Batch: <code>{{ $curBatch->batch_number }}</code> &middot; Stok Berisiko: {{ number_format($curBatch->projected_waste > 0 ? $curBatch->projected_waste : $curBatch->current_stock) }} {{ $curBatch->medicine->unit }}</span>
+                        </div>
+                        <span class="ml-rec-panel-formula">Skor Kecocokan = Kebutuhan Riil (50%) + Jarak (30%) + Logistik (20%)</span>
+                    </div>
+
+                    <div class="ml-rec-grid">
+                        @forelse($curCandidates as $index => $candidate)
+                            @php
+                                $facilityType = match (strtoupper($candidate['facility']->type)) {
+                                    'RSUD' => 'RSUD',
+                                    'PUSKESMAS' => 'Puskesmas',
+                                    'KLINIK' => 'Klinik',
+                                    'DINKES' => 'Dinkes',
+                                    default => ucwords(strtolower(str_replace('_', ' ', $candidate['facility']->type))),
+                                };
+                                $cap = (int) ($candidate['recipient_intake_cap'] ?? 0);
+                                $priorityLabel = match($index) {
+                                    0 => 'Prioritas Utama',
+                                    1 => 'Prioritas Kedua',
+                                    default => 'Alternatif',
+                                };
+                            @endphp
+                            <article class="ml-rec-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                                <div>
+                                    <!-- Header Obat pada Kartu -->
+                                    <div class="ml-rec-card-header">
+                                        <span class="ml-rec-card-med">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+                                            {{ $curBatch->medicine->name }}
+                                        </span>
+                                        <span class="ml-rec-card-batch">Batch {{ $curBatch->batch_number }}</span>
+                                    </div>
+
+                                    <div class="ml-rec-top">
+                                        <span class="ml-rec-rank" aria-hidden="true">{{ $index + 1 }}</span>
+                                        <div class="ml-rec-body">
+                                            <div class="ml-rec-name">{{ $candidate['facility']->name }}</div>
+                                            <div class="ml-rec-meta">
+                                                {{ $facilityType }} &middot; {{ $candidate['distance_km'] }} km dari faskes Anda
+                                            </div>
+                                        </div>
+                                        <div class="ml-rec-score-wrapper">
+                                            <span class="ml-rec-score" title="Skor = Kebutuhan (50%) + Jarak (30%) + Logistik (20%)">
+                                                {{ $candidate['match_score'] }}% Cocok
+                                            </span>
+                                            <span class="ml-rec-priority-tag is-p{{ $index + 1 }}">{{ $priorityLabel }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Transparansi Perhitungan Skor -->
+                                    <div class="ml-rec-calc-card">
+                                        <div class="ml-rec-calc-title">
+                                            <span>Rincian Penilaian Prioritas:</span>
+                                            <span class="ml-rec-calc-total">Total: {{ $candidate['match_score'] }}%</span>
+                                        </div>
+                                        <div class="ml-rec-calc-list">
+                                            <div class="ml-rec-calc-item">
+                                                <span class="ml-rec-calc-key">1. Kebutuhan Riil (50%):</span>
+                                                <span class="ml-rec-calc-val is-urgent">{{ $candidate['need_score'] }}%</span>
+                                            </div>
+                                            <div class="ml-rec-calc-sub">
+                                                {{ $candidate['urgency_label'] }}
+                                            </div>
+                                            <div class="ml-rec-calc-item">
+                                                <span class="ml-rec-calc-key">2. Jarak Terdekat (30%):</span>
+                                                <span class="ml-rec-calc-val">{{ $candidate['proximity_score'] }}% ({{ $candidate['distance_km'] }} km)</span>
+                                            </div>
+                                            <div class="ml-rec-calc-item">
+                                                <span class="ml-rec-calc-key">3. Kesiapan Logistik (20%):</span>
+                                                <span class="ml-rec-calc-val">
+                                                    {{ $candidate['logistics_score'] }}%
+                                                    @if($curBatch->medicine->requires_cold_chain)
+                                                        &middot; Cold-Chain Siap
+                                                    @else
+                                                        &middot; Suhu Ruang Siap
+                                                    @endif
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="ml-rec-facts" style="margin-top: 10px;">
+                                        @if($cap > 0)
+                                            <div>
+                                                <div class="ml-rec-cap-line">
+                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                                    <span>Kapasitas serap: <strong>{{ number_format($cap) }} {{ $curBatch->medicine->unit }}</strong></span>
+                                                </div>
+                                                <span class="ml-rec-cap-sub">Faskes ini dapat menghabiskan stok sebelum kedaluwarsa berdasarkan laju konsumsi.</span>
+                                            </div>
+                                        @else
+                                            <span class="ml-rec-cap-generic">Faskes siap menerima alokasi transfer</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                @if(! $user->isDinkesAuditor())
+                                    <a href="{{ route('transfers.propose', ['batch' => $curBatch, 'recipient_id' => $candidate['facility']->id]) }}" class="ml-btn-primary ml-btn-sm ml-rec-cta" style="margin-top: 14px;">
+                                        <span>Ajukan transfer ke faskes ini</span>
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                                    </a>
+                                @endif
+                            </article>
+                        @empty
+                            <div class="ml-rec-empty">
+                                Belum ada faskes penerima terdekat yang memenuhi syarat penyimpanan dan kebutuhan untuk batch ini.
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            @endforeach
+
             <p class="ml-rec-note">
-                Rekomendasi bersifat saran. Setiap transfer tetap memerlukan persetujuan petugas faskes.
+                Rekomendasi bersifat saran sistem pendukung keputusan (DSS). Setiap transfer tetap memerlukan persetujuan Kepala Instalasi Farmasi faskes pengirim dan penerima.
             </p>
         </section>
     @endif
 </div>
+
+<script>
+function selectRecBatch(batchId) {
+    // 1. Hide all recommendation panels, show target
+    document.querySelectorAll('.ml-rec-batch-panel').forEach(function(panel) {
+        panel.style.display = 'none';
+    });
+    var targetPanel = document.getElementById('rec-panel-' + batchId);
+    if (targetPanel) {
+        targetPanel.style.display = 'block';
+    }
+
+    // 2. Update active medicine tab button
+    document.querySelectorAll('.ml-rec-tab-btn').forEach(function(btn) {
+        btn.classList.remove('is-active');
+    });
+    var targetBtn = document.getElementById('tab-btn-' + batchId);
+    if (targetBtn) {
+        targetBtn.classList.add('is-active');
+    }
+
+    // 3. Highlight the clicked row in the overview table
+    document.querySelectorAll('.ml-table-dashboard tbody tr').forEach(function(row) {
+        row.classList.remove('is-selected-batch');
+    });
+    var targetRow = document.getElementById('dashboard-batch-row-' + batchId);
+    if (targetRow) {
+        targetRow.classList.add('is-selected-batch');
+    }
+
+    // 4. Update browser URL without reloading
+    if (window.history && window.history.replaceState) {
+        var url = new URL(window.location);
+        url.searchParams.set('batch_id', batchId);
+        window.history.replaceState({}, '', url);
+    }
+}
+</script>
 @endsection

@@ -262,21 +262,84 @@ class RedistributionEngine
             // Proximity score (30%)
             $proximityScore = self::calculateProximityScore($distanceKm);
 
-            // Need score (50%) based on recipient stock presence and burn rate
-            $existingBatch = Batch::where('facility_id', $facility->id)
-                ->where('medicine_id', $medicine->id)
+            // Query active batches of this medicine (or generic equivalent) at recipient facility
+            $genericParts = explode(' ', trim($medicine->generic_name ?? $medicine->name));
+            $genericRoot = $genericParts[0];
+            $facilityBatches = Batch::where('facility_id', $facility->id)
+                ->where(function ($q) use ($medicine, $genericRoot) {
+                    $q->where('medicine_id', $medicine->id);
+                    if ($genericRoot !== '') {
+                        $q->orWhereHas('medicine', function ($mq) use ($genericRoot) {
+                            $mq->where('generic_name', 'LIKE', $genericRoot.'%')
+                                ->orWhere('name', 'LIKE', $genericRoot.'%');
+                        });
+                    }
+                })
                 ->where('status', 'ACTIVE')
-                ->first();
+                ->get();
 
-            $recipientBurnRate = $existingBatch ? (float) $existingBatch->daily_burn_rate : 5.0; // Simulated demand if unstocked
-            $recipientStock = $existingBatch ? $existingBatch->current_stock : 0;
+            $recipientStock = (int) $facilityBatches->sum('current_stock');
+            $existingBatch = $facilityBatches->first();
+            $recipientBurnRate = $existingBatch ? (float) $existingBatch->daily_burn_rate : 0.0;
 
-            // Shortage urgency: lower stock relative to burn rate yields higher need score
-            $daysOfStockLeft = self::calculateDaysToDeplete($recipientStock, $recipientBurnRate);
-            $needScore = $daysOfStockLeft <= 7 ? 95.0 : ($daysOfStockLeft <= 14 ? 80.0 : ($daysOfStockLeft <= 30 ? 60.0 : 35.0));
+            if ($facilityBatches->isNotEmpty() && $recipientBurnRate > 0) {
+                $daysOfStockLeft = self::calculateDaysToDeplete($recipientStock, $recipientBurnRate);
+
+                if ($daysOfStockLeft <= 3) {
+                    $needScore = 98.0;
+                    $urgencyLabel = "Defisit Kritis: Sisa {$recipientStock} unit ({$daysOfStockLeft} hari pemakaian)";
+                    $urgencySeverity = 'CRITICAL';
+                } elseif ($daysOfStockLeft <= 7) {
+                    $needScore = 90.0;
+                    $urgencyLabel = "Stok Menipis: Sisa {$recipientStock} unit ({$daysOfStockLeft} hari pemakaian)";
+                    $urgencySeverity = 'HIGH';
+                } elseif ($daysOfStockLeft <= 14) {
+                    $needScore = 75.0;
+                    $urgencyLabel = "Kebutuhan Moderat: Sisa {$recipientStock} unit ({$daysOfStockLeft} hari)";
+                    $urgencySeverity = 'MEDIUM';
+                } elseif ($daysOfStockLeft <= 30) {
+                    $needScore = 45.0;
+                    $urgencyLabel = "Stok Cukup: Sisa {$recipientStock} unit ({$daysOfStockLeft} hari)";
+                    $urgencySeverity = 'LOW';
+                } else {
+                    $needScore = 15.0;
+                    $urgencyLabel = "Surplus: Sisa stok melimpah ({$daysOfStockLeft} hari)";
+                    $urgencySeverity = 'SURPLUS';
+                }
+            } else {
+                // If the facility has no active batch of this medicine:
+                $isAppropriate = true;
+                if ($facility->type === 'KLINIK' && in_array($medicine->category, ['Endocrine', 'Emergency'], true)) {
+                    $isAppropriate = false;
+                }
+
+                if ($isAppropriate) {
+                    $recipientBurnRate = match ($facility->type) {
+                        'RSUD' => 6.0,
+                        'RS_SWASTA' => 5.0,
+                        'PUSKESMAS' => 3.0,
+                        default => 2.0,
+                    };
+                    $daysOfStockLeft = 0.0;
+                    $needScore = 92.0;
+                    $urgencyLabel = 'Kekosongan Total: Faskes belum memiliki persediaan obat ini';
+                    $urgencySeverity = 'CRITICAL';
+                } else {
+                    $recipientBurnRate = 0.0;
+                    $daysOfStockLeft = INF;
+                    $needScore = 0.0;
+                    $urgencyLabel = 'Bukan formularium/tidak melayani jenis obat ini';
+                    $urgencySeverity = 'INELIGIBLE';
+                }
+            }
+
+            // Disqualify completely ineligible facilities
+            if ($needScore <= 0.0) {
+                continue;
+            }
 
             // Logistics score (20%)
-            $logisticsScore = $facility->cold_chain_ready ? 90.0 : 70.0;
+            $logisticsScore = $medicine->requires_cold_chain ? 95.0 : 85.0;
 
             // Composite Match Score (0.50 Need + 0.30 Proximity + 0.20 Logistics)
             $matchScore = self::calculateMatchingScore($needScore, $proximityScore, $logisticsScore);
@@ -296,9 +359,13 @@ class RedistributionEngine
                 'logistics_score' => $logisticsScore,
                 'match_score' => $matchScore,
                 'recipient_daily_burn_rate' => $recipientBurnRate,
+                'recipient_stock' => $recipientStock,
+                'days_of_stock' => is_finite($daysOfStockLeft) ? $daysOfStockLeft : 0,
+                'urgency_label' => $urgencyLabel,
+                'urgency_severity' => $urgencySeverity,
                 'recipient_intake_cap' => $intakeCap,
                 'intake_cap' => $intakeCap,
-                'recommended_quantity' => $intakeCap > 0 ? $intakeCap : min($projectedWaste, 100),
+                'recommended_quantity' => $intakeCap > 0 ? $intakeCap : min(max(10, $projectedWaste), $batch->current_stock),
             ];
         }
 

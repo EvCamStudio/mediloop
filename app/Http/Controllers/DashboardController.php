@@ -41,7 +41,9 @@ class DashboardController extends Controller
                 'activeTransfersCount' => 0,
                 'facilitiesList' => collect(),
                 'topRiskBatch' => null,
+                'selectedBatch' => null,
                 'matchCandidates' => [],
+                'batchRecommendations' => [],
                 'partnerFacilities' => [],
             ]);
         }
@@ -82,15 +84,31 @@ class DashboardController extends Controller
 
         $facilitiesList = Facility::where('type', '!=', 'DINKES')->where('status', 'ACTIVE')->get();
 
-        // Top at-risk batch for candidate recommendations: prioritize CRITICAL first, then HIGH, then MEDIUM
-        $topRiskBatch = $batches->firstWhere('risk_level', 'CRITICAL')
+        // Selected batch for candidate recommendations: prioritize requested batch, then CRITICAL, then HIGH, then MEDIUM
+        $requestedBatchId = $request->integer('batch_id');
+        $selectedBatch = null;
+        if ($requestedBatchId > 0) {
+            $selectedBatch = $batches->firstWhere('id', $requestedBatchId);
+        }
+
+        $topRiskBatch = $selectedBatch
+            ?? $batches->firstWhere('risk_level', 'CRITICAL')
             ?? $batches->firstWhere('risk_level', 'HIGH')
             ?? $batches->firstWhere('risk_level', 'MEDIUM')
             ?? $batches->first();
-        $matchCandidates = [];
-        if ($topRiskBatch) {
-            $matchCandidates = array_slice(RedistributionEngine::findCandidateRecipients($topRiskBatch), 0, 3);
+
+        // Calculate recommendations for all at-risk batches in overview
+        $batchRecommendations = [];
+        $candidatesBatches = $overviewBatches->isNotEmpty() ? $overviewBatches : $batches;
+        foreach ($candidatesBatches as $b) {
+            $candidates = RedistributionEngine::findCandidateRecipients($b);
+            $batchRecommendations[$b->id] = [
+                'batch' => $b,
+                'candidates' => array_slice($candidates, 0, 3),
+            ];
         }
+
+        $matchCandidates = $topRiskBatch ? ($batchRecommendations[$topRiskBatch->id]['candidates'] ?? []) : [];
 
         // Calculate real partner facilities relative to current facility
         $partnerFacilities = [];
@@ -129,7 +147,9 @@ class DashboardController extends Controller
             'activeTransfersCount' => $activeTransfersCount,
             'facilitiesList' => $facilitiesList,
             'topRiskBatch' => $topRiskBatch,
+            'selectedBatch' => $topRiskBatch,
             'matchCandidates' => $matchCandidates,
+            'batchRecommendations' => $batchRecommendations,
             'partnerFacilities' => $partnerFacilities,
         ]);
     }

@@ -872,6 +872,247 @@
             color: var(--ml-muted);
         }
 
+        /* Interactive Medicine Selector & Transparent Prioritization */
+        .ml-table-dashboard tr.is-selected-batch td {
+            background-color: #F0F7FF !important;
+        }
+        .ml-table-dashboard tr.is-selected-batch td:first-child {
+            border-left: 3px solid var(--ml-primary);
+        }
+        .ml-table-dashboard tr.ml-dashboard-batch-row:hover td {
+            background-color: #F8FAFC;
+        }
+        .ml-rec-selector-wrap {
+            padding: 0 24px 14px;
+        }
+        .ml-rec-selector-label {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--ml-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .ml-rec-batch-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .ml-rec-tab-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 13px;
+            border-radius: 8px;
+            border: 1px solid var(--ml-border);
+            background: #fff;
+            color: var(--ml-text);
+            font-size: 12px;
+            font-family: var(--font-body);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .ml-rec-tab-btn:hover {
+            border-color: var(--ml-primary);
+            background: #F8FAFC;
+        }
+        .ml-rec-tab-btn.is-active {
+            border-color: var(--ml-primary);
+            background: #EFF6FF;
+            color: #1D4ED8;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(29, 78, 216, 0.14);
+        }
+        .ml-rec-tab-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .ml-rec-tab-dot.is-critical { background: #DC2626; box-shadow: 0 0 0 2px #FECACA; }
+        .ml-rec-tab-dot.is-high { background: #EA580C; box-shadow: 0 0 0 2px #FED7AA; }
+        .ml-rec-tab-dot.is-medium { background: #D97706; box-shadow: 0 0 0 2px #FDE68A; }
+        .ml-rec-tab-dot.is-low { background: #16A34A; box-shadow: 0 0 0 2px #BBF7D0; }
+        .ml-rec-tab-badge {
+            font-size: 10.5px;
+            color: var(--ml-muted);
+            font-family: monospace;
+            padding: 1px 6px;
+            background: rgba(0,0,0,0.04);
+            border-radius: 4px;
+        }
+        .ml-rec-tab-btn.is-active .ml-rec-tab-badge {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+        .ml-rec-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 14px;
+            background: #F8FAFC;
+            border: 1px solid var(--ml-border);
+            border-radius: 8px;
+            margin: 0 24px 14px;
+            flex-wrap: wrap;
+        }
+        .ml-rec-panel-info {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+        .ml-rec-panel-badge {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1D4ED8;
+            background: #DBEAFE;
+            padding: 3px 9px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .ml-rec-panel-meta {
+            font-size: 11.5px;
+            color: var(--ml-muted);
+        }
+        .ml-rec-panel-formula {
+            font-size: 11px;
+            color: var(--ml-muted);
+            font-weight: 500;
+        }
+        .ml-rec-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        .ml-rec-card-med {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1D4ED8;
+            background: #EAF1FF;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .ml-rec-card-batch {
+            font-size: 10.5px;
+            color: #64748B;
+            font-family: monospace;
+        }
+        .ml-rec-score-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
+        }
+        .ml-rec-priority-tag {
+            font-size: 9.5px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        .ml-rec-priority-tag.is-p1 {
+            background: #FEF3C7;
+            color: #92400E;
+            border: 1px solid #FDE68A;
+        }
+        .ml-rec-priority-tag.is-p2 {
+            background: #F1F5F9;
+            color: #475569;
+            border: 1px solid #E2E8F0;
+        }
+        .ml-rec-priority-tag.is-p3 {
+            background: #F8FAFC;
+            color: #64748B;
+            border: 1px solid #E2E8F0;
+        }
+        .ml-rec-calc-card {
+            margin-top: 10px;
+            padding: 10px 11px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+        .ml-rec-calc-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        .ml-rec-calc-total {
+            color: #1D4ED8;
+            font-weight: 700;
+        }
+        .ml-rec-calc-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .ml-rec-calc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #475569;
+            font-size: 11px;
+        }
+        .ml-rec-calc-key {
+            font-weight: 500;
+        }
+        .ml-rec-calc-val {
+            font-weight: 600;
+            color: #0F172A;
+            font-variant-numeric: tabular-nums;
+        }
+        .ml-rec-calc-val.is-urgent {
+            color: #DC2626;
+        }
+        .ml-rec-calc-sub {
+            font-size: 10.5px;
+            color: #0284C7;
+            font-weight: 500;
+            padding-left: 10px;
+            line-height: 1.3;
+            border-left: 2px solid #BAE6FD;
+            margin: 1px 0 3px 2px;
+        }
+        .ml-rec-cap-line {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            color: #0F766E;
+            font-size: 11.5px;
+        }
+        .ml-rec-cap-sub {
+            display: block;
+            font-size: 10px;
+            color: #64748B;
+            margin-top: 2px;
+            line-height: 1.35;
+        }
+        .ml-rec-cap-generic {
+            font-size: 11px;
+            font-weight: 500;
+            color: #64748B;
+        }
+
         /* ============================================================ */
         /* FACILITY NETWORK MAP                                         */
         /* ============================================================ */

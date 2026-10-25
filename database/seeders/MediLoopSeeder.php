@@ -409,6 +409,171 @@ class MediLoopSeeder extends Seeder
             'status' => 'ACTIVE',
         ]);
 
+        // Seed Realistic Partner Facility Inventories (showing distinct genuine clinical shortages across Jakarta)
+        // 1. RSUD Tanah Abang: Critical shortage for Insulin (3 days left) & Paracetamol Infus (2 days left), Surplus Ceftriaxone & Amoxicillin
+        Batch::create([
+            'facility_id' => $rsudTanahAbang->id,
+            'medicine_id' => $insulin->id,
+            'batch_number' => 'INS-2026-TNA',
+            'current_stock' => 12,
+            'daily_burn_rate' => 4.0,
+            'expiry_date' => Carbon::today()->addDays(180)->toDateString(),
+            'unit_price_idr' => 185000,
+            'storage_location' => 'Chiller Farmasi RSUD Tanah Abang',
+            'status' => 'ACTIVE',
+        ]);
+        Batch::create([
+            'facility_id' => $rsudTanahAbang->id,
+            'medicine_id' => $paracetamol->id,
+            'batch_number' => 'PCT-2026-TNA',
+            'current_stock' => 16,
+            'daily_burn_rate' => 8.0,
+            'expiry_date' => Carbon::today()->addDays(200)->toDateString(),
+            'unit_price_idr' => 28000,
+            'storage_location' => 'Gudang Farmasi IGD RSUD Tanah Abang',
+            'status' => 'ACTIVE',
+        ]);
+        Batch::create([
+            'facility_id' => $rsudTanahAbang->id,
+            'medicine_id' => $ceftriaxone->id,
+            'batch_number' => 'CFT-2026-TNA',
+            'current_stock' => 320,
+            'daily_burn_rate' => 8.0,
+            'expiry_date' => Carbon::today()->addDays(180)->toDateString(),
+            'unit_price_idr' => 45000,
+            'storage_location' => 'Gudang Utama RSUD Tanah Abang',
+            'status' => 'ACTIVE',
+        ]);
+        Batch::create([
+            'facility_id' => $rsudTanahAbang->id,
+            'medicine_id' => $amoxicillin->id,
+            'batch_number' => 'AMX-2026-TNA',
+            'current_stock' => 500,
+            'daily_burn_rate' => 10.0,
+            'expiry_date' => Carbon::today()->addDays(220)->toDateString(),
+            'unit_price_idr' => 65000,
+            'storage_location' => 'Gudang Farmasi RSUD Tanah Abang',
+            'status' => 'ACTIVE',
+        ]);
+
+        // 2. Puskesmas Sawah Besar: Critical shortage for Amoxicillin (2 days left), Urgent Ceftriaxone (5 days), Moderate Insulin (8 days)
+        Batch::create([
+            'facility_id' => $puskesmasSawahBesar->id,
+            'medicine_id' => $amoxicillin->id,
+            'batch_number' => 'AMX-2026-SWB',
+            'current_stock' => 30,
+            'daily_burn_rate' => 15.0,
+            'expiry_date' => Carbon::today()->addDays(150)->toDateString(),
+            'unit_price_idr' => 65000,
+            'storage_location' => 'Apotek Rawat Jalan PKM Sawah Besar',
+            'status' => 'ACTIVE',
+        ]);
+        Batch::create([
+            'facility_id' => $puskesmasSawahBesar->id,
+            'medicine_id' => $ceftriaxone->id,
+            'batch_number' => 'CFT-2026-SWB',
+            'current_stock' => 25,
+            'daily_burn_rate' => 5.0,
+            'expiry_date' => Carbon::today()->addDays(160)->toDateString(),
+            'unit_price_idr' => 45000,
+            'storage_location' => 'Ruang Tindakan PKM Sawah Besar',
+            'status' => 'ACTIVE',
+        ]);
+        Batch::create([
+            'facility_id' => $puskesmasSawahBesar->id,
+            'medicine_id' => $insulin->id,
+            'batch_number' => 'INS-2026-SWB',
+            'current_stock' => 16,
+            'daily_burn_rate' => 2.0,
+            'expiry_date' => Carbon::today()->addDays(180)->toDateString(),
+            'unit_price_idr' => 185000,
+            'storage_location' => 'Cold Box Prolanis PKM Sawah Besar',
+            'status' => 'ACTIVE',
+        ]);
+
+        // 3. RS PGI Cikini: Critical shortage for Ceftriaxone (2 days left) & Paracetamol Infus (5 days left), Surplus Insulin (40 days)
+        Batch::create([
+            'facility_id' => $rsPgiCikini->id,
+            'medicine_id' => $ceftriaxone->id,
+            'batch_number' => 'CFT-2026-CKN',
+            'current_stock' => 20,
+            'daily_burn_rate' => 10.0,
+            'expiry_date' => Carbon::today()->addDays(180)->toDateString(),
+            'unit_price_idr' => 45000,
+            'storage_location' => 'Depo Farmasi Bedah Sentral RS Cikini',
+            'status' => 'ACTIVE',
+        ]);
+        Batch::create([
+            'facility_id' => $rsPgiCikini->id,
+            'medicine_id' => $paracetamol->id,
+            'batch_number' => 'PCT-2026-CKN',
+            'current_stock' => 30,
+            'daily_burn_rate' => 6.0,
+            'expiry_date' => Carbon::today()->addDays(200)->toDateString(),
+            'unit_price_idr' => 28000,
+            'storage_location' => 'Depo Rawat Inap RS Cikini',
+            'status' => 'ACTIVE',
+        ]);
+        Batch::create([
+            'facility_id' => $rsPgiCikini->id,
+            'medicine_id' => $insulin->id,
+            'batch_number' => 'INS-2026-CKN',
+            'current_stock' => 120,
+            'daily_burn_rate' => 3.0,
+            'expiry_date' => Carbon::today()->addDays(210)->toDateString(),
+            'unit_price_idr' => 185000,
+            'storage_location' => 'Kulkas Farmasi Pusat RS Cikini',
+            'status' => 'ACTIVE',
+        ]);
+
+        // 4. Puskesmas Tanah Abang: Critical shortage for Azithromycin (2 days left) & Insulin (3.3 days left)
+        Batch::create([
+            'facility_id' => $puskesmasTanahAbang->id,
+            'medicine_id' => $azithromycin->id,
+            'batch_number' => 'AZM-2026-PTA',
+            'current_stock' => 12,
+            'daily_burn_rate' => 6.0,
+            'expiry_date' => Carbon::today()->addDays(150)->toDateString(),
+            'unit_price_idr' => 88000,
+            'storage_location' => 'Poli ISPA PKM Tanah Abang',
+            'status' => 'ACTIVE',
+        ]);
+        Batch::create([
+            'facility_id' => $puskesmasTanahAbang->id,
+            'medicine_id' => $insulin->id,
+            'batch_number' => 'INS-2026-PTA',
+            'current_stock' => 5,
+            'daily_burn_rate' => 1.5,
+            'expiry_date' => Carbon::today()->addDays(180)->toDateString(),
+            'unit_price_idr' => 185000,
+            'storage_location' => 'Chiller Poli PKM Tanah Abang',
+            'status' => 'ACTIVE',
+        ]);
+        Batch::create([
+            'facility_id' => $puskesmasTanahAbang->id,
+            'medicine_id' => $amoxicillin->id,
+            'batch_number' => 'AMX-2026-PTA',
+            'current_stock' => 60,
+            'daily_burn_rate' => 10.0,
+            'expiry_date' => Carbon::today()->addDays(160)->toDateString(),
+            'unit_price_idr' => 65000,
+            'storage_location' => 'Apotek PKM Tanah Abang',
+            'status' => 'ACTIVE',
+        ]);
+
+        // 5. Klinik Harmoni: Oral medicines only (no cold chain)
+        Batch::create([
+            'facility_id' => $klinikHarmoni->id,
+            'medicine_id' => $amoxicillin->id,
+            'batch_number' => 'AMX-2026-HRM',
+            'current_stock' => 70,
+            'daily_burn_rate' => 7.0,
+            'expiry_date' => Carbon::today()->addDays(140)->toDateString(),
+            'unit_price_idr' => 65000,
+            'storage_location' => 'Apotek Klinik Harmoni',
+            'status' => 'ACTIVE',
+        ]);
+
         // 5. Seed Demonstration Transfers across States
         // Completed Transfer: RSUD to Puskesmas Gambir
         $completedTransfer = Transfer::create([
