@@ -2333,7 +2333,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 6px 0 14px;
+            padding: 4px 0 10px;
         }
         .ml-donut-svg {
             display: block;
@@ -2342,19 +2342,19 @@
         .ml-donut-track {
             fill: none;
             stroke: #F1F5F9;
-            stroke-width: 16;
+            stroke-width: 18;
         }
         .ml-donut-segment {
             transition: stroke-width 0.2s ease, opacity 0.2s ease;
             cursor: pointer;
         }
         .ml-donut-segment:hover {
-            stroke-width: 19;
+            stroke-width: 21;
             opacity: 0.92;
         }
         .ml-donut-center-val {
             font-family: var(--font-heading);
-            font-size: 30px;
+            font-size: 34px;
             font-weight: 700;
             line-height: 1;
         }
@@ -2372,108 +2372,67 @@
             fill: var(--ml-muted);
         }
 
-        /* Stacked Breakdown list below chart */
-        .ml-breakdown-stacked {
+        /* Slim, Compact Legend below Big Donut */
+        .ml-donut-legend-slim {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            margin-bottom: 12px;
+            gap: 4px;
+            margin: 2px 0 12px;
+            padding: 0 4px;
         }
-        .ml-breakdown-item {
+        .ml-legend-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
-            padding: 7px 11px;
-            border-radius: 8px;
-            background: var(--ml-surface);
-            border: 1px solid rgba(0,0,0,0.03);
-            transition: background 0.15s ease, border-color 0.15s ease;
+            font-size: 11px;
+            padding: 2.5px 0;
+            transition: opacity 0.15s ease;
         }
-        .ml-breakdown-item:hover {
-            background: #fff;
-            border-color: var(--ml-border);
+        .ml-legend-row.is-muted {
+            opacity: 0.42;
         }
-        .ml-breakdown-item.is-zero {
-            opacity: 0.52;
-        }
-        .ml-breakdown-item-left {
+        .ml-legend-left {
             display: flex;
             align-items: center;
-            gap: 8px;
-            min-width: 0;
+            gap: 7px;
         }
-        .ml-breakdown-dot {
-            width: 8px;
-            height: 8px;
+        .ml-legend-dot {
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             flex-shrink: 0;
         }
-        .ml-breakdown-dot.is-critical { background: #DC2626; box-shadow: 0 0 0 2px #FECACA; }
-        .ml-breakdown-dot.is-high { background: #EA580C; box-shadow: 0 0 0 2px #FED7AA; }
-        .ml-breakdown-dot.is-medium { background: #D97706; box-shadow: 0 0 0 2px #FDE68A; }
-        .ml-breakdown-dot.is-low { background: #16A34A; box-shadow: 0 0 0 2px #BBF7D0; }
-        .ml-breakdown-name {
-            font-weight: 600;
-            font-size: 11.5px;
+        .ml-legend-label {
             color: var(--ml-text);
-            white-space: nowrap;
+            font-weight: 500;
+            font-size: 11px;
         }
-        .ml-breakdown-sub {
+        .ml-legend-sub {
             font-size: 10px;
             color: var(--ml-muted);
-            font-weight: normal;
+            margin-left: 2px;
         }
-        .ml-breakdown-item-right {
+        .ml-legend-right {
             display: flex;
             align-items: center;
             gap: 8px;
             font-variant-numeric: tabular-nums;
-            flex-shrink: 0;
         }
-        .ml-breakdown-count {
-            font-weight: 600;
-            color: var(--ml-text);
-            font-size: 11px;
+        .ml-legend-count {
+            color: var(--ml-muted);
+            font-size: 10.5px;
         }
-        .ml-breakdown-pill {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 36px;
-            padding: 2px 6px;
-            border-radius: 5px;
-            font-size: 10px;
+        .ml-legend-pct {
             font-weight: 700;
-            text-align: center;
+            font-size: 11px;
+            min-width: 28px;
+            text-align: right;
         }
-        .ml-breakdown-pill.is-critical { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
-        .ml-breakdown-pill.is-high { background: #FFF7ED; color: #C2410C; border: 1px solid #FED7AA; }
-        .ml-breakdown-pill.is-medium { background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A; }
-        .ml-breakdown-pill.is-low { background: #F0FDF4; color: #15803D; border: 1px solid #BBF7D0; }
 
         .ml-stats-footer {
             margin-top: auto;
             padding-top: 10px;
             border-top: 1px solid var(--ml-border);
-        }
-        .ml-stats-footer-metric {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            font-size: 11.5px;
-            margin-bottom: 6px;
-        }
-        .ml-stats-footer-lbl {
-            color: var(--ml-muted);
-            font-weight: 500;
-        }
-        .ml-stats-footer-val {
-            font-family: var(--font-heading);
-            font-weight: 700;
-            color: #B45309;
-            font-size: 13.5px;
         }
         .ml-stats-footer-tip {
             font-size: 10.5px;

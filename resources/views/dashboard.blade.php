@@ -20,8 +20,8 @@
     $mediumPercent = $totalBatches > 0 ? round(($mCount / $totalBatches) * 100) : 0;
     $lowPercent = $totalBatches > 0 ? round(($lCount / $totalBatches) * 100) : 0;
 
-    // SVG Donut calculation: radius = 72, circumference = 2 * pi * 72 = 452.389
-    $circumference = 452.389;
+    // SVG Donut calculation: radius = 80, circumference = 2 * pi * 80 = 502.655
+    $circumference = 502.655;
     $critLen = $totalBatches > 0 ? ($cCount / $totalBatches) * $circumference : 0;
     $highLen = $totalBatches > 0 ? ($hCount / $totalBatches) * $circumference : 0;
     $medLen = $totalBatches > 0 ? ($mCount / $totalBatches) * $circumference : 0;
@@ -335,20 +335,20 @@
 
             <!-- Big Centered Donut Chart -->
             <div class="ml-donut-wrapper-center">
-                <svg class="ml-donut-svg" viewBox="0 0 200 200" width="176" height="176" role="img" aria-label="Grafik persentase risiko stok obat">
-                    <circle cx="100" cy="100" r="72" class="ml-donut-track" />
-                    <g transform="rotate(-90 100 100)">
+                <svg class="ml-donut-svg" viewBox="0 0 220 220" width="200" height="200" role="img" aria-label="Grafik persentase risiko stok obat">
+                    <circle cx="110" cy="110" r="80" class="ml-donut-track" />
+                    <g transform="rotate(-90 110 110)">
                         @foreach($segments as $seg)
                             @php
                                 $dashLen = $hasMultiple ? max(2, $seg['len'] - 4) : $seg['len'];
                             @endphp
                             <circle
-                                cx="100"
-                                cy="100"
-                                r="72"
+                                cx="110"
+                                cy="110"
+                                r="80"
                                 fill="none"
                                 stroke="{{ $seg['color'] }}"
-                                stroke-width="16"
+                                stroke-width="18"
                                 stroke-dasharray="{{ number_format($dashLen, 2, '.', '') }} {{ number_format($circumference, 2, '.', '') }}"
                                 stroke-dashoffset="{{ number_format(-$seg['offset'], 2, '.', '') }}"
                                 stroke-linecap="butt"
@@ -360,81 +360,69 @@
                     </g>
                     <!-- Center dynamic label -->
                     @if($riskCount > 0)
-                        <text x="100" y="93" text-anchor="middle" class="ml-donut-center-val" fill="{{ $statusThemeColor }}">{{ $atRiskPercent }}%</text>
-                        <text x="100" y="112" text-anchor="middle" class="ml-donut-center-lbl" fill="{{ $statusThemeColor }}">{{ $statusTitle }}</text>
-                        <text x="100" y="128" text-anchor="middle" class="ml-donut-center-sub">{{ $riskCount }} dari {{ $totalBatches }} batch</text>
+                        <text x="110" y="103" text-anchor="middle" class="ml-donut-center-val" fill="{{ $statusThemeColor }}">{{ $atRiskPercent }}%</text>
+                        <text x="110" y="123" text-anchor="middle" class="ml-donut-center-lbl" fill="{{ $statusThemeColor }}">{{ $statusTitle }}</text>
+                        <text x="110" y="139" text-anchor="middle" class="ml-donut-center-sub">{{ $riskCount }} dari {{ $totalBatches }} batch</text>
                     @else
-                        <text x="100" y="93" text-anchor="middle" class="ml-donut-center-val" fill="#16A34A">100%</text>
-                        <text x="100" y="112" text-anchor="middle" class="ml-donut-center-lbl" fill="#16A34A">Kondisi Aman</text>
-                        <text x="100" y="128" text-anchor="middle" class="ml-donut-center-sub">Seluruh batch aman</text>
+                        <text x="110" y="103" text-anchor="middle" class="ml-donut-center-val" fill="#16A34A">100%</text>
+                        <text x="110" y="123" text-anchor="middle" class="ml-donut-center-lbl" fill="#16A34A">Kondisi Aman</text>
+                        <text x="110" y="139" text-anchor="middle" class="ml-donut-center-sub">Seluruh batch aman</text>
                     @endif
                 </svg>
             </div>
 
-            <!-- Breakdown list placed BELOW the pie chart -->
-            <div class="ml-breakdown-stacked">
-                <div class="ml-breakdown-item {{ $cCount > 0 ? 'is-active' : 'is-zero' }}">
-                    <div class="ml-breakdown-item-left">
-                        <span class="ml-breakdown-dot is-critical"></span>
-                        <div>
-                            <span class="ml-breakdown-name">Kritis</span>
-                            <span class="ml-breakdown-sub">(&le;30 hari)</span>
-                        </div>
+            <!-- Slim Compact Legend below Big Donut -->
+            <div class="ml-donut-legend-slim">
+                <div class="ml-legend-row {{ $cCount > 0 ? '' : 'is-muted' }}">
+                    <div class="ml-legend-left">
+                        <span class="ml-legend-dot" style="background: #DC2626;"></span>
+                        <span class="ml-legend-label">Kritis</span>
+                        <span class="ml-legend-sub">(&le;30 hari)</span>
                     </div>
-                    <div class="ml-breakdown-item-right">
-                        <span class="ml-breakdown-count">{{ $cCount }} batch</span>
-                        <span class="ml-breakdown-pill is-critical">{{ $criticalPercent }}%</span>
+                    <div class="ml-legend-right">
+                        <span class="ml-legend-count">{{ $cCount }} batch</span>
+                        <span class="ml-legend-pct" style="color: #DC2626;">{{ $criticalPercent }}%</span>
                     </div>
                 </div>
 
-                <div class="ml-breakdown-item {{ $hCount > 0 ? 'is-active' : 'is-zero' }}">
-                    <div class="ml-breakdown-item-left">
-                        <span class="ml-breakdown-dot is-high"></span>
-                        <div>
-                            <span class="ml-breakdown-name">Tinggi</span>
-                            <span class="ml-breakdown-sub">(&le;60 hari)</span>
-                        </div>
+                <div class="ml-legend-row {{ $hCount > 0 ? '' : 'is-muted' }}">
+                    <div class="ml-legend-left">
+                        <span class="ml-legend-dot" style="background: #EA580C;"></span>
+                        <span class="ml-legend-label">Tinggi</span>
+                        <span class="ml-legend-sub">(&le;60 hari)</span>
                     </div>
-                    <div class="ml-breakdown-item-right">
-                        <span class="ml-breakdown-count">{{ $hCount }} batch</span>
-                        <span class="ml-breakdown-pill is-high">{{ $highPercent }}%</span>
+                    <div class="ml-legend-right">
+                        <span class="ml-legend-count">{{ $hCount }} batch</span>
+                        <span class="ml-legend-pct" style="color: #EA580C;">{{ $highPercent }}%</span>
                     </div>
                 </div>
 
-                <div class="ml-breakdown-item {{ $mCount > 0 ? 'is-active' : 'is-zero' }}">
-                    <div class="ml-breakdown-item-left">
-                        <span class="ml-breakdown-dot is-medium"></span>
-                        <div>
-                            <span class="ml-breakdown-name">Sedang</span>
-                            <span class="ml-breakdown-sub">(&le;90 hari)</span>
-                        </div>
+                <div class="ml-legend-row {{ $mCount > 0 ? '' : 'is-muted' }}">
+                    <div class="ml-legend-left">
+                        <span class="ml-legend-dot" style="background: #D97706;"></span>
+                        <span class="ml-legend-label">Sedang</span>
+                        <span class="ml-legend-sub">(&le;90 hari)</span>
                     </div>
-                    <div class="ml-breakdown-item-right">
-                        <span class="ml-breakdown-count">{{ $mCount }} batch</span>
-                        <span class="ml-breakdown-pill is-medium">{{ $mediumPercent }}%</span>
+                    <div class="ml-legend-right">
+                        <span class="ml-legend-count">{{ $mCount }} batch</span>
+                        <span class="ml-legend-pct" style="color: #D97706;">{{ $mediumPercent }}%</span>
                     </div>
                 </div>
 
-                <div class="ml-breakdown-item {{ $lCount > 0 ? 'is-active' : 'is-zero' }}">
-                    <div class="ml-breakdown-item-left">
-                        <span class="ml-breakdown-dot is-low"></span>
-                        <div>
-                            <span class="ml-breakdown-name">Aman</span>
-                            <span class="ml-breakdown-sub">(&gt;90 hari)</span>
-                        </div>
+                <div class="ml-legend-row {{ $lCount > 0 ? '' : 'is-muted' }}">
+                    <div class="ml-legend-left">
+                        <span class="ml-legend-dot" style="background: #16A34A;"></span>
+                        <span class="ml-legend-label">Aman</span>
+                        <span class="ml-legend-sub">(&gt;90 hari)</span>
                     </div>
-                    <div class="ml-breakdown-item-right">
-                        <span class="ml-breakdown-count">{{ $lCount }} batch</span>
-                        <span class="ml-breakdown-pill is-low">{{ $lowPercent }}%</span>
+                    <div class="ml-legend-right">
+                        <span class="ml-legend-count">{{ $lCount }} batch</span>
+                        <span class="ml-legend-pct" style="color: #16A34A;">{{ $lowPercent }}%</span>
                     </div>
                 </div>
             </div>
 
             <div class="ml-stats-footer">
-                <div class="ml-stats-footer-metric">
-                    <span class="ml-stats-footer-lbl">Total Nilai Berisiko:</span>
-                    <span class="ml-stats-footer-val">Rp {{ number_format($totalProjectedWasteValue ?? 0, 0, ',', '.') }}</span>
-                </div>
                 <p class="ml-stats-footer-tip" style="border-left: 3px solid {{ $statusThemeColor }};">
                     @if($cCount > 0)
                         Prioritas utama: Terdapat <strong>{{ $cCount }} batch kritis</strong> yang mendesak untuk ditransfer segera.
