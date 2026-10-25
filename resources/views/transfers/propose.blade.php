@@ -139,11 +139,6 @@
                                 <div class="ml-candidate-side">
                                     <div class="ml-candidate-score">{{ $candidate['match_score'] }}%</div>
                                     <div class="ml-cell-meta">{{ $candidate['distance_km'] }} km</div>
-                                    <button
-                                        type="button"
-                                        class="{{ $isSelected ? 'ml-btn-primary' : 'ml-btn-quiet' }} ml-btn-sm"
-                                        onclick="event.stopPropagation(); selectCandidate({{ $candidate['facility']->id }}, '{{ addslashes($candidate['facility']->name) }}', {{ $candidate['recommended_quantity'] }})"
-                                    >{{ $isSelected ? 'Terpilih' : 'Pilih' }}</button>
                                 </div>
                             </li>
                         @endforeach
@@ -206,25 +201,15 @@
         document.getElementById('selectedFacilityName').value = facilityName;
         document.getElementById('quantity').value = recommendedQty;
 
-        // Reset all candidate cards and button states
+        // Reset active state from all candidate cards
         document.querySelectorAll('.ml-candidate').forEach(function(el) {
             el.classList.remove('is-top');
-            var btn = el.querySelector('.ml-candidate-side button');
-            if (btn) {
-                btn.textContent = 'Pilih';
-                btn.className = 'ml-btn-quiet ml-btn-sm';
-            }
         });
 
-        // Activate selected candidate card and button
+        // Activate selected candidate card
         var selectedCard = document.getElementById('candidate-card-' + facilityId);
         if (selectedCard) {
             selectedCard.classList.add('is-top');
-            var selectedBtn = selectedCard.querySelector('.ml-candidate-side button');
-            if (selectedBtn) {
-                selectedBtn.textContent = 'Terpilih';
-                selectedBtn.className = 'ml-btn-primary ml-btn-sm';
-            }
         }
 
         // Keep URL in sync with selected recipient

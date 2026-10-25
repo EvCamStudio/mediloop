@@ -2917,13 +2917,14 @@
         }
         .ml-candidate {
             display: grid;
-            grid-template-columns: 26px minmax(0, 1fr) 112px;
-            gap: 12px;
+            grid-template-columns: 28px minmax(0, 1fr) 90px;
+            gap: 14px;
             align-items: center;
             padding: 16px 20px;
             border-bottom: 1px solid var(--ml-border);
             cursor: pointer;
-            transition: background 0.2s ease;
+            user-select: none;
+            transition: background 0.15s ease;
         }
         .ml-candidate:last-child { border-bottom: 0; }
         .ml-candidate:hover { background: #F8FAFC; }
@@ -2941,7 +2942,7 @@
             font-family: var(--font-code);
             font-size: 10px;
             font-weight: 600;
-            transition: background 0.2s ease, color 0.2s ease;
+            transition: background 0.15s ease, color 0.15s ease;
         }
         .ml-candidate.is-top .ml-candidate-rank { background: var(--ml-primary); color: #fff; }
         .ml-candidate-copy { min-width: 0; }
@@ -2960,16 +2961,22 @@
             font-size: 10.5px;
         }
         .ml-candidate-metrics strong { color: var(--ml-text); font-weight: 600; }
-        .ml-candidate-side { text-align: right; }
+        .ml-candidate-side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 4px;
+            text-align: right;
+        }
         .ml-candidate-score {
             color: var(--ml-primary);
             font-family: var(--font-heading);
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 600;
             line-height: 1;
             letter-spacing: -0.03em;
         }
-        .ml-candidate-side .ml-btn-sm { margin-top: 7px; }
 
         @media (max-width: 900px) {
             .ml-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
