@@ -3174,8 +3174,9 @@
         .ml-waste-cell {
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
-            gap: 3px;
+            align-items: flex-start;
+            gap: 4px;
+            text-align: left;
         }
         .ml-waste-value {
             color: var(--ml-danger);

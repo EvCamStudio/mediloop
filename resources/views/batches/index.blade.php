@@ -320,7 +320,7 @@
                             <th scope="col" style="min-width: 220px;">Batch &amp; lokasi</th>
                             <th scope="col" style="min-width: 150px;">Stok</th>
                             <th scope="col" style="min-width: 220px;">Kedaluwarsa &amp; runway</th>
-                            <th scope="col" class="is-right" style="min-width: 150px;">Proyeksi limbah</th>
+                            <th scope="col" style="min-width: 170px;">Proyeksi limbah</th>
                             <th scope="col" class="is-right" style="min-width: 230px;"><span class="ml-sr-only">Aksi</span></th>
                         </tr>
                     </thead>
@@ -402,7 +402,7 @@
                                     </button>
                                 </td>
 
-                                <td class="is-right" data-label="Proyeksi limbah">
+                                <td data-label="Proyeksi limbah">
                                     <div class="ml-waste-cell">
                                         <span class="ml-risk ml-risk-{{ $riskTone }}">{{ $riskLabel }}</span>
                                         @if($projectedWaste > 0)
