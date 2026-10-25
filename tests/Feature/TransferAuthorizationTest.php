@@ -152,3 +152,24 @@ test('only parties and auditors can view a transfer', function () {
         ->get(route('transfers.show', $fixture['transfer']))
         ->assertOk();
 });
+
+test('transfer proposal errors render through shared validation components', function () {
+    $fixture = transferFixture();
+    $batch = Batch::query()->firstOrFail();
+
+    $response = $this->actingAs($fixture['donor']['staff'])
+        ->from(route('transfers.propose', ['batch' => $batch]))
+        ->followingRedirects()
+        ->post(route('transfers.store'), [
+            'batch_id' => $batch->id,
+            'recipient_facility_id' => $fixture['recipient']['facility']->id,
+            'quantity' => '',
+        ]);
+
+    $response->assertOk();
+    $response->assertSee('data-validate', false);
+    $response->assertSee('data-form-summary', false);
+    $response->assertSee('href="#quantity"', false);
+    $response->assertSee('id="quantity-error"', false);
+    $response->assertSee('data-field-error="quantity"', false);
+});

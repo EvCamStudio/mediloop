@@ -447,3 +447,32 @@ test('batches index renders top risk candidates recommendations without errors',
     $response->assertSee('Puskesmas Gambir');
     $response->assertSee('Batas Alokasi:');
 });
+
+test('batch form renders server validation errors through shared components', function () {
+    $facility = Facility::create([
+        'name' => 'RSUD Tarakan Jakarta',
+        'code' => 'FSK-RSUD-TRK',
+        'type' => 'RSUD',
+        'address' => 'Jl. Kyai Caringin No. 7',
+        'city' => 'Jakarta Pusat',
+        'latitude' => -6.1729000,
+        'longitude' => 106.8122000,
+        'cold_chain_ready' => true,
+        'contact_person' => 'Apt. Hendra Wijaya',
+        'phone' => '021-3842934',
+    ]);
+
+    $staff = User::factory()->create(['facility_id' => $facility->id, 'role' => 'FACILITY_STAFF']);
+
+    $response = $this->actingAs($staff)
+        ->from('/batches/create')
+        ->followingRedirects()
+        ->post('/batches', []);
+
+    $response->assertOk();
+    $response->assertSee('data-validate', false);
+    $response->assertSee('data-form-summary', false);
+    $response->assertSee('href="#medicine_id"', false);
+    $response->assertSee('id="medicine_id-error"', false);
+    $response->assertSee('data-field-error="medicine_id"', false);
+});

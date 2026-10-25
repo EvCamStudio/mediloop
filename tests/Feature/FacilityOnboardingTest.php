@@ -273,6 +273,45 @@ test('a facility approver can view and update facility settings', function () {
     ]);
 });
 
+test('facility settings renders validation errors through shared components', function () {
+    $facility = makeFacility(['code' => 'FSK-SETTINGS-ERROR']);
+    $approver = User::factory()->create([
+        'role' => UserRole::FacilityApprover->value,
+        'facility_id' => $facility->id,
+    ]);
+
+    $response = $this->actingAs($approver)
+        ->from(route('facility.settings.edit'))
+        ->followingRedirects()
+        ->put(route('facility.settings.update'), []);
+
+    $response->assertOk();
+    $response->assertSee('data-validate', false);
+    $response->assertSee('data-form-summary-for="facilitySettingsForm"', false);
+    $response->assertSee('href="#address"', false);
+    $response->assertSee('id="address-error"', false);
+    $response->assertSee('data-field-error="address"', false);
+});
+
+test('team invitation form renders validation errors through shared components', function () {
+    $facility = makeFacility(['code' => 'FSK-TEAM-ERROR']);
+    $approver = User::factory()->create([
+        'role' => UserRole::FacilityApprover->value,
+        'facility_id' => $facility->id,
+    ]);
+
+    $response = $this->actingAs($approver)
+        ->from(route('facility.team.index'))
+        ->followingRedirects()
+        ->post(route('facility.team.invite'), []);
+
+    $response->assertOk();
+    $response->assertSee('data-validate', false);
+    $response->assertSee('data-form-summary-for="teamInviteForm"', false);
+    $response->assertSee('href="#email"', false);
+    $response->assertSee('id="email-error"', false);
+});
+
 test('a rejected request code can be submitted again', function () {
     $admin = makeSysadmin();
 
@@ -367,4 +406,88 @@ test('facility onboarding events are written to the audit log', function () {
         ->assertRedirect();
 
     expect(AuditLog::where('facility_id', $facility->id)->where('action', 'FACILITY_SUSPENDED')->exists())->toBeTrue();
+});
+
+test('public facility request errors render through shared validation components', function () {
+    $response = $this->from(route('facility-requests.create'))
+        ->followingRedirects()
+        ->post(route('facility-requests.store'), []);
+
+    $response->assertOk();
+    $response->assertSee('data-validate', false);
+    $response->assertSee('data-form-summary-for="facilityRequestForm"', false);
+    $response->assertSee('href="#code"', false);
+    $response->assertSee('id="code-error"', false);
+    $response->assertSee('data-field-error="code"', false);
+});
+
+test('admin facility form errors render through shared validation components', function () {
+    $admin = makeSysadmin();
+
+    $response = $this->actingAs($admin)
+        ->from(route('admin.facilities.create'))
+        ->followingRedirects()
+        ->post(route('admin.facilities.store'), []);
+
+    $response->assertOk();
+    $response->assertSee('data-validate', false);
+    $response->assertSee('data-form-summary-for="facilityForm"', false);
+    $response->assertSee('href="#name"', false);
+    $response->assertSee('id="name-error"', false);
+    $response->assertSee('data-field-error="name"', false);
+});
+
+test('facility request rejection errors render through shared validation components', function () {
+    $admin = makeSysadmin();
+
+    $this->post(route('facility-requests.store'), facilityPayload())->assertRedirect();
+
+    $requestRecord = FacilityRequest::firstOrFail();
+
+    $response = $this->actingAs($admin)
+        ->from(route('admin.facility-requests.show', $requestRecord))
+        ->followingRedirects()
+        ->post(route('admin.facility-requests.reject', $requestRecord), []);
+
+    $response->assertOk();
+    $response->assertSee('data-form-summary-for="rejectRequestForm"', false);
+    $response->assertSee('href="#rejection_reason"', false);
+    $response->assertSee('id="rejection_reason-error"', false);
+    $response->assertSee('data-field-error="rejection_reason"', false);
+    $response->assertSee('minlength="10"', false);
+});
+
+test('invitation acceptance errors render through shared validation components', function () {
+    Mail::fake();
+
+    $admin = makeSysadmin();
+    $facility = makeFacility(['code' => 'FSK-INVITE-ERROR']);
+
+    $this->actingAs($admin)
+        ->post(route('admin.facilities.invitations.store', $facility), [
+            'email' => 'error@example.test',
+            'role' => UserRole::FacilityStaff->value,
+        ])
+        ->assertRedirect();
+
+    $token = null;
+
+    Mail::assertSent(FacilityInvitationMail::class, function (FacilityInvitationMail $mail) use (&$token): bool {
+        $token = $mail->plainToken;
+
+        return true;
+    });
+
+    expect($token)->not->toBeNull();
+
+    $response = $this->from(route('invitations.show', ['token' => $token]))
+        ->followingRedirects()
+        ->post(route('invitations.accept', ['token' => $token]), []);
+
+    $response->assertOk();
+    $response->assertSee('data-validate', false);
+    $response->assertSee('data-form-summary-for="inviteAcceptForm"', false);
+    $response->assertSee('href="#name"', false);
+    $response->assertSee('id="name-error"', false);
+    $response->assertSee('id="password-error"', false);
 });

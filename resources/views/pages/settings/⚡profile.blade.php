@@ -5,7 +5,6 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
@@ -14,25 +13,27 @@ new #[Title('Profile settings')] class extends Component {
 
     public string $name = '';
     public string $email = '';
+    public bool $hasUnverifiedEmail = false;
+    public bool $showDeleteUser = false;
 
-    /**
-     * Mount the component.
-     */
     public function mount(): void
     {
-        $this->name = Auth::user()->name;
-        $this->email = Auth::user()->email;
+        $user = Auth::user();
+        if ($user) {
+            $this->name = $user->name;
+            $this->email = $user->email;
+
+            // Calculate states once during mount to avoid computed property issues
+            $this->hasUnverifiedEmail = $user instanceof MustVerifyEmail && ! $user->hasVerifiedEmail();
+            $this->showDeleteUser = ! ($user instanceof MustVerifyEmail)
+                                    || ($user instanceof MustVerifyEmail && $user->hasVerifiedEmail());
+        }
     }
 
-    /**
-     * Update the profile information for the currently authenticated user.
-     */
     public function updateProfileInformation(): void
     {
         $user = Auth::user();
-
         $validated = $this->validate($this->profileRules($user->id));
-
         $user->fill($validated);
 
         if ($user->isDirty('email')) {
@@ -40,39 +41,18 @@ new #[Title('Profile settings')] class extends Component {
         }
 
         $user->save();
-
         Flux::toast(variant: 'success', text: __('Profile updated.'));
     }
 
-    /**
-     * Send an email verification notification to the current user.
-     */
     public function resendVerificationNotification(): void
     {
         $user = Auth::user();
-
         if ($user->hasVerifiedEmail()) {
             $this->redirectIntended(default: route('dashboard', absolute: false));
-
             return;
         }
-
         $user->sendEmailVerificationNotification();
-
         Session::flash('status', 'verification-link-sent');
-    }
-
-    #[Computed]
-    public function hasUnverifiedEmail(): bool
-    {
-        return Auth::user() instanceof MustVerifyEmail && ! Auth::user()->hasVerifiedEmail();
-    }
-
-    #[Computed]
-    public function showDeleteUser(): bool
-    {
-        return ! Auth::user() instanceof MustVerifyEmail
-            || (Auth::user() instanceof MustVerifyEmail && Auth::user()->hasVerifiedEmail());
     }
 }; ?>
 
@@ -88,11 +68,10 @@ new #[Title('Profile settings')] class extends Component {
             <div>
                 <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
 
-                @if ($this->hasUnverifiedEmail)
+                @if ($hasUnverifiedEmail)
                     <div>
                         <flux:text class="mt-4">
                             {{ __('Your email address is unverified.') }}
-
                             <flux:link class="text-sm cursor-pointer" wire:click.prevent="resendVerificationNotification">
                                 {{ __('Click here to re-send the verification email.') }}
                             </flux:link>
@@ -107,17 +86,14 @@ new #[Title('Profile settings')] class extends Component {
                 @endif
             </div>
 
-            <div class="flex items-center gap-4">
-                <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full" data-test="update-profile-button">
-                        {{ __('Save') }}
-                    </flux:button>
-                </div>
-
+            <div class="flex items-center justify-end">
+                <flux:button variant="primary" type="submit" class="w-full">
+                    {{ __('Save') }}
+                </flux:button>
             </div>
         </form>
 
-        @if ($this->showDeleteUser)
+        @if ($showDeleteUser)
             <livewire:pages::settings.delete-user-form />
         @endif
     </x-pages::settings.layout>

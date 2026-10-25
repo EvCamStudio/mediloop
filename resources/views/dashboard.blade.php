@@ -105,7 +105,7 @@
         <div class="ml-table-responsive">
             <table class="ml-table ml-table-airy">
                 <caption class="ml-sr-only">
-                    Daftar batch obat aktif beserta stok, sisa umur, risiko kedaluwarsa, dan aksi redistribusi.
+                    Daftar batch obat aktif beserta stok, stok habis, risiko kedaluwarsa, dan aksi redistribusi.
                 </caption>
                 <thead>
                     <tr>

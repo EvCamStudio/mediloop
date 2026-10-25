@@ -149,18 +149,9 @@
                 </div>
             </header>
 
-            @if($errors->any())
-                <div class="pub-alert pub-alert-error" role="alert" style="margin: 22px 32px 0;">
-                    <strong>Periksa kembali isian berikut:</strong>
-                    <ul>
-                        @foreach($errors->keys() as $field)
-                            <li><a href="#{{ $field }}">{{ $errors->first($field) }}</a></li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            <x-form.summary variant="pub" for="facilityRequestForm" style="margin: 22px 32px 0;" />
 
-            <form method="POST" action="{{ route('facility-requests.store') }}" novalidate>
+            <form method="POST" action="{{ route('facility-requests.store') }}" id="facilityRequestForm" novalidate data-validate>
                 @csrf
 
                 <section class="pub-section" id="identitas" aria-labelledby="identity-title">
@@ -177,6 +168,7 @@
                             <label for="name" class="pub-label">Nama fasilitas <span class="pub-required">*</span></label>
                             <input
                                 id="name"
+                                data-error-required="Nama fasilitas wajib diisi."
                                 name="name"
                                 type="text"
                                 class="pub-input @error('name') is-invalid @enderror"
@@ -186,14 +178,17 @@
                                 aria-invalid="{{ $errors->has('name') ? 'true' : 'false' }}"
                                 @if($errors->has('name')) aria-describedby="name-error" @endif
                             >
-                            @error('name')<p class="pub-error" id="name-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="name" />
                         </div>
 
                         <div class="pub-field">
                             <label for="code" class="pub-label">Kode fasilitas <span class="pub-required">*</span></label>
                             <input
                                 id="code"
+                                data-error-required="Kode fasilitas wajib diisi." data-error-pattern="Kode hanya boleh huruf, angka, garis bawah, dan tanda hubung."
                                 name="code"
+                                maxlength="40"
+                                pattern="[A-Za-z0-9_-]+"
                                 type="text"
                                 class="pub-input @error('code') is-invalid @enderror"
                                 value="{{ old('code') }}"
@@ -204,13 +199,14 @@
                                 aria-describedby="code-help{{ $errors->has('code') ? ' code-error' : '' }}"
                             >
                             <p class="pub-help" id="code-help">Kode unik dari Dinkes atau internal fasilitas. Huruf, angka, strip, dan garis bawah.</p>
-                            @error('code')<p class="pub-error" id="code-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="code" />
                         </div>
 
                         <div class="pub-field">
                             <label for="type" class="pub-label">Jenis fasilitas <span class="pub-required">*</span></label>
                             <select
                                 id="type"
+                                data-error-required="Pilih jenis fasilitas."
                                 name="type"
                                 class="pub-select @error('type') is-invalid @enderror"
                                 required
@@ -224,7 +220,7 @@
                                     @endif
                                 @endforeach
                             </select>
-                            @error('type')<p class="pub-error" id="type-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="type" />
                         </div>
 
                         <div class="pub-field">
@@ -241,7 +237,7 @@
                                 <option value="SWASTA" @selected(old('ownership') === 'SWASTA')>Swasta</option>
                                 <option value="LAINNYA" @selected(old('ownership') === 'LAINNYA')>Lainnya</option>
                             </select>
-                            @error('ownership')<p class="pub-error" id="ownership-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="ownership" />
                         </div>
 
                         <div class="pub-field">
@@ -254,9 +250,9 @@
                                 value="{{ old('license_number') }}"
                                 placeholder="Contoh: 445/001/RSUD-DKI/2022"
                                 aria-invalid="{{ $errors->has('license_number') ? 'true' : 'false' }}"
-                                @if($errors->has('license_number')) aria-describedby="license-number-error" @endif
+                                @if($errors->has('license_number')) aria-describedby="license_number-error" @endif
                             >
-                            @error('license_number')<p class="pub-error" id="license-number-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="license_number" />
                         </div>
                     </div>
                 </section>
@@ -275,6 +271,7 @@
                             <label for="address" class="pub-label">Alamat lengkap <span class="pub-required">*</span></label>
                             <input
                                 id="address"
+                                data-error-required="Alamat lengkap wajib diisi."
                                 name="address"
                                 type="text"
                                 class="pub-input @error('address') is-invalid @enderror"
@@ -284,13 +281,14 @@
                                 aria-invalid="{{ $errors->has('address') ? 'true' : 'false' }}"
                                 @if($errors->has('address')) aria-describedby="address-error" @endif
                             >
-                            @error('address')<p class="pub-error" id="address-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="address" />
                         </div>
 
                         <div class="pub-field">
                             <label for="province" class="pub-label">Provinsi <span class="pub-required">*</span></label>
                             <input
                                 id="province"
+                                data-error-required="Provinsi wajib diisi."
                                 name="province"
                                 type="text"
                                 class="pub-input @error('province') is-invalid @enderror"
@@ -300,13 +298,14 @@
                                 aria-invalid="{{ $errors->has('province') ? 'true' : 'false' }}"
                                 @if($errors->has('province')) aria-describedby="province-error" @endif
                             >
-                            @error('province')<p class="pub-error" id="province-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="province" />
                         </div>
 
                         <div class="pub-field">
                             <label for="city" class="pub-label">Kota/kabupaten <span class="pub-required">*</span></label>
                             <input
                                 id="city"
+                                data-error-required="Kota/kabupaten wajib diisi."
                                 name="city"
                                 type="text"
                                 class="pub-input @error('city') is-invalid @enderror"
@@ -316,7 +315,7 @@
                                 aria-invalid="{{ $errors->has('city') ? 'true' : 'false' }}"
                                 @if($errors->has('city')) aria-describedby="city-error" @endif
                             >
-                            @error('city')<p class="pub-error" id="city-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="city" />
                         </div>
 
                         <div class="pub-field">
@@ -331,7 +330,7 @@
                                 aria-invalid="{{ $errors->has('district') ? 'true' : 'false' }}"
                                 @if($errors->has('district')) aria-describedby="district-error" @endif
                             >
-                            @error('district')<p class="pub-error" id="district-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="district" />
                         </div>
 
                         <div class="pub-field is-full">
@@ -356,6 +355,7 @@
                             <label for="latitude" class="pub-label">Latitude <span class="pub-required">*</span></label>
                             <input
                                 id="latitude"
+                                data-error-required="Tentukan titik lokasi fasilitas pada peta."
                                 name="latitude"
                                 type="number"
                                 step="0.0000001"
@@ -367,13 +367,14 @@
                                 aria-invalid="{{ $errors->has('latitude') ? 'true' : 'false' }}"
                                 @if($errors->has('latitude')) aria-describedby="latitude-error" @endif
                             >
-                            @error('latitude')<p class="pub-error" id="latitude-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="latitude" />
                         </div>
 
                         <div class="pub-field">
                             <label for="longitude" class="pub-label">Longitude <span class="pub-required">*</span></label>
                             <input
                                 id="longitude"
+                                data-error-required="Tentukan titik lokasi fasilitas pada peta."
                                 name="longitude"
                                 type="number"
                                 step="0.0000001"
@@ -385,7 +386,7 @@
                                 aria-invalid="{{ $errors->has('longitude') ? 'true' : 'false' }}"
                                 @if($errors->has('longitude')) aria-describedby="longitude-error" @endif
                             >
-                            @error('longitude')<p class="pub-error" id="longitude-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="longitude" />
                         </div>
                     </div>
                 </section>
@@ -404,6 +405,7 @@
                             <label for="contact_person" class="pub-label">Nama penanggung jawab <span class="pub-required">*</span></label>
                             <input
                                 id="contact_person"
+                                data-error-required="Nama penanggung jawab wajib diisi."
                                 name="contact_person"
                                 type="text"
                                 class="pub-input @error('contact_person') is-invalid @enderror"
@@ -411,15 +413,16 @@
                                 required
                                 autocomplete="name"
                                 aria-invalid="{{ $errors->has('contact_person') ? 'true' : 'false' }}"
-                                @if($errors->has('contact_person')) aria-describedby="contact-person-error" @endif
+                                @if($errors->has('contact_person')) aria-describedby="contact_person-error" @endif
                             >
-                            @error('contact_person')<p class="pub-error" id="contact-person-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="contact_person" />
                         </div>
 
                         <div class="pub-field">
                             <label for="phone" class="pub-label">Telepon <span class="pub-required">*</span></label>
                             <input
                                 id="phone"
+                                data-error-required="Nomor telepon wajib diisi."
                                 name="phone"
                                 type="tel"
                                 class="pub-input @error('phone') is-invalid @enderror"
@@ -430,13 +433,14 @@
                                 aria-invalid="{{ $errors->has('phone') ? 'true' : 'false' }}"
                                 @if($errors->has('phone')) aria-describedby="phone-error" @endif
                             >
-                            @error('phone')<p class="pub-error" id="phone-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="phone" />
                         </div>
 
                         <div class="pub-field is-full">
                             <label for="email" class="pub-label">Email resmi <span class="pub-required">*</span></label>
                             <input
                                 id="email"
+                                data-error-required="Email resmi fasilitas wajib diisi." data-error-email="Format email tidak valid."
                                 name="email"
                                 type="email"
                                 class="pub-input @error('email') is-invalid @enderror"
@@ -447,7 +451,7 @@
                                 aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}"
                                 @if($errors->has('email')) aria-describedby="email-error" @endif
                             >
-                            @error('email')<p class="pub-error" id="email-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="email" />
                         </div>
 
                         <div class="pub-field is-full">
@@ -467,7 +471,7 @@
                                 aria-invalid="{{ $errors->has('notes') ? 'true' : 'false' }}"
                                 @if($errors->has('notes')) aria-describedby="notes-error" @endif
                             >{{ old('notes') }}</textarea>
-                            @error('notes')<p class="pub-error" id="notes-error">{{ $message }}</p>@enderror
+                            <x-form.error variant="pub" for="notes" />
                         </div>
                     </div>
                 </section>

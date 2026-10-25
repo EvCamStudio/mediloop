@@ -7,9 +7,7 @@
 
     <title>{{ filled($title ?? null) ? $title.' — MediLoop' : 'MediLoop' }}</title>
 
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    @include('partials.favicons')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -29,14 +27,8 @@
                 aria-hidden="true"></div>
 
             <a href="{{ route('home') }}" class="relative z-10 inline-flex items-center gap-3">
-                <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="1.8" aria-hidden="true">
-                        <rect x="3" y="8" width="18" height="8" rx="4" transform="rotate(-45 12 12)" />
-                        <path d="M8.5 8.5l7 7" />
-                    </svg>
-                </span>
-                <span class="text-lg font-semibold tracking-tight">MediLoop</span>
+                <img src="{{ asset('images/logo.png') }}" alt="MediLoop" class="h-11 w-11 object-contain" />
+                <span class="text-xl font-bold tracking-tight text-white">MediLoop</span>
             </a>
 
             <div class="relative z-10 my-auto max-w-md py-16">
@@ -98,14 +90,8 @@
             <div class="w-full max-w-md">
                 <a href="{{ route('home') }}"
                     class="mb-8 inline-flex items-center gap-2.5 text-text lg:hidden">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-sky text-brand-primary">
-                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="1.9" aria-hidden="true">
-                            <rect x="3" y="8" width="18" height="8" rx="4" transform="rotate(-45 12 12)" />
-                            <path d="M8.5 8.5l7 7" />
-                        </svg>
-                    </span>
-                    <span class="text-base font-semibold tracking-tight">MediLoop</span>
+                    <img src="{{ asset('images/logo.png') }}" alt="MediLoop" class="h-9 w-9 object-contain" />
+                    <span class="text-lg font-bold tracking-tight text-text">MediLoop</span>
                 </a>
 
                 <div id="auth-form" class="rounded-2xl border border-border bg-surface-raised p-6 shadow-panel sm:p-8">

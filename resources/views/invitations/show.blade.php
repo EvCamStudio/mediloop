@@ -50,18 +50,9 @@
         <h2>Aktifkan akun</h2>
         <p>Isi nama lengkap dan buat password untuk menyelesaikan pendaftaran.</p>
 
-        @if($errors->any())
-            <div class="pub-alert pub-alert-error" role="alert">
-                <strong>Periksa kembali isian berikut:</strong>
-                <ul>
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        <x-form.summary variant="pub" for="inviteAcceptForm" />
 
-        <form method="POST" action="{{ route('invitations.accept', ['token' => $token]) }}" novalidate>
+        <form method="POST" action="{{ route('invitations.accept', ['token' => $token]) }}" id="inviteAcceptForm" novalidate data-validate>
             @csrf
 
             <div class="pub-field">
@@ -74,10 +65,9 @@
                     value="{{ old('name') }}"
                     required
                     autocomplete="name"
-                    aria-invalid="{{ $errors->has('name') ? 'true' : 'false' }}"
-                    @if($errors->has('name')) aria-describedby="name-error" @endif
+                    data-error-required="Nama lengkap wajib diisi."
                 >
-                @error('name')<p class="pub-error" id="name-error">{{ $message }}</p>@enderror
+                <x-form.error variant="pub" for="name" />
             </div>
 
             <div class="pub-field">
@@ -89,9 +79,10 @@
                         type="password"
                         class="pub-input password-input @error('password') is-invalid @enderror"
                         required
+                        minlength="8"
                         autocomplete="new-password"
-                        aria-invalid="{{ $errors->has('password') ? 'true' : 'false' }}"
-                        @if($errors->has('password')) aria-describedby="password-error" @endif
+                        data-error-required="Password wajib diisi."
+                        data-error-minlength="Password minimal 8 karakter."
                     >
                     <button type="button" class="password-toggle" data-password-toggle
                         data-password-target="password" data-label-show="Tampilkan password"
@@ -111,14 +102,16 @@
                     </button>
                 </div>
                 <p class="pub-help">Gunakan password yang kuat dan tidak dipakai di layanan lain.</p>
-                @error('password')<p class="pub-error" id="password-error">{{ $message }}</p>@enderror
+                <x-form.error variant="pub" for="password" />
             </div>
 
             <div class="pub-field">
                 <label for="password_confirmation" class="pub-label">Ulangi password <span class="pub-required">*</span></label>
                 <div class="password-control">
                     <input id="password_confirmation" name="password_confirmation" type="password"
-                        class="pub-input password-input" required autocomplete="new-password">
+                        class="pub-input password-input" required minlength="8" autocomplete="new-password"
+                        data-error-required="Konfirmasi password wajib diisi."
+                        data-error-minlength="Password minimal 8 karakter.">
                     <button type="button" class="password-toggle" data-password-toggle
                         data-password-target="password_confirmation"
                         data-label-show="Tampilkan ulangi password"
@@ -138,6 +131,7 @@
                         </svg>
                     </button>
                 </div>
+                <x-form.error variant="pub" for="password_confirmation" />
             </div>
 
             <div class="pub-actions">

@@ -18,8 +18,10 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-5" novalidate>
+        <form method="POST" action="{{ route('login.store') }}" id="loginForm" class="flex flex-col gap-5" novalidate data-validate>
             @csrf
+
+            <x-form.summary variant="auth" />
 
             <div>
                 <label for="email" class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text">
@@ -27,10 +29,9 @@
                 </label>
                 <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus
                     autocomplete="email" placeholder="nama@faskes.go.id" class="{{ $inputClass }}"
+                    data-error-required="Email wajib diisi." data-error-email="Format email belum benar, contoh: nama@faskes.id."
                     @error('email') aria-invalid="true" aria-describedby="email-error" @enderror>
-                @error('email')
-                    <p id="email-error" class="mt-1.5 text-xs font-medium text-[#B42318]">{{ $message }}</p>
-                @enderror
+                <x-form.error variant="auth" for="email" />
             </div>
 
             <div>
@@ -48,6 +49,7 @@
                 <div class="password-control">
                     <input id="password" name="password" type="password" required autocomplete="current-password"
                         placeholder="••••••••" class="{{ $inputClass }}"
+                        data-error-required="Password wajib diisi."
                         @error('password') aria-invalid="true" aria-describedby="password-error" @enderror>
                     <button type="button" class="password-toggle" data-password-toggle
                         data-password-target="password" aria-controls="password" aria-label="Tampilkan password"
@@ -65,9 +67,7 @@
                         </svg>
                     </button>
                 </div>
-                @error('password')
-                    <p id="password-error" class="mt-1.5 text-xs font-medium text-[#B42318]">{{ $message }}</p>
-                @enderror
+                <x-form.error variant="auth" for="password" />
             </div>
 
             <label for="remember" class="flex items-center gap-2.5 text-sm text-text-muted">

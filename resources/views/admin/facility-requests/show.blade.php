@@ -17,19 +17,10 @@
     </nav>
 
     @if(session('status'))
-        <div class="ml-alert ml-alert-success" role="status">{{ session('status') }}</div>
+        <x-alert variant="success">{{ session('status') }}</x-alert>
     @endif
 
-    @if($errors->any())
-        <div class="ml-alert ml-alert-error" role="alert">
-            <strong>Periksa kembali isian berikut:</strong>
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-form.summary for="rejectRequestForm" />
 
     <header class="ml-passport">
         <div class="ml-passport-main">
@@ -174,12 +165,12 @@
                             </form>
 
                             <div class="ml-review-reject">
-                                <form method="POST" action="{{ route('admin.facility-requests.reject', $requestRecord) }}">
+                                <form method="POST" action="{{ route('admin.facility-requests.reject', $requestRecord) }}" id="rejectRequestForm" novalidate data-validate>
                                     @csrf
                                     <div class="ml-field">
                                         <label for="rejection_reason" class="ml-label">Alasan penolakan <span class="ml-required">*</span></label>
-                                        <textarea id="rejection_reason" name="rejection_reason" class="ml-textarea" placeholder="Jelaskan data yang perlu diperbaiki." required>{{ old('rejection_reason') }}</textarea>
-                                        @error('rejection_reason')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                        <textarea id="rejection_reason" name="rejection_reason" class="ml-textarea @error('rejection_reason') is-invalid @enderror" placeholder="Jelaskan data yang perlu diperbaiki." required minlength="10" data-error-required="Alasan penolakan wajib diisi." data-error-minlength="Tulis alasan yang cukup jelas (minimal 10 karakter).">{{ old('rejection_reason') }}</textarea>
+                                        <x-form.error for="rejection_reason" />
                                     </div>
                                     <button type="submit" class="ml-btn-danger-quiet">Tolak pengajuan</button>
                                 </form>

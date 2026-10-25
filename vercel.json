@@ -22,8 +22,20 @@
       "dest": "/public/favicon.svg"
     },
     {
+      "src": "/favicon-32x32.png",
+      "dest": "/public/favicon-32x32.png"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "dest": "/public/favicon-16x16.png"
+    },
+    {
       "src": "/apple-touch-icon.png",
       "dest": "/public/apple-touch-icon.png"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/public/images/$1"
     },
     {
       "src": "/robots.txt",

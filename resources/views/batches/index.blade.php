@@ -292,7 +292,7 @@
             <div class="ml-table-responsive">
                 <table class="ml-table ml-table-airy ml-table-inventory">
                     <caption class="ml-sr-only">
-                        Daftar batch obat beserta stok, sisa umur, proyeksi limbah, dan aksi redistribusi.
+                        Daftar batch obat beserta stok, stok habis, proyeksi limbah, dan aksi redistribusi.
                     </caption>
                     <thead>
                         <tr>
@@ -470,7 +470,7 @@
                                                     </span>
                                                 </div>
                                                 <div class="ml-simulator-metric">
-                                                    <span class="ml-simulator-metric-label">Sisa umur stok</span>
+                                                    <span class="ml-simulator-metric-label">Stok habis</span>
                                                     <span id="deplete-{{ $simId }}" class="ml-simulator-metric-value">
                                                         {{ $daysToDeplete === null ? 'Tidak habis' : number_format($daysToDeplete, 0).' hari' }}
                                                     </span>

@@ -20,24 +20,15 @@
     </header>
 
     @if(session('status'))
-        <div class="ml-alert ml-alert-success" role="status">{{ session('status') }}</div>
+        <x-alert variant="success">{{ session('status') }}</x-alert>
     @endif
 
-    @if($errors->any())
-        <div class="ml-alert ml-alert-error" role="alert">
-            <strong>Periksa kembali isian berikut:</strong>
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-form.summary for="teamInviteForm" />
 
     @if(! $facility->isActive())
-        <div class="ml-alert ml-alert-info" role="status">
+        <x-alert variant="info">
             Fasilitas belum aktif. Undangan baru dapat dikirim setelah administrator memverifikasi fasilitas.
-        </div>
+        </x-alert>
     @endif
 
     <div class="ml-inline-metrics" aria-label="Ringkasan tim">
@@ -149,22 +140,22 @@
                 </div>
                 <div class="ml-card-body">
                     @if($facility->isActive())
-                        <form method="POST" action="{{ route('facility.team.invite') }}">
+                        <form method="POST" action="{{ route('facility.team.invite') }}" id="teamInviteForm" novalidate data-validate>
                             @csrf
                             <div class="ml-field">
                                 <label for="email" class="ml-label">Email <span class="ml-required">*</span></label>
-                                <input id="email" name="email" type="email" class="ml-input @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="nama@faskes.id" required>
-                                @error('email')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <input id="email" name="email" type="email" class="ml-input @error('email') is-invalid @enderror" value="{{ old('email') }}" placeholder="nama@faskes.id" required data-error-required="Email calon anggota wajib diisi." data-error-email="Format email belum benar, contoh: nama@faskes.id.">
+                                <x-form.error for="email" />
                             </div>
 
                             <div class="ml-field">
                                 <label for="role" class="ml-label">Peran <span class="ml-required">*</span></label>
-                                <select id="role" name="role" class="ml-select @error('role') is-invalid @enderror" required>
+                                <select id="role" name="role" class="ml-select @error('role') is-invalid @enderror" required data-error-required="Pilih peran anggota.">
                                     @foreach($roles as $value => $label)
                                         <option value="{{ $value }}" @selected(old('role') === $value)>{{ $label }}</option>
                                     @endforeach
                                 </select>
-                                @error('role')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="role" />
                             </div>
 
                             <button type="submit" class="ml-btn-primary ml-btn-block">Kirim undangan</button>

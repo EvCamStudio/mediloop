@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ filled($title ?? null) ? $title.' - MediLoop' : 'MediLoop' }}</title>
+    @include('partials.favicons')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     <style>
@@ -1293,10 +1294,12 @@
             z-index: 45;
             opacity: 0;
             transition: opacity 0.25s ease;
+            pointer-events: none; /* Tambahkan ini agar tidak menghalangi klik saat tidak aktif */
         }
         .ml-sidebar-backdrop.is-active {
             display: block;
             opacity: 1;
+            pointer-events: auto; /* Aktifkan klik hanya saat sidebar terbuka */
         }
         .ml-sidebar-close {
             display: none;
@@ -1725,7 +1728,7 @@
             font-weight: 600;
             color: var(--ml-text);
         }
-        .ml-required { color: #B91C1C; }
+        .ml-required { color: var(--color-feedback-danger); }
         .ml-input,
         .ml-select,
         .ml-textarea {
@@ -1759,7 +1762,7 @@
         }
         .ml-input.is-invalid,
         .ml-select.is-invalid,
-        .ml-textarea.is-invalid { border-color: #DC2626; }
+        .ml-textarea.is-invalid { border-color: var(--color-feedback-danger-border); }
         .ml-help {
             margin-top: 5px;
             font-size: 11.5px;
@@ -1770,7 +1773,7 @@
             margin-top: 5px;
             font-size: 11.5px;
             line-height: 1.45;
-            color: #B91C1C;
+            color: var(--color-feedback-danger);
         }
         .ml-field { margin-bottom: 16px; }
         .ml-form-grid {
@@ -1846,10 +1849,12 @@
         }
         .ml-alert strong { font-weight: 700; }
         .ml-alert-success { background: #EFF6FF; border-color: #BFDBFE; color: #1E3A8A; }
-        .ml-alert-error { background: #FEF2F2; border-color: #FECACA; color: #7F1D1D; }
+        .ml-alert-error { background: var(--color-feedback-danger-surface); border-color: var(--color-feedback-danger-surface-border); color: var(--color-feedback-danger-ink); }
         .ml-alert-info { background: #F8FAFC; border-color: var(--ml-border); color: var(--ml-muted); }
         .ml-alert-info strong { color: var(--ml-text); }
         .ml-alert ul { margin: 6px 0 0; padding-left: 18px; }
+        .ml-alert a { color: inherit; font-weight: 600; text-underline-offset: 2px; }
+        .ml-alert a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
         .ml-status {
             display: inline-flex;
@@ -3557,7 +3562,10 @@
 {{-- ============================================================ --}}
 <aside class="ml-sidebar" id="ml-sidebar" role="dialog" aria-modal="true" aria-label="Menu Navigasi">
     <div class="ml-sidebar-logo" style="display: flex; align-items: center; justify-content: space-between;">
-        <span>MediLoop</span>
+        <span style="display: inline-flex; align-items: center; gap: 8px;">
+            <img src="{{ asset('images/logo.png') }}" alt="" style="width: 26px; height: 26px; object-fit: contain;" />
+            MediLoop
+        </span>
         <button type="button" class="ml-sidebar-close" id="ml-sidebar-close" aria-label="Tutup Menu">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
@@ -3808,136 +3816,6 @@
         </a>
     </div>
 </nav>
-
-{{-- Vanilla JS Dropdown & Mobile Drawer Interactions --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const settingsBtn = document.getElementById('ml-settings-btn');
-        const settingsDropdown = document.getElementById('ml-settings-dropdown');
-        const profileBtn = document.getElementById('ml-profile-btn');
-        const profileDropdown = document.getElementById('ml-profile-dropdown');
-
-        // Mobile Sidebar Drawer Elements
-        const hamburgerBtn = document.getElementById('ml-hamburger-btn');
-        const sidebar = document.getElementById('ml-sidebar');
-        const sidebarCloseBtn = document.getElementById('ml-sidebar-close');
-        const sidebarBackdrop = document.getElementById('ml-sidebar-backdrop');
-
-        function openMobileSidebar() {
-            if (sidebar && sidebarBackdrop) {
-                sidebar.classList.add('is-open');
-                sidebarBackdrop.classList.add('is-active');
-                hamburgerBtn?.setAttribute('aria-expanded', 'true');
-                document.body.style.overflow = 'hidden';
-            }
-        }
-
-        function closeMobileSidebar() {
-            if (sidebar && sidebarBackdrop) {
-                sidebar.classList.remove('is-open');
-                sidebarBackdrop.classList.remove('is-active');
-                hamburgerBtn?.setAttribute('aria-expanded', 'false');
-                document.body.style.overflow = '';
-            }
-        }
-
-        if (hamburgerBtn) {
-            hamburgerBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                openMobileSidebar();
-            });
-        }
-
-        if (sidebarCloseBtn) {
-            sidebarCloseBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                closeMobileSidebar();
-            });
-        }
-
-        if (sidebarBackdrop) {
-            sidebarBackdrop.addEventListener('click', function () {
-                closeMobileSidebar();
-            });
-        }
-
-        function closeAllDropdowns() {
-            if (settingsDropdown) {
-                settingsDropdown.style.display = 'none';
-                settingsBtn?.setAttribute('aria-expanded', 'false');
-            }
-            if (profileDropdown) {
-                profileDropdown.style.display = 'none';
-                profileBtn?.setAttribute('aria-expanded', 'false');
-            }
-        }
-
-        if (settingsBtn && settingsDropdown) {
-            settingsBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const isOpen = settingsDropdown.style.display === 'block';
-                closeAllDropdowns();
-                if (!isOpen) {
-                    settingsDropdown.style.display = 'block';
-                    settingsBtn.setAttribute('aria-expanded', 'true');
-                }
-            });
-        }
-
-        if (profileBtn && profileDropdown) {
-            profileBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const isOpen = profileDropdown.style.display === 'block';
-                closeAllDropdowns();
-                if (!isOpen) {
-                    profileDropdown.style.display = 'block';
-                    profileBtn.setAttribute('aria-expanded', 'true');
-                }
-            });
-
-            profileBtn.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    profileBtn.click();
-                }
-            });
-        }
-
-        document.addEventListener('click', function (e) {
-            const isClickInsideSettings = settingsBtn?.contains(e.target) || settingsDropdown?.contains(e.target);
-            const isClickInsideProfile = profileBtn?.contains(e.target) || profileDropdown?.contains(e.target);
-
-            if (!isClickInsideSettings && !isClickInsideProfile) {
-                closeAllDropdowns();
-            }
-        });
-
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                closeAllDropdowns();
-                closeMobileSidebar();
-            }
-        });
-
-        // Auto-hiding Scrollbar Listener
-        let scrollTimeout;
-        window.addEventListener('scroll', function (e) {
-            document.documentElement.classList.add('is-scrolling');
-            document.body.classList.add('is-scrolling');
-            if (e.target && e.target.classList && e.target.classList.contains('ml-table-responsive')) {
-                e.target.classList.add('is-scrolling');
-            }
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(function () {
-                document.documentElement.classList.remove('is-scrolling');
-                document.body.classList.remove('is-scrolling');
-                document.querySelectorAll('.is-scrolling').forEach(function (el) {
-                    el.classList.remove('is-scrolling');
-                });
-            }, 900);
-        }, { passive: true, capture: true });
-    });
-</script>
 
 @livewireScripts
 @yield('scripts')

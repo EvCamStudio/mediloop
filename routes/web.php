@@ -18,7 +18,13 @@ use Illuminate\Support\Facades\Route;
 // Public Landing Page
 Route::view('/', 'welcome')->name('home');
 
+// Laravel Boost fallback to prevent MethodNotAllowed error on browser access
+Route::get('/_boost/browser-logs', function () {
+    return response('The /_boost/browser-logs endpoint only supports POST requests. Please use the Boost tools to access logs.', 405);
+});
+
 // Public facility onboarding request
+
 Route::get('/facility-request', [FacilityRequestController::class, 'create'])->name('facility-requests.create');
 Route::post('/facility-request', [FacilityRequestController::class, 'store'])
     ->middleware('throttle:5,1')

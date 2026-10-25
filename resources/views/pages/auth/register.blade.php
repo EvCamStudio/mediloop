@@ -18,8 +18,10 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('register.store') }}" class="flex flex-col gap-5" novalidate>
+        <form method="POST" action="{{ route('register.store') }}" id="registerForm" class="flex flex-col gap-5" novalidate data-validate>
             @csrf
+
+            <x-form.summary variant="auth" />
 
             <div>
                 <label for="name" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-[#0B1F4B]">
@@ -27,10 +29,9 @@
                 </label>
                 <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus
                     autocomplete="name" placeholder="Apt. Nama Lengkap, S.Farm" class="{{ $inputClass }}"
+                    data-error-required="Nama lengkap wajib diisi."
                     @error('name') aria-invalid="true" aria-describedby="name-error" @enderror>
-                @error('name')
-                    <p id="name-error" class="mt-1.5 text-xs font-medium text-[#B42318]">{{ $message }}</p>
-                @enderror
+                <x-form.error variant="auth" for="name" />
             </div>
 
             <div>
@@ -39,10 +40,9 @@
                 </label>
                 <input id="email" name="email" type="email" value="{{ old('email') }}" required autocomplete="email"
                     placeholder="nama@faskes.go.id" class="{{ $inputClass }}"
+                    data-error-required="Email wajib diisi." data-error-email="Format email belum benar, contoh: nama@faskes.id."
                     @error('email') aria-invalid="true" aria-describedby="email-error" @enderror>
-                @error('email')
-                    <p id="email-error" class="mt-1.5 text-xs font-medium text-[#B42318]">{{ $message }}</p>
-                @enderror
+                <x-form.error variant="auth" for="email" />
             </div>
 
             <div>
@@ -50,7 +50,8 @@
                     Fasilitas Kesehatan
                 </label>
                 <select id="facility_id" name="facility_id" required class="{{ $inputClass }}"
-                    @error('facility_id') aria-invalid="true" aria-describedby="facility-error" @enderror>
+                    data-error-required="Pilih fasilitas kesehatan."
+                    @error('facility_id') aria-invalid="true" aria-describedby="facility_id-error" @enderror>
                     <option value="" disabled @selected(old('facility_id') === null)>Pilih fasilitas</option>
                     @foreach ($facilityOptions as $facility)
                         <option value="{{ $facility->id }}" @selected((string) old('facility_id') === (string) $facility->id)>
@@ -58,9 +59,7 @@
                         </option>
                     @endforeach
                 </select>
-                @error('facility_id')
-                    <p id="facility-error" class="mt-1.5 text-xs font-medium text-[#B42318]">{{ $message }}</p>
-                @enderror
+                <x-form.error variant="auth" for="facility_id" />
             </div>
 
             <div>
@@ -68,15 +67,14 @@
                     Peran di Fasilitas
                 </label>
                 <select id="role" name="role" required class="{{ $inputClass }}"
+                    data-error-required="Pilih peran di fasilitas."
                     @error('role') aria-invalid="true" aria-describedby="role-error" @enderror>
                     <option value="" disabled @selected(old('role') === null)>Pilih peran</option>
                     @foreach ($roles ?? [] as $value => $label)
                         <option value="{{ $value }}" @selected(old('role') === $value)>{{ $label }}</option>
                     @endforeach
                 </select>
-                @error('role')
-                    <p id="role-error" class="mt-1.5 text-xs font-medium text-[#B42318]">{{ $message }}</p>
-                @enderror
+                <x-form.error variant="auth" for="role" />
             </div>
 
             <div class="grid gap-5 sm:grid-cols-2">
@@ -86,10 +84,8 @@
                     </label>
                     <input id="job_title" name="job_title" type="text" value="{{ old('job_title') }}"
                         autocomplete="organization-title" placeholder="Staf Farmasi" class="{{ $inputClass }}"
-                        @error('job_title') aria-invalid="true" aria-describedby="job-title-error" @enderror>
-                    @error('job_title')
-                        <p id="job-title-error" class="mt-1.5 text-xs font-medium text-[#B42318]">{{ $message }}</p>
-                    @enderror
+                        @error('job_title') aria-invalid="true" aria-describedby="job_title-error" @enderror>
+                    <x-form.error variant="auth" for="job_title" />
                 </div>
 
                 <div>
@@ -98,10 +94,8 @@
                     </label>
                     <input id="license_sip" name="license_sip" type="text" value="{{ old('license_sip') }}"
                         placeholder="SIPA.3171.01.2024.0001" class="{{ $inputClass }}"
-                        @error('license_sip') aria-invalid="true" aria-describedby="license-error" @enderror>
-                    @error('license_sip')
-                        <p id="license-error" class="mt-1.5 text-xs font-medium text-[#B42318]">{{ $message }}</p>
-                    @enderror
+                        @error('license_sip') aria-invalid="true" aria-describedby="license_sip-error" @enderror>
+                    <x-form.error variant="auth" for="license_sip" />
                 </div>
             </div>
 
@@ -112,6 +106,8 @@
                 <div class="password-control">
                     <input id="password" name="password" type="password" required autocomplete="new-password"
                         placeholder="Minimal 8 karakter" class="{{ $inputClass }} password-input"
+                        minlength="8"
+                        data-error-required="Password wajib diisi." data-error-minlength="Password minimal 8 karakter."
                         @error('password') aria-invalid="true" aria-describedby="password-error" @enderror>
                     <button type="button" class="password-toggle" data-password-toggle
                         data-password-target="password" aria-controls="password" aria-label="Tampilkan password"
@@ -129,9 +125,7 @@
                         </svg>
                     </button>
                 </div>
-                @error('password')
-                    <p id="password-error" class="mt-1.5 text-xs font-medium text-[#B42318]">{{ $message }}</p>
-                @enderror
+                <x-form.error variant="auth" for="password" />
             </div>
 
             <div>
@@ -142,7 +136,9 @@
                 <div class="password-control">
                     <input id="password_confirmation" name="password_confirmation" type="password" required
                         autocomplete="new-password" placeholder="Ulangi password"
-                        class="{{ $inputClass }} password-input">
+                        class="{{ $inputClass }} password-input"
+                        minlength="8"
+                        data-error-required="Konfirmasi password wajib diisi." data-error-minlength="Password minimal 8 karakter.">
                     <button type="button" class="password-toggle" data-password-toggle
                         data-password-target="password_confirmation"
                         data-label-show="Tampilkan ulangi password"
@@ -162,6 +158,7 @@
                         </svg>
                     </button>
                 </div>
+                <x-form.error variant="auth" for="password_confirmation" />
             </div>
 
             <button type="submit"

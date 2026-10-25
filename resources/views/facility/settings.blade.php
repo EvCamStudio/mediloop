@@ -22,19 +22,10 @@
     </header>
 
     @if(session('status'))
-        <div class="ml-alert ml-alert-success" role="status">{{ session('status') }}</div>
+        <x-alert variant="success">{{ session('status') }}</x-alert>
     @endif
 
-    @if($errors->any())
-        <div class="ml-alert ml-alert-error" role="alert">
-            <strong>Periksa kembali isian berikut:</strong>
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    <x-form.summary for="facilitySettingsForm" />
 
     <div class="ml-settings-layout">
         <aside>
@@ -82,7 +73,7 @@
             </section>
         </aside>
 
-        <form method="POST" action="{{ route('facility.settings.update') }}" novalidate>
+        <form method="POST" action="{{ route('facility.settings.update') }}" id="facilitySettingsForm" novalidate data-validate>
             @csrf
             @method('PUT')
 
@@ -98,43 +89,44 @@
                     <div class="ml-form-grid">
                         <div class="ml-field is-full">
                             <label for="address" class="ml-label">Alamat <span class="ml-required">*</span></label>
-                            <input id="address" name="address" type="text" class="ml-input @error('address') is-invalid @enderror" value="{{ old('address', $facility->address) }}" required autocomplete="street-address">
-                            @error('address')<p class="ml-error-text">{{ $message }}</p>@enderror
+                            <input id="address" name="address" type="text" class="ml-input @error('address') is-invalid @enderror" value="{{ old('address', $facility->address) }}" required autocomplete="street-address" data-error-required="Alamat fasilitas wajib diisi.">
+                            <x-form.error for="address" />
                         </div>
 
                         <div class="ml-field">
                             <label for="province" class="ml-label">Provinsi <span class="ml-required">*</span></label>
-                            <input id="province" name="province" type="text" class="ml-input @error('province') is-invalid @enderror" value="{{ old('province', $facility->province) }}" required autocomplete="address-level1">
-                            @error('province')<p class="ml-error-text">{{ $message }}</p>@enderror
+                            <input id="province" name="province" type="text" class="ml-input @error('province') is-invalid @enderror" value="{{ old('province', $facility->province) }}" required autocomplete="address-level1" data-error-required="Provinsi wajib diisi.">
+                            <x-form.error for="province" />
                         </div>
 
                         <div class="ml-field">
                             <label for="city" class="ml-label">Kota/kabupaten <span class="ml-required">*</span></label>
-                            <input id="city" name="city" type="text" class="ml-input @error('city') is-invalid @enderror" value="{{ old('city', $facility->city) }}" required autocomplete="address-level2">
-                            @error('city')<p class="ml-error-text">{{ $message }}</p>@enderror
+                            <input id="city" name="city" type="text" class="ml-input @error('city') is-invalid @enderror" value="{{ old('city', $facility->city) }}" required autocomplete="address-level2" data-error-required="Kota/kabupaten wajib diisi.">
+                            <x-form.error for="city" />
                         </div>
 
                         <div class="ml-field">
                             <label for="district" class="ml-label">Kecamatan</label>
-                            <input id="district" name="district" type="text" class="ml-input" value="{{ old('district', $facility->district) }}" autocomplete="address-level3">
+                            <input id="district" name="district" type="text" class="ml-input @error('district') is-invalid @enderror" value="{{ old('district', $facility->district) }}" autocomplete="address-level3">
+                            <x-form.error for="district" />
                         </div>
 
                         <div class="ml-field">
                             <label for="contact_person" class="ml-label">Penanggung jawab <span class="ml-required">*</span></label>
-                            <input id="contact_person" name="contact_person" type="text" class="ml-input @error('contact_person') is-invalid @enderror" value="{{ old('contact_person', $facility->contact_person) }}" required autocomplete="name">
-                            @error('contact_person')<p class="ml-error-text">{{ $message }}</p>@enderror
+                            <input id="contact_person" name="contact_person" type="text" class="ml-input @error('contact_person') is-invalid @enderror" value="{{ old('contact_person', $facility->contact_person) }}" required autocomplete="name" data-error-required="Nama penanggung jawab wajib diisi.">
+                            <x-form.error for="contact_person" />
                         </div>
 
                         <div class="ml-field">
                             <label for="phone" class="ml-label">Telepon <span class="ml-required">*</span></label>
-                            <input id="phone" name="phone" type="tel" class="ml-input @error('phone') is-invalid @enderror" value="{{ old('phone', $facility->phone) }}" required autocomplete="tel" inputmode="tel">
-                            @error('phone')<p class="ml-error-text">{{ $message }}</p>@enderror
+                            <input id="phone" name="phone" type="tel" class="ml-input @error('phone') is-invalid @enderror" value="{{ old('phone', $facility->phone) }}" required autocomplete="tel" inputmode="tel" data-error-required="Nomor telepon wajib diisi.">
+                            <x-form.error for="phone" />
                         </div>
 
                         <div class="ml-field is-full">
                             <label for="email" class="ml-label">Email fasilitas</label>
-                            <input id="email" name="email" type="email" class="ml-input @error('email') is-invalid @enderror" value="{{ old('email', $facility->email) }}" autocomplete="email" inputmode="email">
-                            @error('email')<p class="ml-error-text">{{ $message }}</p>@enderror
+                            <input id="email" name="email" type="email" class="ml-input @error('email') is-invalid @enderror" value="{{ old('email', $facility->email) }}" autocomplete="email" inputmode="email" data-error-email="Format email belum benar, contoh: nama@faskes.id.">
+                            <x-form.error for="email" />
                         </div>
 
                         <div class="ml-field is-full">

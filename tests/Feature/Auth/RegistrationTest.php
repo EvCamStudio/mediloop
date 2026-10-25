@@ -84,3 +84,16 @@ test('registration cannot escalate to privileged roles', function () {
     $this->assertGuest();
     $this->assertDatabaseMissing('users', ['email' => 'test@example.com']);
 });
+
+test('registration errors render through shared validation components', function () {
+    $response = $this->from(route('register'))
+        ->followingRedirects()
+        ->post(route('register.store'), []);
+
+    $response->assertOk();
+    $response->assertSee('data-validate', false);
+    $response->assertSee('data-form-summary', false);
+    $response->assertSee('href="#facility_id"', false);
+    $response->assertSee('id="facility_id-error"', false);
+    $response->assertSee('data-field-error="facility_id"', false);
+});

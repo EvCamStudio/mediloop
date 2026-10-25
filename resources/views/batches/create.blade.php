@@ -52,19 +52,10 @@
         </div>
     </div>
 
-    @if($errors->any())
-        <div class="ml-alert ml-alert-error" role="alert">
-            <strong>Periksa kembali isian berikut:</strong>
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <form method="POST" action="{{ route('batches.store') }}" id="batchForm">
+    <form method="POST" action="{{ route('batches.store') }}" id="batchForm" novalidate data-validate>
         @csrf
+
+        <x-form.summary />
 
         <div class="ml-two-col">
             <div>
@@ -84,7 +75,7 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('facility_id')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="facility_id" />
                                 <p class="ml-help">Pilih fasilitas yang akan menyimpan batch ini.</p>
                             </div>
                         </div>
@@ -118,7 +109,7 @@
                         <div class="ml-form-stack">
                             <div id="existingMedicineSection" @if(old('is_new_medicine')) hidden @endif>
                                 <label for="medicine_id" class="ml-label">Pilih obat dari master formularium <span class="ml-required">*</span></label>
-                                <select id="medicine_id" name="medicine_id" class="ml-select @error('medicine_id') is-invalid @enderror">
+                                <select id="medicine_id" name="medicine_id" class="ml-select @error('medicine_id') is-invalid @enderror" required data-error-required="Pilih obat terlebih dahulu.">
                                     <option value="">Pilih obat yang tersedia</option>
                                     @foreach($medicines as $medicine)
                                         <option
@@ -132,7 +123,7 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('medicine_id')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="medicine_id" />
                                 <p class="ml-help">Jika obat belum tersedia di daftar, aktifkan “Obat belum terdaftar di master”.</p>
                             </div>
 
@@ -148,11 +139,11 @@
                                             type="text"
                                             id="new_medicine_name"
                                             name="new_medicine_name"
-                                            class="ml-input @error('new_medicine_name') is-invalid @enderror"
+                                            class="ml-input @error('new_medicine_name') is-invalid @enderror" required data-error-required="Nama obat wajib diisi."
                                             value="{{ old('new_medicine_name') }}"
                                             placeholder="Contoh: Ceftriaxone 1g Injeksi"
                                         >
-                                        @error('new_medicine_name')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                        <x-form.error for="new_medicine_name" />
                                     </div>
 
                                     <div class="ml-field">
@@ -161,16 +152,16 @@
                                             type="text"
                                             id="new_generic_name"
                                             name="new_generic_name"
-                                            class="ml-input @error('new_generic_name') is-invalid @enderror"
+                                            class="ml-input @error('new_generic_name') is-invalid @enderror" required data-error-required="Nama generik wajib diisi."
                                             value="{{ old('new_generic_name') }}"
                                             placeholder="Contoh: Ceftriaxone Sodium"
                                         >
-                                        @error('new_generic_name')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                        <x-form.error for="new_generic_name" />
                                     </div>
 
                                     <div class="ml-field">
                                         <label for="new_category" class="ml-label">Kategori terapeutik <span class="ml-required">*</span></label>
-                                        <select id="new_category" name="new_category" class="ml-select @error('new_category') is-invalid @enderror">
+                                        <select id="new_category" name="new_category" class="ml-select @error('new_category') is-invalid @enderror" required data-error-required="Kategori terapeutik wajib diisi.">
                                             <option value="Antibiotic" @selected(old('new_category') === 'Antibiotic')>Antibiotik</option>
                                             <option value="Cardiovascular" @selected(old('new_category') === 'Cardiovascular')>Kardiovaskular</option>
                                             <option value="Endocrine" @selected(old('new_category') === 'Endocrine')>Endokrin</option>
@@ -179,7 +170,7 @@
                                             <option value="Respiratory" @selected(old('new_category') === 'Respiratory')>Respirasi</option>
                                             <option value="Other" @selected(old('new_category') === 'Other')>Lainnya</option>
                                         </select>
-                                        @error('new_category')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                        <x-form.error for="new_category" />
                                     </div>
 
                                     <div class="ml-field">
@@ -188,11 +179,11 @@
                                             type="text"
                                             id="new_dosage_form"
                                             name="new_dosage_form"
-                                            class="ml-input @error('new_dosage_form') is-invalid @enderror"
+                                            class="ml-input @error('new_dosage_form') is-invalid @enderror" required data-error-required="Bentuk sediaan wajib diisi."
                                             value="{{ old('new_dosage_form') }}"
                                             placeholder="Vial, tablet, sirup, infus"
                                         >
-                                        @error('new_dosage_form')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                        <x-form.error for="new_dosage_form" />
                                     </div>
 
                                     <div class="ml-field">
@@ -201,11 +192,11 @@
                                             type="text"
                                             id="new_unit"
                                             name="new_unit"
-                                            class="ml-input @error('new_unit') is-invalid @enderror"
+                                            class="ml-input @error('new_unit') is-invalid @enderror" required data-error-required="Satuan kemasan wajib diisi."
                                             value="{{ old('new_unit', 'Box') }}"
                                             placeholder="Box, vial, botol, ampul"
                                         >
-                                        @error('new_unit')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                        <x-form.error for="new_unit" />
                                     </div>
 
                                     <div class="ml-field">
@@ -214,11 +205,11 @@
                                             type="number"
                                             id="new_unit_price_idr"
                                             name="new_unit_price_idr"
-                                            class="ml-input is-mono @error('new_unit_price_idr') is-invalid @enderror"
+                                            class="ml-input is-mono @error('new_unit_price_idr') is-invalid @enderror" required data-error-required="Harga acuan wajib diisi."
                                             value="{{ old('new_unit_price_idr', 50000) }}"
                                             min="0"
                                         >
-                                        @error('new_unit_price_idr')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                        <x-form.error for="new_unit_price_idr" />
                                     </div>
 
                                     <div class="ml-field is-full">
@@ -244,7 +235,7 @@
                                             value="{{ old('new_handling_instructions') }}"
                                             placeholder="Contoh: Simpan pada suhu ruang kering di bawah 25°C."
                                         >
-                                        @error('new_handling_instructions')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                        <x-form.error for="new_handling_instructions" />
                                     </div>
                                 </div>
                             </div>
@@ -271,6 +262,7 @@
                                 <input
                                     type="text"
                                     id="batch_number"
+                                    data-error-required="Nomor batch wajib diisi."
                                     name="batch_number"
                                     class="ml-input is-mono is-uppercase @error('batch_number') is-invalid @enderror"
                                     value="{{ old('batch_number') }}"
@@ -279,7 +271,7 @@
                                     spellcheck="false"
                                     required
                                 >
-                                @error('batch_number')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="batch_number" />
                                 <p class="ml-help">Sesuai yang tertera pada kemasan fisik obat.</p>
                             </div>
 
@@ -288,12 +280,13 @@
                                 <input
                                     type="date"
                                     id="expiry_date"
+                                    data-error-required="Tanggal kedaluwarsa wajib diisi."
                                     name="expiry_date"
                                     class="ml-input @error('expiry_date') is-invalid @enderror"
                                     value="{{ old('expiry_date') }}"
                                     required
                                 >
-                                @error('expiry_date')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="expiry_date" />
                                 <p class="ml-help">Tanggal berakhir masa edar obat.</p>
                             </div>
 
@@ -302,13 +295,14 @@
                                 <input
                                     type="number"
                                     id="current_stock"
+                                    data-error-required="Stok fisik wajib diisi."
                                     name="current_stock"
                                     class="ml-input is-mono @error('current_stock') is-invalid @enderror"
                                     value="{{ old('current_stock', 100) }}"
                                     min="1"
                                     required
                                 >
-                                @error('current_stock')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="current_stock" />
                                 <p class="ml-help">Jumlah yang tersedia di gudang saat ini.</p>
                             </div>
 
@@ -318,13 +312,14 @@
                                     type="number"
                                     step="0.01"
                                     id="daily_burn_rate"
+                                    data-error-required="Laju pakai harian wajib diisi."
                                     name="daily_burn_rate"
                                     class="ml-input is-mono @error('daily_burn_rate') is-invalid @enderror"
                                     value="{{ old('daily_burn_rate', 2.0) }}"
                                     min="0"
                                     required
                                 >
-                                @error('daily_burn_rate')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="daily_burn_rate" />
                                 <p class="ml-help">Rata-rata unit yang dipakai per hari.</p>
                             </div>
 
@@ -339,7 +334,7 @@
                                     min="0"
                                     placeholder="Gunakan harga master jika kosong"
                                 >
-                                @error('unit_price_idr')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="unit_price_idr" />
                                 <p class="ml-help">Kosongkan untuk memakai harga acuan obat.</p>
                             </div>
 
@@ -353,7 +348,7 @@
                                     value="{{ old('storage_location') }}"
                                     placeholder="Contoh: Gudang farmasi, rak injeksi B-02"
                                 >
-                                @error('storage_location')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="storage_location" />
                                 <p class="ml-help">Rak, lemari, atau chiller tempat batch disimpan.</p>
                             </div>
                         </div>
@@ -411,141 +406,4 @@
         </div>
     </form>
 </div>
-@endsection
-
-@section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const toggleNewMedicine = document.getElementById('toggleNewMedicine');
-        const existingSection = document.getElementById('existingMedicineSection');
-        const newSection = document.getElementById('newMedicineSection');
-        const medicineSelect = document.getElementById('medicine_id');
-        const unitPriceInput = document.getElementById('unit_price_idr');
-
-        const currentStockInput = document.getElementById('current_stock');
-        const dailyBurnRateInput = document.getElementById('daily_burn_rate');
-        const expiryDateInput = document.getElementById('expiry_date');
-
-        const previewDaysExpiry = document.getElementById('previewDaysExpiry');
-        const previewDaysDeplete = document.getElementById('previewDaysDeplete');
-        const previewWaste = document.getElementById('previewWaste');
-        const previewRisk = document.getElementById('previewRisk');
-        const previewRiskNote = document.getElementById('previewRiskNote');
-
-        const numberFormatter = new Intl.NumberFormat('id-ID');
-        const decimalFormatter = new Intl.NumberFormat('id-ID', {
-            minimumFractionDigits: 1,
-            maximumFractionDigits: 1,
-        });
-
-        function syncMedicineMode() {
-            const isNewMedicine = toggleNewMedicine.checked;
-
-            existingSection.hidden = isNewMedicine;
-            newSection.hidden = ! isNewMedicine;
-
-            if (isNewMedicine) {
-                medicineSelect.removeAttribute('required');
-            } else {
-                medicineSelect.setAttribute('required', 'required');
-            }
-        }
-
-        function localDateFromInput(value) {
-            const [year, month, day] = value.split('-').map(Number);
-
-            return new Date(year, month - 1, day);
-        }
-
-        function formatLocalDate(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-
-            return `${year}-${month}-${day}`;
-        }
-
-        toggleNewMedicine.addEventListener('change', syncMedicineMode);
-        syncMedicineMode();
-
-        if (! expiryDateInput.value) {
-            const defaultDate = new Date();
-            defaultDate.setDate(defaultDate.getDate() + 60);
-            expiryDateInput.value = formatLocalDate(defaultDate);
-        }
-
-        medicineSelect.addEventListener('change', function () {
-            const selected = medicineSelect.options[medicineSelect.selectedIndex];
-
-            if (selected && selected.dataset.price && ! unitPriceInput.value) {
-                unitPriceInput.value = selected.dataset.price;
-            }
-        });
-
-        function updatePreview() {
-            const stock = parseInt(currentStockInput.value, 10) || 0;
-            const burnRate = parseFloat(dailyBurnRateInput.value) || 0;
-            const expiryValue = expiryDateInput.value;
-
-            if (! expiryValue) {
-                return;
-            }
-
-            const expiryDate = localDateFromInput(expiryValue);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            const daysToExpiry = Math.max(0, Math.ceil((expiryDate.getTime() - today.getTime()) / 86400000));
-            const expectedConsumption = Math.floor(burnRate * daysToExpiry);
-            const projectedWaste = Math.max(0, stock - expectedConsumption);
-            const wasteRatio = stock > 0 ? projectedWaste / stock : 0;
-
-            previewDaysExpiry.innerHTML = `${numberFormatter.format(daysToExpiry)} <small>hari</small>`;
-
-            if (burnRate > 0) {
-                previewDaysDeplete.innerHTML = `${decimalFormatter.format(stock / burnRate)} <small>hari</small>`;
-            } else {
-                previewDaysDeplete.innerHTML = 'Tidak habis <small>0/hari</small>';
-            }
-
-            previewWaste.innerHTML = `${numberFormatter.format(projectedWaste)} <small>unit (${Math.round(wasteRatio * 100)}%)</small>`;
-
-            let risk = {
-                label: 'Rendah',
-                className: 'ml-risk ml-risk-low',
-                note: 'Stok diproyeksikan habis sebelum kedaluwarsa.',
-            };
-
-            if (projectedWaste > 0 && daysToExpiry <= 30) {
-                risk = {
-                    label: 'Kritis',
-                    className: 'ml-risk ml-risk-critical',
-                    note: 'Sisa masa edar ≤30 hari; prioritaskan redistribusi.',
-                };
-            } else if (projectedWaste > 0 && (daysToExpiry <= 60 || wasteRatio >= 0.25)) {
-                risk = {
-                    label: 'Tinggi',
-                    className: 'ml-risk ml-risk-high',
-                    note: 'Risiko tinggi; evaluasi kebutuhan redistribusi.',
-                };
-            } else if (projectedWaste > 0) {
-                risk = {
-                    label: 'Sedang',
-                    className: 'ml-risk ml-risk-medium',
-                    note: 'Pantau laju pakai dan sisa masa edar.',
-                };
-            }
-
-            previewRisk.textContent = risk.label;
-            previewRisk.className = risk.className;
-            previewRiskNote.textContent = risk.note;
-        }
-
-        currentStockInput.addEventListener('input', updatePreview);
-        dailyBurnRateInput.addEventListener('input', updatePreview);
-        expiryDateInput.addEventListener('change', updatePreview);
-
-        updatePreview();
-    });
-</script>
 @endsection

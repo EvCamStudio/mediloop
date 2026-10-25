@@ -22,6 +22,13 @@
     --color-brand-risk: #D9480F;
     --color-brand-warning: #B7791F;
 
+    /* Validation feedback tokens; all meet WCAG AA contrast on surface-raised. */
+    --color-feedback-danger: #B91C1C;
+    --color-feedback-danger-ink: #7F1D1D;
+    --color-feedback-danger-border: #DC2626;
+    --color-feedback-danger-surface: #FEF2F2;
+    --color-feedback-danger-surface-border: #FECACA;
+
     /* Facility marker colours; white labels meet WCAG AA contrast. */
     --color-facility-rsud: #1D4ED8;
     --color-facility-puskesmas: #0F766E;

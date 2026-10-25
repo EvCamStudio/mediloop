@@ -65,3 +65,18 @@ test('users can logout', function () {
 
     $this->assertGuest();
 });
+
+test('login errors render through shared validation components', function () {
+    $response = $this->from(route('login'))
+        ->followingRedirects()
+        ->post(route('login.store'), [
+            'email' => 'missing@example.test',
+            'password' => 'wrong-password',
+        ]);
+
+    $response->assertOk();
+    $response->assertSee('data-validate', false);
+    $response->assertSee('data-form-summary', false);
+    $response->assertSee('id="email-error"', false);
+    $response->assertSee('data-field-error="email"', false);
+});

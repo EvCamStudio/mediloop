@@ -1,3 +1,7 @@
+import './mediloop-shell';
+import './form-validation';
+import './batch-form';
+
 const passwordToggles = document.querySelectorAll('[data-password-toggle]');
 
 passwordToggles.forEach((toggle) => {

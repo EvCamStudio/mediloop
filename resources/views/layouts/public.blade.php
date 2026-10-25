@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ filled($title ?? null) ? $title.' — MediLoop' : 'MediLoop' }}</title>
     <meta name="description" content="MediLoop — pendaftaran fasilitas kesehatan dan onboarding tim.">
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    @include('partials.favicons')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
@@ -870,11 +869,8 @@
     <header class="pub-header">
         <div class="pub-header-inner">
             <a href="{{ route('home') }}" class="pub-logo">
-                <span class="pub-logo-mark" aria-hidden="true">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-                        <rect x="3" y="8" width="18" height="8" rx="4" transform="rotate(-45 12 12)" />
-                        <path d="M8.5 8.5l7 7" />
-                    </svg>
+                <span class="pub-logo-mark" aria-hidden="true" style="background: transparent; box-shadow: none;">
+                    <img src="{{ asset('images/logo.png') }}" alt="" style="width: 34px; height: 34px; object-fit: contain;" />
                 </span>
                 MediLoop
             </a>

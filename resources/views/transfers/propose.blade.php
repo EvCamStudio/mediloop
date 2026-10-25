@@ -131,7 +131,7 @@
         </div>
 
         <aside>
-            <form method="POST" action="{{ route('transfers.store') }}" class="ml-card ml-sticky" id="proposalForm" novalidate>
+            <form method="POST" action="{{ route('transfers.store') }}" class="ml-card ml-sticky" id="proposalForm" novalidate data-validate>
                 @csrf
                 <input type="hidden" name="batch_id" value="{{ $batch->id }}">
                 <input type="hidden" id="selectedFacilityId" name="recipient_facility_id" value="{{ $candidates[0]['facility']->id ?? '' }}">
@@ -141,30 +141,26 @@
                     <p class="ml-card-sub">Usulan diteruskan ke Kepala Instalasi Farmasi donor.</p>
                 </div>
                 <div class="ml-card-body">
-                    @if($errors->any())
-                        <div class="ml-alert ml-alert-error" role="alert">
-                            <ul>
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+                    <x-form.summary />
+                    <x-form.error for="batch_id" />
 
                     <div class="ml-field">
                         <label for="selectedFacilityName" class="ml-label">Fasilitas penerima</label>
-                        <input type="text" id="selectedFacilityName" readonly value="{{ $candidates[0]['facility']->name ?? '' }}" class="ml-input">
+                        <input type="text" id="selectedFacilityName" readonly value="{{ $candidates[0]['facility']->name ?? '' }}" class="ml-input" @if($errors->has('recipient_facility_id')) aria-invalid="true" aria-describedby="recipient_facility_id-error" @endif>
+                        <x-form.error for="recipient_facility_id" />
                     </div>
 
                     <div class="ml-field">
                         <label for="quantity" class="ml-label">Jumlah unit <span class="ml-required">*</span></label>
-                        <input type="number" id="quantity" name="quantity" min="1" max="{{ $batch->current_stock }}" value="{{ $candidates[0]['recommended_quantity'] ?? 100 }}" class="ml-input is-mono" required>
+                        <input type="number" id="quantity" name="quantity" min="1" max="{{ $batch->current_stock }}" value="{{ $candidates[0]['recommended_quantity'] ?? 100 }}" class="ml-input is-mono @error('quantity') is-invalid @enderror" required data-error-required="Jumlah unit wajib diisi." data-error-min="Jumlah minimal 1 unit." data-error-max="Jumlah melebihi stok tersedia ({{ number_format($batch->current_stock) }} unit).">
                         <p class="ml-help">Maksimal {{ number_format($batch->current_stock) }} {{ $batch->medicine->unit }} tersedia di donor.</p>
+                        <x-form.error for="quantity" />
                     </div>
 
                     <div class="ml-field">
                         <label for="notes" class="ml-label">Catatan justifikasi</label>
-                        <textarea id="notes" name="notes" class="ml-textarea" rows="4" placeholder="Jelaskan kebutuhan penerima dan alasan redistribusi.">Pengusulan redistribusi surplus stok {{ $batch->medicine->name }} untuk mencegah pemusnahan obat kedaluwarsa dan mendukung ketersediaan di fasilitas sekitar.</textarea>
+                        <textarea id="notes" name="notes" class="ml-textarea @error('notes') is-invalid @enderror" rows="4" maxlength="500" data-error-maxlength="Catatan maksimal 500 karakter." placeholder="Jelaskan kebutuhan penerima dan alasan redistribusi.">Pengusulan redistribusi surplus stok {{ $batch->medicine->name }} untuk mencegah pemusnahan obat kedaluwarsa dan mendukung ketersediaan di fasilitas sekitar.</textarea>
+                        <x-form.error for="notes" />
                     </div>
 
                     <div class="ml-action-row">

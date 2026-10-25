@@ -55,20 +55,11 @@
         </p>
     </div>
 
-    @if($errors->any())
-        <div class="ml-alert ml-alert-error" role="alert">
-            <strong>Periksa kembali isian berikut:</strong>
-            <ul>
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
-    <form method="POST" action="{{ route('batches.update', $batch) }}">
+    <form method="POST" action="{{ route('batches.update', $batch) }}" novalidate data-validate>
         @csrf
         @method('PUT')
+
+        <x-form.summary />
 
         <div class="ml-two-col">
             <div>
@@ -84,13 +75,14 @@
                                 <input
                                     type="number"
                                     id="current_stock"
+                                    data-error-required="Stok fisik wajib diisi."
                                     name="current_stock"
                                     class="ml-input is-mono @error('current_stock') is-invalid @enderror"
                                     value="{{ old('current_stock', $batch->current_stock) }}"
                                     min="0"
                                     required
                                 >
-                                @error('current_stock')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="current_stock" />
                                 <p class="ml-help">Jumlah yang tersedia di gudang saat ini.</p>
                             </div>
 
@@ -100,13 +92,14 @@
                                     type="number"
                                     step="0.01"
                                     id="daily_burn_rate"
+                                    data-error-required="Laju pakai harian wajib diisi."
                                     name="daily_burn_rate"
                                     class="ml-input is-mono @error('daily_burn_rate') is-invalid @enderror"
                                     value="{{ old('daily_burn_rate', $batch->daily_burn_rate) }}"
                                     min="0"
                                     required
                                 >
-                                @error('daily_burn_rate')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="daily_burn_rate" />
                                 <p class="ml-help">Rata-rata unit yang dipakai per hari.</p>
                             </div>
 
@@ -115,12 +108,13 @@
                                 <input
                                     type="date"
                                     id="expiry_date"
+                                    data-error-required="Tanggal kedaluwarsa wajib diisi."
                                     name="expiry_date"
                                     class="ml-input @error('expiry_date') is-invalid @enderror"
                                     value="{{ old('expiry_date', $batch->expiry_date->toDateString()) }}"
                                     required
                                 >
-                                @error('expiry_date')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="expiry_date" />
                                 <p class="ml-help">Tanggal berakhir masa edar obat.</p>
                             </div>
 
@@ -129,13 +123,14 @@
                                 <input
                                     type="number"
                                     id="unit_price_idr"
+                                    data-error-required="Harga satuan wajib diisi."
                                     name="unit_price_idr"
                                     class="ml-input is-mono @error('unit_price_idr') is-invalid @enderror"
                                     value="{{ old('unit_price_idr', $batch->unit_price_idr) }}"
                                     min="0"
                                     required
                                 >
-                                @error('unit_price_idr')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="unit_price_idr" />
                                 <p class="ml-help">Dipakai untuk estimasi nilai stok dan potensi limbah.</p>
                             </div>
 
@@ -149,7 +144,7 @@
                                     value="{{ old('storage_location', $batch->storage_location) }}"
                                     placeholder="Contoh: Rak baru 9 atau chiller 2–8°C"
                                 >
-                                @error('storage_location')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="storage_location" />
                                 <p class="ml-help">Rak, lemari, atau chiller tempat batch disimpan.</p>
                             </div>
 
@@ -161,7 +156,7 @@
                                     <option value="DEPLETED" @selected(old('status', $batch->status) === 'DEPLETED')>Habis</option>
                                     <option value="EXPIRED" @selected(old('status', $batch->status) === 'EXPIRED')>Kedaluwarsa</option>
                                 </select>
-                                @error('status')<p class="ml-error-text">{{ $message }}</p>@enderror
+                                <x-form.error for="status" />
                                 <p class="ml-help">Status tidak mengubah jumlah stok secara otomatis.</p>
                             </div>
                         </div>
