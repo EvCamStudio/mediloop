@@ -20,8 +20,8 @@
     $mediumPercent = $totalBatches > 0 ? round(($mCount / $totalBatches) * 100) : 0;
     $lowPercent = $totalBatches > 0 ? round(($lCount / $totalBatches) * 100) : 0;
 
-    // SVG Donut calculation: radius = 48, circumference = 2 * pi * 48 = 301.593
-    $circumference = 301.593;
+    // SVG Donut calculation: radius = 72, circumference = 2 * pi * 72 = 452.389
+    $circumference = 452.389;
     $critLen = $totalBatches > 0 ? ($cCount / $totalBatches) * $circumference : 0;
     $highLen = $totalBatches > 0 ? ($hCount / $totalBatches) * $circumference : 0;
     $medLen = $totalBatches > 0 ? ($mCount / $totalBatches) * $circumference : 0;
@@ -31,41 +31,80 @@
     $offset = 0;
     if ($cCount > 0) {
         $segments[] = [
-            'color' => '#EF4444',
+            'color' => '#DC2626',
             'len' => $critLen,
             'offset' => $offset,
             'label' => 'Kritis',
+            'count' => $cCount,
+            'pct' => $criticalPercent,
         ];
         $offset += $critLen;
     }
     if ($hCount > 0) {
         $segments[] = [
-            'color' => '#F97316',
+            'color' => '#EA580C',
             'len' => $highLen,
             'offset' => $offset,
             'label' => 'Tinggi',
+            'count' => $hCount,
+            'pct' => $highPercent,
         ];
         $offset += $highLen;
     }
     if ($mCount > 0) {
         $segments[] = [
-            'color' => '#F59E0B',
+            'color' => '#D97706',
             'len' => $medLen,
             'offset' => $offset,
             'label' => 'Sedang',
+            'count' => $mCount,
+            'pct' => $mediumPercent,
         ];
         $offset += $medLen;
     }
     if ($lCount > 0) {
         $segments[] = [
-            'color' => '#10B981',
+            'color' => '#16A34A',
             'len' => $lowLen,
             'offset' => $offset,
             'label' => 'Aman',
+            'count' => $lCount,
+            'pct' => $lowPercent,
         ];
         $offset += $lowLen;
     }
     $hasMultiple = count($segments) > 1;
+
+    // Dynamic Condition Colors & Status
+    if ($cCount > 0) {
+        $statusThemeColor = '#DC2626';
+        $statusBgColor = '#FEF2F2';
+        $statusBorderColor = '#FECACA';
+        $statusTextColor = '#991B1B';
+        $statusTitle = 'Risiko Kritis';
+        $statusSub = $cCount . ' batch kritis mendesak';
+    } elseif ($hCount > 0) {
+        $statusThemeColor = '#EA580C';
+        $statusBgColor = '#FFF7ED';
+        $statusBorderColor = '#FED7AA';
+        $statusTextColor = '#C2410C';
+        $statusTitle = 'Risiko Tinggi';
+        $statusSub = $hCount . ' batch risiko tinggi';
+    } elseif ($mCount > 0) {
+        $statusThemeColor = '#D97706';
+        $statusBgColor = '#FFFBEB';
+        $statusBorderColor = '#FDE68A';
+        $statusTextColor = '#B45309';
+        $statusTitle = 'Risiko Sedang';
+        $statusSub = $mCount . ' batch risiko sedang';
+    } else {
+        $statusThemeColor = '#16A34A';
+        $statusBgColor = '#F0FDF4';
+        $statusBorderColor = '#BBF7D0';
+        $statusTextColor = '#15803D';
+        $statusTitle = 'Kondisi Aman';
+        $statusSub = 'Seluruh batch aman';
+    }
 @endphp
 
 <div class="ml-dashboard">
@@ -289,87 +328,104 @@
                     <h2 class="ml-stats-title" id="risk-stats-title">Komposisi Risiko Stok</h2>
                     <p class="ml-stats-sub">Distribusi dari total {{ $totalBatches }} batch aktif faskes</p>
                 </div>
-                <span class="ml-stats-badge {{ $riskCount > 0 ? 'is-warning' : 'is-safe' }}">
-                    {{ $riskCount > 0 ? $riskCount . ' Berisiko' : 'Semua Aman' }}
+                <span class="ml-stats-badge" style="background: {{ $statusBgColor }}; color: {{ $statusTextColor }}; border: 1px solid {{ $statusBorderColor }};">
+                    {{ $riskCount > 0 ? $riskCount . ' Batch Berisiko' : 'Semua Aman' }}
                 </span>
             </div>
 
-            <div class="ml-stats-body">
-                <div class="ml-donut-wrapper">
-                    <svg class="ml-donut-svg" viewBox="0 0 140 140" width="124" height="124" role="img" aria-label="Grafik persentase risiko stok obat">
-                        <circle cx="70" cy="70" r="48" class="ml-donut-track" />
-                        <g transform="rotate(-90 70 70)">
-                            @foreach($segments as $seg)
-                                @php
-                                    $dashLen = $hasMultiple ? max(1, $seg['len'] - 2.5) : $seg['len'];
-                                @endphp
-                                <circle
-                                    cx="70"
-                                    cy="70"
-                                    r="48"
-                                    fill="none"
-                                    stroke="{{ $seg['color'] }}"
-                                    stroke-width="12"
-                                    stroke-dasharray="{{ number_format($dashLen, 2, '.', '') }} {{ number_format($circumference, 2, '.', '') }}"
-                                    stroke-dashoffset="{{ number_format(-$seg['offset'], 2, '.', '') }}"
-                                    stroke-linecap="butt"
-                                />
-                            @endforeach
-                        </g>
-                        <!-- Center label -->
-                        @if($riskCount > 0)
-                            <text x="70" y="65" text-anchor="middle" class="ml-donut-center-val">{{ $atRiskPercent }}%</text>
-                            <text x="70" y="81" text-anchor="middle" class="ml-donut-center-lbl">Berisiko</text>
-                        @else
-                            <text x="70" y="65" text-anchor="middle" class="ml-donut-center-val is-safe">100%</text>
-                            <text x="70" y="81" text-anchor="middle" class="ml-donut-center-lbl is-safe">Aman</text>
-                        @endif
-                    </svg>
+            <!-- Big Centered Donut Chart -->
+            <div class="ml-donut-wrapper-center">
+                <svg class="ml-donut-svg" viewBox="0 0 200 200" width="176" height="176" role="img" aria-label="Grafik persentase risiko stok obat">
+                    <circle cx="100" cy="100" r="72" class="ml-donut-track" />
+                    <g transform="rotate(-90 100 100)">
+                        @foreach($segments as $seg)
+                            @php
+                                $dashLen = $hasMultiple ? max(2, $seg['len'] - 4) : $seg['len'];
+                            @endphp
+                            <circle
+                                cx="100"
+                                cy="100"
+                                r="72"
+                                fill="none"
+                                stroke="{{ $seg['color'] }}"
+                                stroke-width="16"
+                                stroke-dasharray="{{ number_format($dashLen, 2, '.', '') }} {{ number_format($circumference, 2, '.', '') }}"
+                                stroke-dashoffset="{{ number_format(-$seg['offset'], 2, '.', '') }}"
+                                stroke-linecap="butt"
+                                class="ml-donut-segment"
+                            >
+                                <title>{{ $seg['label'] }}: {{ $seg['count'] }} batch ({{ $seg['pct'] }}%)</title>
+                            </circle>
+                        @endforeach
+                    </g>
+                    <!-- Center dynamic label -->
+                    @if($riskCount > 0)
+                        <text x="100" y="93" text-anchor="middle" class="ml-donut-center-val" fill="{{ $statusThemeColor }}">{{ $atRiskPercent }}%</text>
+                        <text x="100" y="112" text-anchor="middle" class="ml-donut-center-lbl" fill="{{ $statusThemeColor }}">{{ $statusTitle }}</text>
+                        <text x="100" y="128" text-anchor="middle" class="ml-donut-center-sub">{{ $riskCount }} dari {{ $totalBatches }} batch</text>
+                    @else
+                        <text x="100" y="93" text-anchor="middle" class="ml-donut-center-val" fill="#16A34A">100%</text>
+                        <text x="100" y="112" text-anchor="middle" class="ml-donut-center-lbl" fill="#16A34A">Kondisi Aman</text>
+                        <text x="100" y="128" text-anchor="middle" class="ml-donut-center-sub">Seluruh batch aman</text>
+                    @endif
+                </svg>
+            </div>
+
+            <!-- Breakdown list placed BELOW the pie chart -->
+            <div class="ml-breakdown-stacked">
+                <div class="ml-breakdown-item {{ $cCount > 0 ? 'is-active' : 'is-zero' }}">
+                    <div class="ml-breakdown-item-left">
+                        <span class="ml-breakdown-dot is-critical"></span>
+                        <div>
+                            <span class="ml-breakdown-name">Kritis</span>
+                            <span class="ml-breakdown-sub">(&le;30 hari)</span>
+                        </div>
+                    </div>
+                    <div class="ml-breakdown-item-right">
+                        <span class="ml-breakdown-count">{{ $cCount }} batch</span>
+                        <span class="ml-breakdown-pill is-critical">{{ $criticalPercent }}%</span>
+                    </div>
                 </div>
 
-                <div class="ml-stats-breakdown">
-                    <div class="ml-breakdown-row">
-                        <div class="ml-breakdown-info">
-                            <span class="ml-breakdown-dot is-critical"></span>
-                            <span class="ml-breakdown-name">Kritis</span>
-                        </div>
-                        <div class="ml-breakdown-nums">
-                            <span class="ml-breakdown-count">{{ $cCount }} batch</span>
-                            <span class="ml-breakdown-pct">{{ $criticalPercent }}%</span>
-                        </div>
-                    </div>
-
-                    <div class="ml-breakdown-row">
-                        <div class="ml-breakdown-info">
-                            <span class="ml-breakdown-dot is-high"></span>
+                <div class="ml-breakdown-item {{ $hCount > 0 ? 'is-active' : 'is-zero' }}">
+                    <div class="ml-breakdown-item-left">
+                        <span class="ml-breakdown-dot is-high"></span>
+                        <div>
                             <span class="ml-breakdown-name">Tinggi</span>
-                        </div>
-                        <div class="ml-breakdown-nums">
-                            <span class="ml-breakdown-count">{{ $hCount }} batch</span>
-                            <span class="ml-breakdown-pct">{{ $highPercent }}%</span>
+                            <span class="ml-breakdown-sub">(&le;60 hari)</span>
                         </div>
                     </div>
+                    <div class="ml-breakdown-item-right">
+                        <span class="ml-breakdown-count">{{ $hCount }} batch</span>
+                        <span class="ml-breakdown-pill is-high">{{ $highPercent }}%</span>
+                    </div>
+                </div>
 
-                    <div class="ml-breakdown-row">
-                        <div class="ml-breakdown-info">
-                            <span class="ml-breakdown-dot is-medium"></span>
+                <div class="ml-breakdown-item {{ $mCount > 0 ? 'is-active' : 'is-zero' }}">
+                    <div class="ml-breakdown-item-left">
+                        <span class="ml-breakdown-dot is-medium"></span>
+                        <div>
                             <span class="ml-breakdown-name">Sedang</span>
-                        </div>
-                        <div class="ml-breakdown-nums">
-                            <span class="ml-breakdown-count">{{ $mCount }} batch</span>
-                            <span class="ml-breakdown-pct">{{ $mediumPercent }}%</span>
+                            <span class="ml-breakdown-sub">(&le;90 hari)</span>
                         </div>
                     </div>
+                    <div class="ml-breakdown-item-right">
+                        <span class="ml-breakdown-count">{{ $mCount }} batch</span>
+                        <span class="ml-breakdown-pill is-medium">{{ $mediumPercent }}%</span>
+                    </div>
+                </div>
 
-                    <div class="ml-breakdown-row">
-                        <div class="ml-breakdown-info">
-                            <span class="ml-breakdown-dot is-low"></span>
+                <div class="ml-breakdown-item {{ $lCount > 0 ? 'is-active' : 'is-zero' }}">
+                    <div class="ml-breakdown-item-left">
+                        <span class="ml-breakdown-dot is-low"></span>
+                        <div>
                             <span class="ml-breakdown-name">Aman</span>
+                            <span class="ml-breakdown-sub">(&gt;90 hari)</span>
                         </div>
-                        <div class="ml-breakdown-nums">
-                            <span class="ml-breakdown-count">{{ $lCount }} batch</span>
-                            <span class="ml-breakdown-pct">{{ $lowPercent }}%</span>
-                        </div>
+                    </div>
+                    <div class="ml-breakdown-item-right">
+                        <span class="ml-breakdown-count">{{ $lCount }} batch</span>
+                        <span class="ml-breakdown-pill is-low">{{ $lowPercent }}%</span>
                     </div>
                 </div>
             </div>
@@ -379,7 +435,7 @@
                     <span class="ml-stats-footer-lbl">Total Nilai Berisiko:</span>
                     <span class="ml-stats-footer-val">Rp {{ number_format($totalProjectedWasteValue ?? 0, 0, ',', '.') }}</span>
                 </div>
-                <p class="ml-stats-footer-tip">
+                <p class="ml-stats-footer-tip" style="border-left: 3px solid {{ $statusThemeColor }};">
                     @if($cCount > 0)
                         Prioritas utama: Terdapat <strong>{{ $cCount }} batch kritis</strong> yang mendesak untuk ditransfer segera.
                     @elseif($hCount > 0)
