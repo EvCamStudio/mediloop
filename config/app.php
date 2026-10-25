@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'MediLoop'),
 
+    'demo_password' => env('DEMO_PASSWORD', 'password'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

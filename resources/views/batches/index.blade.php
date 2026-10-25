@@ -321,7 +321,7 @@
                             <th scope="col" class="is-right">Stok</th>
                             <th scope="col">Kedaluwarsa &amp; runway</th>
                             <th scope="col" class="is-right">Proyeksi limbah</th>
-                            <th scope="col" class="is-right"><span class="ml-sr-only">Aksi</span></th>
+                            <th scope="col" class="is-right" style="min-width: 230px;"><span class="ml-sr-only">Aksi</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -415,18 +415,14 @@
                                     </div>
                                 </td>
 
-                                <td class="is-right" data-label="Aksi">
+                                <td class="is-right" data-label="Aksi" style="white-space: nowrap;">
                                     <div class="ml-inventory-actions">
-                                        @if($projectedWaste > 0 && $batch->current_stock > 0 && ! $user->isDinkesAuditor())
-                                            <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-primary ml-btn-sm">
+                                        @if($batch->current_stock > 0 && ! $user->isDinkesAuditor())
+                                            <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-primary ml-btn-sm" title="Usulkan redistribusi batch ini">
                                                 <span>Usulkan</span>
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
                                                     <path d="M5 12h14M13 6l6 6-6 6" />
                                                 </svg>
-                                            </a>
-                                        @elseif($batch->current_stock > 0 && ! $user->isDinkesAuditor())
-                                            <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-quiet ml-btn-sm" title="Usulkan redistribusi batch ini">
-                                                <span>Usulkan</span>
                                             </a>
                                         @endif
 

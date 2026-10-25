@@ -3134,10 +3134,11 @@
         .ml-waste-value.is-safe { color: var(--ml-text); }
         .ml-inventory-actions {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-items: center;
             justify-content: flex-end;
-            gap: 8px;
+            gap: 6px;
+            white-space: nowrap;
         }
         .ml-inventory-actions form {
             display: inline-flex;
