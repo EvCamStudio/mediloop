@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build",
+  "buildCommand": "node -e \"const fs=require('fs');if(!fs.existsSync('public/build/manifest.json')){console.error('public/build missing');process.exit(1)}console.log('using prebuilt Vite assets')\"",
+  "framework": null,
+  "outputDirectory": "public",
+  "regions": ["sin1"],
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.9.0",
@@ -45,18 +48,5 @@
       "src": "/(.*)",
       "dest": "/api/index.php"
     }
-  ],
-  "env": {
-    "APP_ENV": "production",
-    "APP_DEBUG": "false",
-    "LARAVEL_STORAGE_PATH": "/tmp/storage",
-    "VIEW_COMPILED_PATH": "/tmp/views",
-    "DB_CONNECTION": "sqlite",
-    "CACHE_STORE": "array",
-    "SESSION_DRIVER": "cookie",
-    "QUEUE_CONNECTION": "sync",
-    "MAIL_MAILER": "log",
-    "LOG_CHANNEL": "stderr",
-    "LOG_LEVEL": "error"
-  }
+  ]
 }

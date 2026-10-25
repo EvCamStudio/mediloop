@@ -10,6 +10,7 @@ $storagePath = $_ENV['LARAVEL_STORAGE_PATH'] ?? $_SERVER['LARAVEL_STORAGE_PATH']
 
 $writableDirectories = [
     $storagePath.'/app/public',
+    $storagePath.'/cache',
     $storagePath.'/framework/cache/data',
     $storagePath.'/framework/sessions',
     $storagePath.'/framework/views',

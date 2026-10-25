@@ -20,3 +20,7 @@
 /public/hot
 /public/fonts-manifest.dev.json
 /database/database.sqlite
+/bootstrap/cache/*.php
+/.env
+/.env.*
+/.vercel
