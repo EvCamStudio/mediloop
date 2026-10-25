@@ -3113,37 +3113,37 @@
         .ml-stock-cell {
             display: flex;
             flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+            text-align: left;
+        }
+        .ml-stock-main {
+            display: inline-flex;
             align-items: center;
-            gap: 2px;
-            text-align: center;
-        }
-        .ml-cell-stock.is-center {
-            text-align: center;
-        }
-        .ml-table th.is-center {
-            text-align: center;
+            gap: 5px;
+            height: 24px;
+            box-sizing: border-box;
         }
         .ml-stock-cell .ml-stock-value {
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 15px;
+            font-weight: 600;
             color: var(--ml-text);
             font-variant-numeric: tabular-nums;
-            line-height: 1.2;
+            line-height: 1;
         }
         .ml-stock-cell .ml-stock-unit {
             margin-left: 0;
-            font-size: 12px;
+            font-size: 12.5px;
             font-weight: 500;
             color: var(--ml-muted);
-            line-height: 1.35;
+            line-height: 1;
             white-space: nowrap;
         }
-        .ml-stock-burn {
-            font-size: 11px;
-            font-weight: 400;
-            color: var(--ml-subtle);
-            line-height: 1.35;
-            white-space: nowrap;
+        .ml-stock-cell .ml-cell-meta {
+            margin-top: 0;
+            font-size: 12px;
+            color: var(--ml-muted);
+            line-height: 1.4;
         }
         .ml-inline-icon {
             margin-right: 2px;
