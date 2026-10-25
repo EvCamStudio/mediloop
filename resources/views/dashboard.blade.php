@@ -102,6 +102,62 @@
         </div>
     @endif
 
+    <div class="ml-kpi-grid">
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Batch berisiko</span>
+                <span class="ml-kpi-icon is-risk" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01" /><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+                </span>
+            </div>
+            <div class="ml-kpi-value">{{ number_format($riskCount, 0, ',', '.') }} <span>batch</span></div>
+            <div class="ml-kpi-meta">
+                @if($riskCount > 0)
+                    <span class="ml-kpi-emphasis">{{ $cCount }} kritis</span>
+                    <span class="ml-meta-dot">·</span>
+                    {{ $hCount }} tinggi
+                    <span class="ml-meta-dot">·</span>
+                    {{ $mCount }} sedang
+                @else
+                    <span>Seluruh batch aman</span>
+                @endif
+            </div>
+        </article>
+
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Stok aktif</span>
+                <span class="ml-kpi-icon" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                </span>
+            </div>
+            <div class="ml-kpi-value">{{ number_format($totalUnits, 0, ',', '.') }} <span>unit</span></div>
+            <div class="ml-kpi-meta">{{ number_format($totalBatches, 0, ',', '.') }} batch aktif tercatat</div>
+        </article>
+
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Nilai berisiko</span>
+                <span class="ml-kpi-icon" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></svg>
+                </span>
+            </div>
+            <div class="ml-kpi-value ml-kpi-value-currency">Rp {{ number_format($totalProjectedWasteValue ?? 0, 0, ',', '.') }}</div>
+            <div class="ml-kpi-meta">Potensi limbah kedaluwarsa</div>
+        </article>
+
+        <article class="ml-kpi">
+            <div class="ml-kpi-top">
+                <span class="ml-kpi-label">Jaringan faskes</span>
+                <span class="ml-kpi-icon" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13A4 4 0 0116 11" /></svg>
+                </span>
+            </div>
+            <div class="ml-kpi-value">{{ number_format($networkCount, 0, ',', '.') }} <span>faskes</span></div>
+            <div class="ml-kpi-meta">Terhubung aktif redistribusi</div>
+        </article>
+    </div>
+
     <!-- MAIN DASHBOARD SPLIT: OVERVIEW TABLE (LEFT) + MODERN STATS & DONUT CHART (RIGHT) -->
     <div class="ml-dashboard-main-grid">
         <section class="ml-section ml-overview-table-card" aria-labelledby="forecast-title">
