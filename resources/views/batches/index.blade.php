@@ -316,11 +316,11 @@
                     </caption>
                     <thead>
                         <tr>
-                            <th scope="col">Obat &amp; spesifikasi</th>
-                            <th scope="col">Batch &amp; lokasi</th>
-                            <th scope="col" class="is-right">Stok</th>
-                            <th scope="col">Kedaluwarsa &amp; runway</th>
-                            <th scope="col" class="is-right">Proyeksi limbah</th>
+                            <th scope="col" style="min-width: 220px;">Obat &amp; spesifikasi</th>
+                            <th scope="col" style="min-width: 220px;">Batch &amp; lokasi</th>
+                            <th scope="col" class="is-right" style="min-width: 140px;">Stok</th>
+                            <th scope="col" style="min-width: 220px;">Kedaluwarsa &amp; runway</th>
+                            <th scope="col" class="is-right" style="min-width: 150px;">Proyeksi limbah</th>
                             <th scope="col" class="is-right" style="min-width: 230px;"><span class="ml-sr-only">Aksi</span></th>
                         </tr>
                     </thead>
@@ -355,20 +355,20 @@
                                 </td>
 
                                 <td data-label="Batch &amp; lokasi">
-                                    <span class="ml-batch-code">{{ $batch->batch_number }}</span>
-                                    <div class="ml-cell-meta">
-                                        <svg class="ml-inline-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                            <path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                        {{ $batch->storage_location ?? 'Gudang Farmasi Utama' }}
+                                    <div class="ml-batch-cell">
+                                        <span class="ml-batch-code">{{ $batch->batch_number }}</span>
+                                        <div class="ml-cell-meta">{{ $batch->storage_location ?? 'Gudang Farmasi Utama' }}</div>
                                     </div>
                                 </td>
 
                                 <td class="ml-cell-stock" data-label="Stok">
-                                    <span class="ml-stock-value">{{ number_format($batch->current_stock) }}</span>
-                                    <span class="ml-stock-unit">{{ $batch->medicine->unit }}</span>
-                                    <div class="ml-cell-meta">~{{ $batch->daily_burn_rate }} unit/hari</div>
+                                    <div class="ml-stock-cell">
+                                        <div class="ml-stock-main">
+                                            <span class="ml-stock-value">{{ number_format($batch->current_stock) }}</span>
+                                            <span class="ml-stock-unit">{{ $batch->medicine->unit }}</span>
+                                        </div>
+                                        <div class="ml-cell-meta">~{{ $batch->daily_burn_rate }} unit/hari</div>
+                                    </div>
                                 </td>
 
                                 <td data-label="Kedaluwarsa &amp; runway">

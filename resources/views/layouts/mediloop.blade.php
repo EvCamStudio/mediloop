@@ -3090,7 +3090,44 @@
             font-size: 11px;
             font-weight: 600;
             line-height: 1.35;
-            overflow-wrap: break-word;
+            white-space: nowrap;
+        }
+        .ml-batch-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+        .ml-batch-cell .ml-batch-code {
+            height: 24px;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+        }
+        .ml-batch-cell .ml-cell-meta {
+            margin-top: 0;
+            font-size: 12px;
+            color: var(--ml-muted);
+            line-height: 1.4;
+        }
+        .ml-stock-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+        .ml-stock-cell .ml-cell-meta {
+            margin-top: 0;
+            font-size: 12px;
+            color: var(--ml-muted);
+            line-height: 1.4;
+        }
+        .ml-stock-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            height: 24px;
+            box-sizing: border-box;
         }
         .ml-inline-icon {
             margin-right: 2px;
@@ -3149,7 +3186,11 @@
             border-color: var(--ml-danger);
         }
         .ml-btn-quiet.is-danger:hover { background: var(--ml-surface); }
-        .ml-table-inventory { min-width: 960px; }
+        .ml-table-inventory { min-width: 1120px; }
+        .ml-table-inventory td {
+            vertical-align: top;
+            padding: 16px 20px;
+        }
         .ml-simulator-row[hidden] { display: none !important; }
         .ml-simulator-row > td {
             padding: 16px 24px;
