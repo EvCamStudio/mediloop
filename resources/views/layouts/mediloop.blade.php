@@ -3113,8 +3113,15 @@
         .ml-stock-cell {
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
+            align-items: center;
             gap: 2px;
+            text-align: center;
+        }
+        .ml-cell-stock.is-center {
+            text-align: center;
+        }
+        .ml-table th.is-center {
+            text-align: center;
         }
         .ml-stock-cell .ml-stock-value {
             font-size: 16px;

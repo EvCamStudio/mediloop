@@ -318,7 +318,7 @@
                         <tr>
                             <th scope="col" style="min-width: 220px;">Obat &amp; spesifikasi</th>
                             <th scope="col" style="min-width: 220px;">Batch &amp; lokasi</th>
-                            <th scope="col" class="is-right" style="min-width: 140px;">Stok</th>
+                            <th scope="col" class="is-center" style="min-width: 140px; text-align: center;">Stok</th>
                             <th scope="col" style="min-width: 220px;">Kedaluwarsa &amp; runway</th>
                             <th scope="col" class="is-right" style="min-width: 150px;">Proyeksi limbah</th>
                             <th scope="col" class="is-right" style="min-width: 230px;"><span class="ml-sr-only">Aksi</span></th>
@@ -361,7 +361,7 @@
                                     </div>
                                 </td>
 
-                                <td class="ml-cell-stock" data-label="Stok">
+                                <td class="ml-cell-stock is-center" data-label="Stok">
                                     <div class="ml-stock-cell">
                                         <span class="ml-stock-value">{{ number_format($batch->current_stock) }}</span>
                                         <span class="ml-stock-unit">{{ $batch->medicine->unit }}</span>
