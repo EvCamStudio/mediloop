@@ -2922,9 +2922,13 @@
             align-items: center;
             padding: 16px 20px;
             border-bottom: 1px solid var(--ml-border);
+            cursor: pointer;
+            transition: background 0.2s ease;
         }
         .ml-candidate:last-child { border-bottom: 0; }
+        .ml-candidate:hover { background: #F8FAFC; }
         .ml-candidate.is-top { background: linear-gradient(90deg, #EFF4FF 0%, #FFFFFF 62%); }
+        .ml-candidate.is-top:hover { background: linear-gradient(90deg, #E6EFFF 0%, #FFFFFF 62%); }
         .ml-candidate-rank {
             display: inline-flex;
             align-items: center;
@@ -2936,6 +2940,8 @@
             color: var(--ml-muted);
             font-family: var(--font-code);
             font-size: 10px;
+            font-weight: 600;
+            transition: background 0.2s ease, color 0.2s ease;
         }
         .ml-candidate.is-top .ml-candidate-rank { background: var(--ml-primary); color: #fff; }
         .ml-candidate-copy { min-width: 0; }

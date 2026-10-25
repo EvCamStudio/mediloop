@@ -92,12 +92,12 @@
 
                 <div class="ml-sort-row" role="group" aria-label="Urutkan kandidat">
                     <a
-                        href="{{ route('transfers.propose', ['batch' => $batch, 'sort' => 'score']) }}"
+                        href="{{ route('transfers.propose', array_filter(['batch' => $batch, 'sort' => 'score', 'recipient_id' => $defaultCandidate['facility']->id ?? null])) }}"
                         class="ml-sort-pill {{ $sort === 'score' ? 'is-active' : '' }}"
                         @if($sort === 'score') aria-current="true" @endif
                     >Skor terbaik</a>
                     <a
-                        href="{{ route('transfers.propose', ['batch' => $batch, 'sort' => 'distance']) }}"
+                        href="{{ route('transfers.propose', array_filter(['batch' => $batch, 'sort' => 'distance', 'recipient_id' => $defaultCandidate['facility']->id ?? null])) }}"
                         class="ml-sort-pill {{ $sort === 'distance' ? 'is-active' : '' }}"
                         @if($sort === 'distance') aria-current="true" @endif
                     >Terdekat</a>
@@ -110,9 +110,17 @@
                         <p class="ml-empty-copy">Tidak ada fasilitas yang memenuhi syarat rantai dingin dan jarak saat ini.</p>
                     </div>
                 @else
-                    <ol class="ml-candidate-list">
+                    <ol class="ml-candidate-list" id="candidateList">
                         @foreach($candidates as $index => $candidate)
-                            <li class="ml-candidate {{ $index === 0 ? 'is-top' : '' }}">
+                            @php
+                                $isSelected = ($defaultCandidate && $candidate['facility']->id === $defaultCandidate['facility']->id);
+                            @endphp
+                            <li
+                                class="ml-candidate {{ $isSelected ? 'is-top' : '' }}"
+                                id="candidate-card-{{ $candidate['facility']->id }}"
+                                data-facility-id="{{ $candidate['facility']->id }}"
+                                onclick="selectCandidate({{ $candidate['facility']->id }}, '{{ addslashes($candidate['facility']->name) }}', {{ $candidate['recommended_quantity'] }})"
+                            >
                                 <div class="ml-candidate-rank" aria-hidden="true">{{ $index + 1 }}</div>
                                 <div class="ml-candidate-copy">
                                     <div class="ml-candidate-name">{{ $candidate['facility']->name }}</div>
@@ -133,9 +141,9 @@
                                     <div class="ml-cell-meta">{{ $candidate['distance_km'] }} km</div>
                                     <button
                                         type="button"
-                                        class="ml-btn-primary ml-btn-sm"
-                                        onclick="selectCandidate({{ $candidate['facility']->id }}, '{{ addslashes($candidate['facility']->name) }}', {{ $candidate['recommended_quantity'] }})"
-                                    >Pilih</button>
+                                        class="{{ $isSelected ? 'ml-btn-primary' : 'ml-btn-quiet' }} ml-btn-sm"
+                                        onclick="event.stopPropagation(); selectCandidate({{ $candidate['facility']->id }}, '{{ addslashes($candidate['facility']->name) }}', {{ $candidate['recommended_quantity'] }})"
+                                    >{{ $isSelected ? 'Terpilih' : 'Pilih' }}</button>
                                 </div>
                             </li>
                         @endforeach
@@ -197,6 +205,35 @@
         document.getElementById('selectedFacilityId').value = facilityId;
         document.getElementById('selectedFacilityName').value = facilityName;
         document.getElementById('quantity').value = recommendedQty;
+
+        // Reset all candidate cards and button states
+        document.querySelectorAll('.ml-candidate').forEach(function(el) {
+            el.classList.remove('is-top');
+            var btn = el.querySelector('.ml-candidate-side button');
+            if (btn) {
+                btn.textContent = 'Pilih';
+                btn.className = 'ml-btn-quiet ml-btn-sm';
+            }
+        });
+
+        // Activate selected candidate card and button
+        var selectedCard = document.getElementById('candidate-card-' + facilityId);
+        if (selectedCard) {
+            selectedCard.classList.add('is-top');
+            var selectedBtn = selectedCard.querySelector('.ml-candidate-side button');
+            if (selectedBtn) {
+                selectedBtn.textContent = 'Terpilih';
+                selectedBtn.className = 'ml-btn-primary ml-btn-sm';
+            }
+        }
+
+        // Keep URL in sync with selected recipient
+        try {
+            var url = new URL(window.location.href);
+            url.searchParams.set('recipient_id', facilityId);
+            window.history.replaceState({}, '', url);
+        } catch (e) {}
+
         document.getElementById('proposalForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
         document.getElementById('quantity').focus({ preventScroll: true });
     }
