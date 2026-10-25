@@ -26,7 +26,7 @@ if (container) {
     const map = L.map(container, {
         center: start,
         zoom: 14,
-        scrollWheelZoom: false,
+        scrollWheelZoom: true,
     });
 
     L.tileLayer(TILE_URL, {

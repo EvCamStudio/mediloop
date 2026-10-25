@@ -76,19 +76,6 @@ function buildPopup(facility, isOrigin = false) {
     return root;
 }
 
-function addZoomHint(map) {
-    const hint = L.control({ position: 'bottomleft' });
-
-    hint.onAdd = () => {
-        const element = L.DomUtil.create('div', 'ml-map-hint');
-        element.textContent = 'Ctrl + scroll untuk zoom';
-
-        return element;
-    };
-
-    hint.addTo(map);
-}
-
 function addRadiusControl(map, radiusBounds, maxRadiusKm) {
     const control = L.control({ position: 'topright' });
 
@@ -135,7 +122,7 @@ function initNetworkMap() {
     fallback?.remove();
 
     const map = L.map(container, {
-        scrollWheelZoom: false,
+        scrollWheelZoom: true,
         zoomControl: true,
         attributionControl: true,
     });
@@ -144,8 +131,6 @@ function initNetworkMap() {
         maxZoom: 19,
         attribution: TILE_ATTRIBUTION,
     }).addTo(map);
-
-    addZoomHint(map);
 
     map.setView(
         origin ? [origin.lat, origin.lng] : [-6.1754, 106.8272],
