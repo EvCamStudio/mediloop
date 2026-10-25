@@ -37,10 +37,21 @@ class TransferController extends Controller
 
         $transfers = $query->orderBy('updated_at', 'desc')->paginate(15);
 
+        $availableBatches = collect();
+        if (! $user->isDinkesAuditor() && $user->facility_id) {
+            $availableBatches = Batch::with('medicine')
+                ->where('facility_id', $user->facility_id)
+                ->where('status', 'ACTIVE')
+                ->where('current_stock', '>', 0)
+                ->orderBy('expiry_date', 'asc')
+                ->get();
+        }
+
         return view('transfers.index', [
             'transfers' => $transfers,
             'currentStatus' => $request->get('status'),
             'user' => $user,
+            'availableBatches' => $availableBatches,
         ]);
     }
 
@@ -58,6 +69,7 @@ class TransferController extends Controller
 
         $sort = $request->string('sort')->toString();
         $sort = in_array($sort, ['score', 'distance'], true) ? $sort : 'score';
+        $selectedRecipientId = $request->filled('recipient_id') ? $request->integer('recipient_id') : null;
 
         $batch->load(['medicine', 'facility']);
         $candidates = RedistributionEngine::findCandidateRecipients($batch, $sort);
@@ -67,6 +79,7 @@ class TransferController extends Controller
             'candidates' => $candidates,
             'sort' => $sort,
             'user' => $user,
+            'selectedRecipientId' => $selectedRecipientId,
         ]);
     }
 

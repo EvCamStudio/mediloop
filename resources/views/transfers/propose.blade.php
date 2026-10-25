@@ -1,13 +1,27 @@
 @extends('layouts.mediloop', ['title' => 'Rekomendasi & Pengusulan Transfer'])
 
 @section('content')
+@php
+    $defaultCandidate = null;
+    if (isset($selectedRecipientId)) {
+        foreach ($candidates as $c) {
+            if ($c['facility']->id === $selectedRecipientId) {
+                $defaultCandidate = $c;
+                break;
+            }
+        }
+    }
+    $defaultCandidate = $defaultCandidate ?? ($candidates[0] ?? null);
+    $defaultQty = $defaultCandidate ? ($defaultCandidate['recommended_quantity'] > 0 ? $defaultCandidate['recommended_quantity'] : min(100, $batch->current_stock)) : min(100, $batch->current_stock);
+@endphp
+
 <div class="ml-page-admin">
     <nav class="ml-breadcrumb" aria-label="Breadcrumb">
         <a href="{{ route('dashboard') }}">Dashboard</a>
         <span class="ml-breadcrumb-sep">/</span>
-        <a href="{{ route('transfers.index') }}">Redistribusi</a>
+        <a href="{{ route('transfers.index') }}">Transfers &amp; Alokasi</a>
         <span class="ml-breadcrumb-sep">/</span>
-        <span>Usulan batch {{ $batch->batch_number }}</span>
+        <span>Usulan: {{ $batch->medicine->name }} ({{ $batch->batch_number }})</span>
     </nav>
 
     <header class="ml-page-head">
@@ -134,7 +148,7 @@
             <form method="POST" action="{{ route('transfers.store') }}" class="ml-card ml-sticky" id="proposalForm" novalidate data-validate>
                 @csrf
                 <input type="hidden" name="batch_id" value="{{ $batch->id }}">
-                <input type="hidden" id="selectedFacilityId" name="recipient_facility_id" value="{{ $candidates[0]['facility']->id ?? '' }}">
+                <input type="hidden" id="selectedFacilityId" name="recipient_facility_id" value="{{ $defaultCandidate['facility']->id ?? '' }}">
 
                 <div class="ml-card-head">
                     <h2 class="ml-card-title">Ajukan transfer</h2>
@@ -146,13 +160,13 @@
 
                     <div class="ml-field">
                         <label for="selectedFacilityName" class="ml-label">Fasilitas penerima</label>
-                        <input type="text" id="selectedFacilityName" readonly value="{{ $candidates[0]['facility']->name ?? '' }}" class="ml-input" @if($errors->has('recipient_facility_id')) aria-invalid="true" aria-describedby="recipient_facility_id-error" @endif>
+                        <input type="text" id="selectedFacilityName" readonly value="{{ $defaultCandidate['facility']->name ?? '' }}" class="ml-input" @if($errors->has('recipient_facility_id')) aria-invalid="true" aria-describedby="recipient_facility_id-error" @endif>
                         <x-form.error for="recipient_facility_id" />
                     </div>
 
                     <div class="ml-field">
                         <label for="quantity" class="ml-label">Jumlah unit <span class="ml-required">*</span></label>
-                        <input type="number" id="quantity" name="quantity" min="1" max="{{ $batch->current_stock }}" value="{{ $candidates[0]['recommended_quantity'] ?? 100 }}" class="ml-input is-mono @error('quantity') is-invalid @enderror" required data-error-required="Jumlah unit wajib diisi." data-error-min="Jumlah minimal 1 unit." data-error-max="Jumlah melebihi stok tersedia ({{ number_format($batch->current_stock) }} unit).">
+                        <input type="number" id="quantity" name="quantity" min="1" max="{{ $batch->current_stock }}" value="{{ $defaultQty }}" class="ml-input is-mono @error('quantity') is-invalid @enderror" required data-error-required="Jumlah unit wajib diisi." data-error-min="Jumlah minimal 1 unit." data-error-max="Jumlah melebihi stok tersedia ({{ number_format($batch->current_stock) }} unit).">
                         <p class="ml-help">Maksimal {{ number_format($batch->current_stock) }} {{ $batch->medicine->unit }} tersedia di donor.</p>
                         <x-form.error for="quantity" />
                     </div>

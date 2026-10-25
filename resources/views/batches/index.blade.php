@@ -40,6 +40,20 @@
         </div>
     @endif
 
+    @if($errors->has('csv_file'))
+        <div class="ml-alert ml-alert-danger" role="alert" style="margin-bottom: 1.25rem; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 0.875rem 1.25rem; border-radius: 0.75rem;">
+            <div class="ml-alert-row" style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span><strong>Gagal Impor CSV:</strong> {{ $errors->first('csv_file') }}</span>
+                </div>
+                <button type="button" onclick="this.closest('.ml-alert-danger').remove()" aria-label="Tutup notifikasi" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #991b1b;">&times;</button>
+            </div>
+        </div>
+    @endif
+
     @if($errors->has('delete_error'))
         <div class="ml-alert ml-alert-error" role="alert">
             <div class="ml-alert-row">
@@ -68,7 +82,13 @@
         </div>
 
         @if(! $user->isDinkesAuditor())
-            <div class="ml-page-actions">
+            <div class="ml-page-actions flex items-center gap-2">
+                <button type="button" onclick="document.getElementById('ml-csv-modal').style.display='flex'" class="ml-btn-quiet inline-flex items-center gap-1.5">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <span>Import Stok (CSV)</span>
+                </button>
                 <a href="{{ route('batches.create') }}" class="ml-btn-primary">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M12 4v16m8-8H4" />
@@ -404,6 +424,10 @@
                                                     <path d="M5 12h14M13 6l6 6-6 6" />
                                                 </svg>
                                             </a>
+                                        @elseif($batch->current_stock > 0 && ! $user->isDinkesAuditor())
+                                            <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-quiet ml-btn-sm" title="Usulkan redistribusi batch ini">
+                                                <span>Usulkan</span>
+                                            </a>
                                         @endif
 
                                         @if(! $user->isDinkesAuditor())
@@ -494,11 +518,121 @@
             </div>
         @endif
     </section>
+
+    <!-- Modal CSV Import -->
+    <div id="ml-csv-modal" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none; position: fixed; inset: 0; z-index: 999; align-items: center; justify-content: center;">
+        <div style="position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);" onclick="document.getElementById('ml-csv-modal').style.display='none'"></div>
+
+        <div style="position: relative; z-index: 1000; width: 100%; max-width: 540px; margin: 1rem; background: #fff; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid #e2e8f0; overflow: hidden; text-align: left;">
+            <!-- Header -->
+            <div style="background: #f8fafc; padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #0b1f4b;" id="modal-title">Impor Data Stok Obat (CSV)</h3>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.75rem; color: #52627f;">Unggah berkas spreadsheet/CSV inventaris untuk sinkronisasi massal</p>
+                </div>
+                <button type="button" onclick="document.getElementById('ml-csv-modal').style.display='none'" style="background: none; border: none; cursor: pointer; color: #94a3b8; padding: 0.25rem; border-radius: 0.5rem;">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form id="ml-csv-import-form" method="POST" action="{{ route('batches.importCsv') }}" enctype="multipart/form-data" onsubmit="return handleCsvSubmit(event)" style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+                @csrf
+
+                <div id="ml-csv-client-error" style="display: none; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 600;"></div>
+
+                <!-- Instructions & Template Box -->
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 0.75rem; padding: 0.875rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; font-size: 0.75rem;">
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                        <p style="margin: 0; font-weight: 700; color: #1d4ed8;">Format Kolom CSV yang Didukung:</p>
+                        <p style="margin: 0; color: #475569; font-size: 0.72rem; line-height: 1.4;">
+                            <code>nama_obat</code>, <code>nomor_batch</code>, <code>stok_saat_ini</code>, <code>tanggal_kadaluwarsa</code>, <code>laju_pemakaian_harian</code>
+                        </p>
+                    </div>
+                    <a href="{{ route('batches.csvTemplate') }}" style="flex-shrink: 0; display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.375rem 0.75rem; background: #fff; border: 1px solid #93c5fd; color: #1d4ed8; font-weight: 700; border-radius: 0.5rem; font-size: 0.7rem; text-decoration: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        <span>Unduh Template</span>
+                    </a>
+                </div>
+
+                <!-- Dropzone File Input using LABEL -->
+                <label for="csv_file_input" id="csv-dropzone" style="display: block; border: 2px dashed #bfdbfe; background: #f8fafc; border-radius: 0.75rem; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s;">
+                    <svg id="csv-icon-upload" style="width: 2.5rem; height: 2.5rem; margin: 0 auto 0.5rem; color: #1d4ed8;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p style="margin: 0; font-size: 0.85rem; font-weight: 700; color: #0b1f4b;" id="csv-prompt-text">Klik di sini untuk memilih berkas CSV</p>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.72rem; color: #64748b;">Mendukung format .csv atau .txt (Maksimal 5 MB)</p>
+                    <div id="selected-file-details" style="display: none; margin-top: 0.75rem; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 0.5rem 0.75rem; border-radius: 0.5rem; color: #166534; font-size: 0.75rem; font-weight: 600;">
+                        <span id="selected-file-name"></span>
+                    </div>
+                </label>
+                <input type="file" name="csv_file" id="csv_file_input" accept=".csv,.txt" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0;" onchange="handleFileChange(this)">
+
+                <!-- Action Buttons -->
+                <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; padding-top: 0.5rem;">
+                    <button type="button" onclick="document.getElementById('ml-csv-modal').style.display='none'" style="padding: 0.5rem 1rem; font-size: 0.75rem; font-weight: 700; color: #64748b; background: none; border: none; cursor: pointer; border-radius: 0.5rem;">
+                        Batal
+                    </button>
+                    <button type="submit" id="ml-csv-submit-btn" class="ml-btn-primary" style="display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.5rem 1.25rem; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
+                        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        <span id="ml-csv-submit-text">Mulai Impor &amp; Kalkulasi</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection
 
 @section('scripts')
 <script>
+    function handleFileChange(input) {
+        const errorBox = document.getElementById('ml-csv-client-error');
+        if (errorBox) errorBox.style.display = 'none';
+
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const sizeKb = (file.size / 1024).toFixed(1);
+            const nameEl = document.getElementById('selected-file-name');
+            const detailsEl = document.getElementById('selected-file-details');
+            const dropzone = document.getElementById('csv-dropzone');
+            const promptText = document.getElementById('csv-prompt-text');
+
+            if (nameEl) nameEl.textContent = 'Berkas dipilih: ' + file.name + ' (' + sizeKb + ' KB)';
+            if (detailsEl) detailsEl.style.display = 'block';
+            if (dropzone) {
+                dropzone.style.borderColor = '#22c55e';
+                dropzone.style.background = '#f0fdf4';
+            }
+            if (promptText) promptText.textContent = 'Klik untuk mengganti berkas';
+        }
+    }
+
+    function handleCsvSubmit(e) {
+        const input = document.getElementById('csv_file_input');
+        const errorBox = document.getElementById('ml-csv-client-error');
+
+        if (!input.files || input.files.length === 0) {
+            e.preventDefault();
+            if (errorBox) {
+                errorBox.textContent = 'Silakan pilih berkas CSV terlebih dahulu dari komputer Anda.';
+                errorBox.style.display = 'block';
+            } else {
+                alert('Silakan pilih berkas CSV terlebih dahulu dari komputer Anda.');
+            }
+            return false;
+        }
+
+        const btn = document.getElementById('ml-csv-submit-btn');
+        const txt = document.getElementById('ml-csv-submit-text');
+        if (btn && txt) {
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            txt.textContent = 'Sedang Memproses Impor & Kalkulasi...';
+        }
+        return true;
+    }
+
     function toggleSimulator(id) {
         const row = document.getElementById(id);
         if (!row) {
@@ -557,5 +691,14 @@
         riskElement.textContent = newRiskLabel;
         riskElement.className = 'ml-risk ml-risk-' + newRisk.toLowerCase();
     }
+
+    window.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('ml-csv-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+    });
 </script>
 @endsection

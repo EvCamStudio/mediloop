@@ -214,11 +214,11 @@
         <section class="ml-section ml-rec-band" aria-labelledby="match-title">
             <div class="ml-section-header">
                 <div>
-                    <h2 class="ml-section-title" id="match-title">Rekomendasi match redistribusi</h2>
+                    <h2 class="ml-section-title" id="match-title">Rekomendasi Redistribusi Obat</h2>
                     <p class="ml-section-sub">
-                        Kandidat untuk <strong>{{ $topRiskBatch->medicine->name }}</strong>
-                        (batch {{ $topRiskBatch->batch_number }}).
-                        Skor: kebutuhan 50% &middot; jarak 30% &middot; logistik 20%.
+                        Kandidat faskes penerima yang paling cocok untuk obat <strong>{{ $topRiskBatch->medicine->name }}</strong>
+                        (Nomor batch: <code>{{ $topRiskBatch->batch_number }}</code>).
+                        Skor kecocokan dihitung dari: Kebutuhan riil (50%) &middot; Jarak terdekat (30%) &middot; Kesiapan rantai dingin (20%).
                     </p>
                 </div>
             </div>
@@ -233,29 +233,45 @@
                             'DINKES' => 'Dinkes',
                             default => ucwords(strtolower(str_replace('_', ' ', $candidate['facility']->type))),
                         };
+                        $cap = (int) ($candidate['recipient_intake_cap'] ?? 0);
                     @endphp
-                    <article class="ml-rec-card">
-                        <div class="ml-rec-top">
-                            <span class="ml-rec-rank" aria-hidden="true">{{ $index + 1 }}</span>
-                            <div class="ml-rec-body">
-                                <div class="ml-rec-name">{{ $candidate['facility']->name }}</div>
-                                <div class="ml-rec-meta">
-                                    {{ $facilityType }}
-                                    &middot; {{ $candidate['distance_km'] }} km
-                                </div>
+                    <article class="ml-rec-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <!-- Header Obat pada Kartu -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid rgba(0,0,0,0.06);">
+                                <span style="font-size: 11px; font-weight: 700; color: #1d4ed8; background: #eaf1ff; padding: 3px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+                                    {{ $topRiskBatch->medicine->name }}
+                                </span>
+                                <span style="font-size: 10.5px; color: #64748b; font-family: monospace;">Batch {{ $topRiskBatch->batch_number }}</span>
                             </div>
-                            <span class="ml-rec-score" title="Skor = kebutuhan 50% + jarak 30% + logistik 20%">
-                                {{ $candidate['match_score'] }}%
-                            </span>
-                        </div>
 
-                        <div class="ml-rec-facts">
-                            <span>Kapasitas {{ $candidate['recipient_intake_cap'] }} unit</span>
+                            <div class="ml-rec-top">
+                                <span class="ml-rec-rank" aria-hidden="true">{{ $index + 1 }}</span>
+                                <div class="ml-rec-body">
+                                    <div class="ml-rec-name" style="font-weight: 700; color: #0b1f4b;">{{ $candidate['facility']->name }}</div>
+                                    <div class="ml-rec-meta">
+                                        {{ $facilityType }}
+                                        &middot; {{ $candidate['distance_km'] }} km dari lokasi Anda
+                                    </div>
+                                </div>
+                                <span class="ml-rec-score" title="Skor = kebutuhan 50% + jarak 30% + logistik 20%">
+                                    {{ $candidate['match_score'] }}% Cocok
+                                </span>
+                            </div>
+
+                            <div class="ml-rec-facts" style="margin-top: 10px;">
+                                @if($cap > 0)
+                                    <span style="font-weight: 600; color: #0f766e;">Kapasitas serap: {{ number_format($cap) }} unit</span>
+                                @else
+                                    <span style="font-weight: 500; color: #64748b;">Siap menerima transfer antar-faskes</span>
+                                @endif
+                            </div>
                         </div>
 
                         @if(! $user->isDinkesAuditor())
-                            <a href="{{ route('transfers.propose', $topRiskBatch) }}" class="ml-btn-primary ml-btn-sm ml-rec-cta">
-                                <span>Ajukan transfer</span>
+                            <a href="{{ route('transfers.propose', ['batch' => $topRiskBatch, 'recipient_id' => $candidate['facility']->id]) }}" class="ml-btn-primary ml-btn-sm ml-rec-cta" style="margin-top: 14px;">
+                                <span>Ajukan transfer ke faskes ini</span>
                                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                             </a>
                         @endif

@@ -45,6 +45,8 @@ Route::middleware(['auth', 'active', 'facility.active'])->group(function () {
     Route::get('/batches', [BatchController::class, 'index'])->name('batches.index');
     Route::get('/batches/create', [BatchController::class, 'create'])->name('batches.create');
     Route::post('/batches', [BatchController::class, 'store'])->name('batches.store');
+    Route::post('/batches/import-csv', [BatchController::class, 'importCsv'])->name('batches.importCsv');
+    Route::get('/batches/csv-template', [BatchController::class, 'downloadTemplate'])->name('batches.csvTemplate');
     Route::get('/batches/{batch}/edit', [BatchController::class, 'edit'])->name('batches.edit');
     Route::put('/batches/{batch}', [BatchController::class, 'update'])->name('batches.update');
     Route::delete('/batches/{batch}', [BatchController::class, 'destroy'])->name('batches.destroy');
