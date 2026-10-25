@@ -363,11 +363,9 @@
 
                                 <td class="ml-cell-stock" data-label="Stok">
                                     <div class="ml-stock-cell">
-                                        <div class="ml-stock-main">
-                                            <span class="ml-stock-value">{{ number_format($batch->current_stock) }}</span>
-                                            <span class="ml-stock-unit">{{ $batch->medicine->unit }}</span>
-                                        </div>
-                                        <div class="ml-cell-meta">~{{ $batch->daily_burn_rate }} unit/hari</div>
+                                        <span class="ml-stock-value">{{ number_format($batch->current_stock) }}</span>
+                                        <span class="ml-stock-unit">{{ $batch->medicine->unit }}</span>
+                                        <span class="ml-stock-burn">~{{ $batch->daily_burn_rate }} unit/hari</span>
                                     </div>
                                 </td>
 

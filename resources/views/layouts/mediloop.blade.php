@@ -3114,20 +3114,29 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 5px;
+            gap: 2px;
         }
-        .ml-stock-cell .ml-cell-meta {
-            margin-top: 0;
+        .ml-stock-cell .ml-stock-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--ml-text);
+            font-variant-numeric: tabular-nums;
+            line-height: 1.2;
+        }
+        .ml-stock-cell .ml-stock-unit {
+            margin-left: 0;
             font-size: 12px;
+            font-weight: 500;
             color: var(--ml-muted);
-            line-height: 1.4;
+            line-height: 1.35;
+            white-space: nowrap;
         }
-        .ml-stock-main {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            height: 24px;
-            box-sizing: border-box;
+        .ml-stock-burn {
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--ml-subtle);
+            line-height: 1.35;
+            white-space: nowrap;
         }
         .ml-inline-icon {
             margin-right: 2px;
