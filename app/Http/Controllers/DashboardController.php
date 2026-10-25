@@ -29,8 +29,13 @@ class DashboardController extends Controller
                 'facility' => null,
                 'facilityMissing' => true,
                 'batches' => collect(),
+                'overviewBatches' => collect(),
                 'totalStockUnits' => 0,
                 'atRiskCount' => 0,
+                'criticalCount' => 0,
+                'highCount' => 0,
+                'mediumCount' => 0,
+                'lowCount' => 0,
                 'totalProjectedWasteUnits' => 0,
                 'totalProjectedWasteValue' => 0,
                 'activeTransfersCount' => 0,
@@ -56,7 +61,15 @@ class DashboardController extends Controller
 
         // Calculate aggregate metrics
         $totalStockUnits = $batches->sum('current_stock');
-        $atRiskBatches = $batches->filter(fn ($b) => in_array($b->risk_level, ['CRITICAL', 'HIGH']));
+        $criticalCount = $batches->where('risk_level', 'CRITICAL')->count();
+        $highCount = $batches->where('risk_level', 'HIGH')->count();
+        $mediumCount = $batches->where('risk_level', 'MEDIUM')->count();
+        $lowCount = $batches->where('risk_level', 'LOW')->count();
+
+        // At-risk batches for overview table (CRITICAL, HIGH, MEDIUM)
+        $overviewBatches = $batches->filter(fn ($b) => in_array($b->risk_level, ['CRITICAL', 'HIGH', 'MEDIUM']));
+        $atRiskCount = $overviewBatches->count();
+
         $totalProjectedWasteUnits = $batches->sum('projected_waste');
         $totalProjectedWasteValue = $batches->sum(fn ($b) => $b->projected_waste * (float) $b->unit_price_idr);
 
@@ -69,8 +82,11 @@ class DashboardController extends Controller
 
         $facilitiesList = Facility::where('type', '!=', 'DINKES')->where('status', 'ACTIVE')->get();
 
-        // Top at-risk batch for candidate recommendations
-        $topRiskBatch = $atRiskBatches->first() ?? $batches->first();
+        // Top at-risk batch for candidate recommendations: prioritize CRITICAL first, then HIGH, then MEDIUM
+        $topRiskBatch = $batches->firstWhere('risk_level', 'CRITICAL')
+            ?? $batches->firstWhere('risk_level', 'HIGH')
+            ?? $batches->firstWhere('risk_level', 'MEDIUM')
+            ?? $batches->first();
         $matchCandidates = [];
         if ($topRiskBatch) {
             $matchCandidates = array_slice(RedistributionEngine::findCandidateRecipients($topRiskBatch), 0, 3);
@@ -101,8 +117,13 @@ class DashboardController extends Controller
             'user' => $user,
             'facility' => $facility,
             'batches' => $batches,
+            'overviewBatches' => $overviewBatches,
             'totalStockUnits' => $totalStockUnits,
-            'atRiskCount' => $atRiskBatches->count(),
+            'atRiskCount' => $atRiskCount,
+            'criticalCount' => $criticalCount,
+            'highCount' => $highCount,
+            'mediumCount' => $mediumCount,
+            'lowCount' => $lowCount,
             'totalProjectedWasteUnits' => $totalProjectedWasteUnits,
             'totalProjectedWasteValue' => $totalProjectedWasteValue,
             'activeTransfersCount' => $activeTransfersCount,
