@@ -126,25 +126,63 @@ Dokumen ini mencatat seluruh perubahan, perbaikan bug, penyempurnaan UI/UX, dan 
 
 ---
 
+### G. Integrasi Fitur dari `origin/main` (Analitik, Multi-Bahasa, & Solusi Deploy)
+- **Konteks & Analisis Masalah**:
+  1. Rekan tim mengerjakan fitur analitik statistik dan lokalisasi bahasa (Indonesia / Inggris) langsung pada `origin/main`, namun saat di-deploy tampilan desain tidak berubah atau mengalami kegagalan build.
+  2. Penyebabnya adalah kegagalan build Vite akibat pustaka `chart.js` belum terpasang di `node_modules`, adanya duplikasi metode pada `BatchController`, rute yang tidak valid (`AdminFacilityController::destroy`), serta upaya mengganti sistem rekomendasi interaktif dengan Livewire sederhana yang justru merusak fungsionalitas multi-obat.
+- **Perubahan & Solusi Integrasi**:
+  1. **Penggabungan Fitur Analitik / Statistik (`/analytics`)**:
+     - Mengintegrasikan rute `/analytics` dan controller `AnalyticsController` serta layanan `AnalyticsService`.
+     - Menginstal ketergantungan `chart.js` (`npm install`) dan menyelaraskan kompilasi Vite pada `resources/js/analytics.js`.
+     - Menambahkan tautan navigasi "Statistik & Analitik" pada sidebar dan bottom bar navigasi seluler `layouts/mediloop.blade.php`.
+  2. **Penggabungan Sistem Multi-Bahasa (ID / EN)**:
+     - Mengintegrasikan berkas bahasa lengkap pada `lang/id/` dan `lang/en/` beserta `lang/id.json`.
+     - Mengaktifkan middleware `SetLocale` pada `bootstrap/app.php` dan endpoint `/locale`.
+     - Menjalankan migrasi database kolom `locale` pada tabel `users`.
+     - Menyematkan komponen pengalih bahasa instan (`<x-language-switcher variant="compact" />`) pada topbar header di samping avatar profil pengguna.
+     - Menyinkronkan label-label tampilan tanpa merusak atribut HTML, selector, atau logika JavaScript interaktif.
+  3. **Penjagaan Penuh Desain & Solusi Kita**:
+     - Desain Donut Chart 200px SVG, posisi keterangan di bawah donat, tab pemilih multi-obat, kartu transparansi skor 3 bobot, dan sorotan baris tabel **100% terjaga utuh**.
+     - Halaman stok obat (`/batches`) tetap langsung menyajikan tabel inventaris tanpa kartu KPI dan banner redundan di bagian atas.
+     - Zoom otomatis roda mouse pada Leaflet map tetap aktif dan mulus.
+- **Berkas yang Diubah / Ditambahkan**:
+  - `app/Http/Controllers/AnalyticsController.php`
+  - `app/Services/AnalyticsService.php`
+  - `app/Http/Controllers/LocaleController.php`
+  - `app/Http/Middleware/SetLocale.php`
+  - `config/localization.php`
+  - `database/migrations/2026_10_25_133513_add_locale_to_users_table.php`
+  - `resources/views/analytics/index.blade.php`
+  - `resources/js/analytics.js`
+  - `resources/views/components/language-switcher.blade.php`
+  - `lang/id/*` dan `lang/en/*`
+
+---
+
 ## 3. Daftar Berkas yang Dimodifikasi
 
-Berikut adalah daftar lengkap 20 berkas yang mengalami perubahan di branch `fix_zoe`:
+Berikut adalah daftar berkas utama yang diselaraskan dan disempurnakan di branch `fix_zoe`:
 
-1. `app/Http/Controllers/BatchController.php` - Fitur import CSV dan penataan filter batch.
+1. `app/Http/Controllers/BatchController.php` - Fitur import CSV, penanganan duplikasi fungsi, dan lokalisasi pesan audit/flash.
 2. `app/Http/Controllers/DashboardController.php` - Penyiapan data rekomendasi multi-obat dan batch selector.
-3. `app/Http/Controllers/TransferController.php` - Alur usulan transfer antar-faskes.
-4. `app/Services/RedistributionEngine.php` - Logika penilaian kecocokan riil (50% kebutuhan, 30% jarak, 20% logistik).
-5. `database/seeders/MediLoopSeeder.php` - Seeding inventaris dan kebutuhan klinis realistis faskes mitra Jakarta.
-6. `resources/views/dashboard.blade.php` - Donut chart besar, legenda ramping, tab selector rekomendasi obat, kartu transparansi skor.
-7. `resources/views/layouts/mediloop.blade.php` - Penataan CSS tabel, tab selector, kartu prioritas, dan layout dashboard.
-8. `resources/views/batches/index.blade.php` - Pembersihan banner atas dan penataan langsung tabel stok.
-9. `resources/views/transfers/index.blade.php` - Tampilan daftar dan riwayat transfer.
-10. `resources/views/transfers/propose.blade.php` - Kartu faskes penerima interaktif dan responsif.
-11. `resources/js/network-map.js` - Pengaktifan scroll wheel zoom otomatis Leaflet dan pembersihan hint usang.
-12. `resources/js/facility-map-picker.js` - Pengaktifan scroll wheel zoom pada modul pemilih koordinat faskes.
-13. `routes/web.php` - Rute template import CSV dan navigasi dashboard.
-14. `config/app.php` - Konfigurasi aplikasi pendukung.
-15. `public/build/*` - Aset terkompilasi frontend (Vite manifest, CSS, JS).
+3. `app/Http/Controllers/AnalyticsController.php` - Controller modul analitik statistik dari `main`.
+4. `app/Http/Controllers/LocaleController.php` - Pengontrol pergantian bahasa pengguna (ID/EN).
+5. `app/Http/Controllers/TransferController.php` - Alur usulan transfer antar-faskes.
+6. `app/Services/RedistributionEngine.php` - Logika penilaian kecocokan riil (50% kebutuhan, 30% jarak, 20% logistik).
+7. `app/Services/AnalyticsService.php` - Kalkulasi metrik KPI, distribusi risiko, horizon kedaluwarsa, dan anomali surplus.
+8. `database/seeders/MediLoopSeeder.php` - Seeding inventaris dan kebutuhan klinis realistis faskes mitra Jakarta.
+9. `resources/views/dashboard.blade.php` - Donut chart besar, legenda ramping, tab selector rekomendasi obat, kartu transparansi skor.
+10. `resources/views/layouts/mediloop.blade.php` - Penataan CSS tabel, tab selector, kartu prioritas, menu navigasi analitik, dan language switcher di topbar.
+11. `resources/views/batches/index.blade.php` - Pembersihan banner atas dan penataan langsung tabel stok tanpa KPI redundan.
+12. `resources/views/transfers/index.blade.php` - Tampilan daftar dan riwayat transfer dengan tombol modal usulan baru.
+13. `resources/views/transfers/propose.blade.php` - Kartu faskes penerima interaktif dan responsif tanpa tombol ganda.
+14. `resources/views/analytics/index.blade.php` - Halaman analitik dan visualisasi Chart.js.
+15. `resources/views/components/language-switcher.blade.php` - Komponen pemilih bahasa Indonesia dan Inggris.
+16. `resources/js/network-map.js` - Pengaktifan scroll wheel zoom otomatis Leaflet dan pembersihan hint usang.
+17. `resources/js/facility-map-picker.js` - Pengaktifan scroll wheel zoom pada modul pemilih koordinat faskes.
+18. `resources/js/analytics.js` - Skrip render Chart.js untuk visualisasi data analitik.
+19. `routes/web.php` - Rute template import CSV, analitik, dan perbaikan penanganan rute pencabutan undangan faskes.
+20. `public/build/*` - Aset terkompilasi frontend (Vite manifest, CSS, JS, Chart.js bundler).
 
 ---
 
@@ -154,6 +192,25 @@ Seluruh berkas dan modul telah diverifikasi secara ketat melalui suite pengujian
 - **Laravel Pint (Code Style & PSR-12)**:
   `./vendor/bin/pint --test` -> **PASSED (0 errors)**
 - **PHPStan Static Analysis (Level Maksimal Konfigurasi)**:
-  `./vendor/bin/phpstan analyse` -> **PASSED (0 errors)**
+  `./vendor/bin/phpstan analyse --memory-limit=1G` -> **PASSED (0 errors)**
+- **Asset Compilation (Vite & Rolldown)**:
+  `npm run build` -> **BUILT SUCCESSFULLY in 3.76s**
 - **Headless Chrome Browser Testing**:
   Pengujian rendering visual dan interaktivitas JavaScript (tab switching, scroll zoom peta, pemilihan faskes transfer) terverifikasi berjalan lancar.
+
+---
+
+## 5. Panduan Sinkronisasi Deployment
+
+Agar perubahan ini langsung terlihat pada server deployment:
+1. Kode lengkap dan teruji berada pada branch `fix_zoe`.
+2. Jika server CI/CD atau Vercel/VPS melakukan deployment dari branch `main`, lakukan penggabungan (merge) branch `fix_zoe` ke `main` lalu push ke `origin/main`:
+   ```bash
+   git checkout main
+   git merge fix_zoe --ff-only
+   git push origin main
+   ```
+3. Pastikan pada server deployment dijalankan:
+   - `npm install` (agar dependensi `chart.js` terpasang)
+   - `npm run build` (agar file asset produksi terbarui)
+   - `php artisan migrate` (agar kolom `locale` ditambahkan ke database)
