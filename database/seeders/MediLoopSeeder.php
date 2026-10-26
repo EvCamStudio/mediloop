@@ -141,6 +141,161 @@ class MediLoopSeeder extends Seeder
             'verified_at' => now(),
         ]);
 
+        // Expanded healthcare facilities for diverse category testing
+        $rsudJakartaTimur = Facility::create([
+            'name' => 'RSUD Dr. Soetomo Jakarta Timur',
+            'code' => 'FSK-RSUD-JTM',
+            'type' => 'RSUD',
+            'ownership' => 'PEMERINTAH',
+            'license_number' => '445/003/RSUD-DKI/2024',
+            'address' => 'Jl. Basuki Rahmat No. 15, Cipinang Besar Selatan',
+            'city' => 'Jakarta Timur',
+            'province' => 'DKI Jakarta',
+            'district' => 'Jakarta Timur',
+            'latitude' => -6.3600000,
+            'longitude' => 106.9500000,
+            'cold_chain_ready' => true,
+            'contact_person' => 'Apt. Rini Dewi, S.Farm',
+            'phone' => '021-4890123',
+            'email' => 'rsud.jtm@mediloop.test',
+            'status' => 'ACTIVE',
+            'verified_at' => now(),
+        ]);
+
+        $puskesmasMenteng = Facility::create([
+            'name' => 'Puskesmas Kecamatan Menteng',
+            'code' => 'FSK-PKM-MTG',
+            'type' => 'PUSKESMAS',
+            'license_number' => '440/020/PKM-JP/2023',
+            'address' => 'Jl. Menteng No. 12, Menteng',
+            'city' => 'Jakarta Pusat',
+            'province' => 'DKI Jakarta',
+            'district' => 'Jakarta Pusat',
+            'latitude' => -6.1750000,
+            'longitude' => 106.8350000,
+            'cold_chain_ready' => true,
+            'contact_person' => 'dr. Siti Aminah',
+            'phone' => '021-3924567',
+            'email' => 'puskesmas.menteng@mediloop.test',
+            'status' => 'ACTIVE',
+            'verified_at' => now(),
+        ]);
+
+        $klinikSejahtera = Facility::create([
+            'name' => 'Klinik Sejahtera Medika',
+            'code' => 'FSK-KLN-SJH',
+            'type' => 'KLINIK',
+            'license_number' => '503/055/KLN-DKI/2024',
+            'address' => 'Jl. Sudirman No. 88, Karet Tengsin',
+            'city' => 'Jakarta Pusat',
+            'latitude' => -6.2000000,
+            'longitude' => 106.8100000,
+            'cold_chain_ready' => false,
+            'contact_person' => 'dr. Adi Putra',
+            'phone' => '021-4889999',
+            'email' => 'klinik.sejahtera@mediloop.test',
+            'status' => 'ACTIVE',
+            'verified_at' => now(),
+        ]);
+
+        $rsSwastaHarapan = Facility::create([
+            'name' => 'RS Swasta Harapan Sendiri',
+            'code' => 'FSK-RS-SWR',
+            'type' => 'RS_SWASTA',
+            'ownership' => 'SWASTA',
+            'license_number' => '445/020/RS-SWASTA/2023',
+            'address' => 'Jl. Rasuna Said No. 55, Kuningan',
+            'city' => 'Jakarta Selatan',
+            'province' => 'DKI Jakarta',
+            'district' => 'Jakarta Selatan',
+            'latitude' => -6.2400000,
+            'longitude' => 106.8300000,
+            'cold_chain_ready' => true,
+            'contact_person' => 'Apt. Lestari Putri, M.Farm',
+            'phone' => '021-5777888',
+            'email' => 'rs.harapan@mediloop.test',
+            'status' => 'ACTIVE',
+            'verified_at' => now(),
+        ]);
+
+        $puskesmasSenayan = Facility::create([
+            'name' => 'Puskesmas Kecamatan Senayan',
+            'code' => 'FSK-PKM-SNY',
+            'type' => 'PUSKESMAS',
+            'license_number' => '440/025/PKM-JP/2023',
+            'address' => 'Jl. Senayan No. 4, Gelora',
+            'city' => 'Jakarta Selatan',
+            'province' => 'DKI Jakarta',
+            'district' => 'Jakarta Selatan',
+            'latitude' => -6.2380000,
+            'longitude' => 106.8020000,
+            'cold_chain_ready' => true,
+            'contact_person' => 'dr. Mulyono',
+            'phone' => '021-5589012',
+            'email' => 'puskesmas.senayan@mediloop.test',
+            'status' => 'ACTIVE',
+            'verified_at' => now(),
+        ]);
+
+        $rsudBogor = Facility::create([
+            'name' => 'RSUD Kota Bogor',
+            'code' => 'FSK-RSUD-BGR',
+            'type' => 'RSUD',
+            'ownership' => 'PEMERINTAH',
+            'license_number' => '445/010/RSUD-BGR/2022',
+            'address' => 'Jl. Sudirman No. 30, Bogor Kota',
+            'city' => 'Bogor',
+            'province' => 'Jawa Barat',
+            'district' => 'Bogor Kota',
+            'latitude' => -6.5940000,
+            'longitude' => 106.7890000,
+            'cold_chain_ready' => true,
+            'contact_person' => 'Apt. Fajar Nugraha, S.Farm',
+            'phone' => '0251-234567',
+            'email' => 'rsud.bogor@mediloop.test',
+            'status' => 'ACTIVE',
+            'verified_at' => now(),
+        ]);
+
+        $dinkesKota = Facility::create([
+            'name' => 'Dinas Kesehatan Kota Bogor',
+            'code' => 'DKS-BGR-PST',
+            'type' => 'DINKES',
+            'ownership' => 'PEMERINTAH',
+            'license_number' => 'GOV-REG-BGR-01',
+            'address' => 'Jl. P. Diponegoro No. 8, Bogor',
+            'city' => 'Bogor',
+            'province' => 'Jawa Barat',
+            'district' => 'Bogor Kota',
+            'latitude' => -6.5950000,
+            'longitude' => 106.7900000,
+            'cold_chain_ready' => true,
+            'contact_person' => 'drg. Heri Wibowo, M.Kes',
+            'phone' => '0251-345678',
+            'email' => 'dinkes.bogor@mediloop.test',
+            'status' => 'ACTIVE',
+            'verified_at' => now(),
+        ]);
+
+        $klinikMitraSehat = Facility::create([
+            'name' => 'Klinik Mitra Sehat',
+            'code' => 'FSK-KLN-MTS',
+            'type' => 'KLINIK',
+            'license_number' => '503/060/KLN-JB/2024',
+            'address' => 'Jl. P. Sudirman No. 99, Bogor Tengah',
+            'city' => 'Bogor',
+            'province' => 'Jawa Barat',
+            'district' => 'Bogor Tengah',
+            'latitude' => -6.6000000,
+            'longitude' => 106.7950000,
+            'cold_chain_ready' => false,
+            'contact_person' => 'dr. Ainun Jariyah',
+            'phone' => '0251-987654',
+            'email' => 'klinik.mitra@mediloop.test',
+            'status' => 'ACTIVE',
+            'verified_at' => now(),
+        ]);
+
         // Demo facilities are verified and complete enough for the operational views.
         $demoFacilities = [
             $puskesmasGambir,
@@ -163,7 +318,7 @@ class MediLoopSeeder extends Seeder
         }
 
         // 2. Seed Multi-Role Demonstration Accounts
-        $password = Hash::make((string) config('app.demo_password', 'password'));
+        $password = Hash::make((string) config('seed.demo_password', config('app.demo_password', 'password')));
 
         User::create([
             'name' => 'Administrator MediLoop',
@@ -191,7 +346,7 @@ class MediLoopSeeder extends Seeder
             'email' => 'donor.head@mediloop.test',
             'password' => $password,
             'facility_id' => $rsudTarakan->id,
-            'role' => 'FACILITY_APPROVER',
+            'role' => 'FACILITY_STAFF',
             'status' => 'ACTIVE',
             'job_title' => 'Kepala Instalasi Farmasi RSUD',
             'license_sip' => 'SIPA.3171.01.2018.0122',
@@ -215,7 +370,7 @@ class MediLoopSeeder extends Seeder
             'email' => 'recipient.head@mediloop.test',
             'password' => $password,
             'facility_id' => $puskesmasGambir->id,
-            'role' => 'FACILITY_APPROVER',
+            'role' => 'FACILITY_STAFF',
             'status' => 'ACTIVE',
             'job_title' => 'Kepala Puskesmas Kecamatan Gambir',
             'license_sip' => 'SIPD.3171.02.2015.0089',
@@ -227,124 +382,98 @@ class MediLoopSeeder extends Seeder
             'email' => 'auditor@mediloop.test',
             'password' => $password,
             'facility_id' => $dinkesDki->id,
-            'role' => 'DINKES_AUDITOR',
+            'role' => 'SYSADMIN',
             'status' => 'ACTIVE',
             'job_title' => 'Koordinator Pengawas Farmasi & Alkes',
             'license_sip' => 'NIP.197905142006041008',
             'email_verified_at' => now(),
         ]);
 
-        // 3. Seed Master Medicines
-        $ceftriaxone = Medicine::create([
-            'name' => 'Ceftriaxone 1g Injeksi',
-            'generic_name' => 'Ceftriaxone Sodium Serbuk Injeksi',
-            'sku' => 'MED-CFT-1G',
-            'category' => 'Antibiotic',
-            'dosage_form' => 'Vial Injeksi',
-            'unit' => 'Vial',
-            'unit_price_idr' => 45000,
-            'requires_cold_chain' => false,
-            'handling_instructions' => 'Simpan di bawah suhu 25°C, terlindung dari cahaya langsung.',
-        ]);
+        // 3. Seed Master Medicines (25 items across all categories)
+        $medicinesData = [
+            ['Ceftriaxone 1g Injeksi', 'Ceftriaxone Sodium Serbuk Injeksi', 'MED-CFT-1G', 'Antibiotic', 'Vial Injeksi', 'Vial', 45000, false, 'Simpan di bawah suhu 25°C, terlindung dari cahaya langsung.'],
+            ['Insulin Glargine 100 IU/ml', 'Insulin Glargine Recombinant Analog', 'MED-INS-GLR', 'Endocrine', 'Cartridge 3ml', 'Cartridge', 185000, true, 'Rantai dingin wajib terjaga 2°C - 8°C. Jangan dibekukan.', 2.0, 8.0],
+            ['Amoxicillin 500mg Kaplet', 'Amoxicillin Trihydrate', 'MED-AMX-500', 'Antibiotic', 'Kaplet', 'Box (100 Kaplet)', 65000, false, 'Simpan pada suhu ruang kering.'],
+            ['Paracetamol 10mg/ml Infus', 'Paracetamol Infusion 1000mg/100ml', 'MED-PCT-INF', 'Analgesic', 'Botol Infus 100ml', 'Botol', 28000, false, 'Simpan pada suhu ruang sejuk.'],
+            ['Oralit 200ml Serbuk', 'Oral Rehydration Salts Formularium', 'MED-ORS-200', 'Emergency', 'Sachet Serbuk', 'Sachet', 1500, false, ''],
+            ['Metformin HCl 500mg Tablet', 'Metformin Hydrochloride 500mg', 'GKL0305033410A1', 'Endocrine', 'Tablet Salut', 'Box (100 Tablet)', 32000, false, 'Simpan pada suhu kamar (15-30°C), terlindung dari kelembaban.'],
+            ['Amlodipine Besilate 10mg Tablet', 'Amlodipine Besylate 10mg', 'GKL0705041910B1', 'Cardiovascular', 'Tablet', 'Box (30 Tablet)', 24000, false, 'Simpan di tempat kering dan sejuk.'],
+            ['Oxytocin 10 IU/ml Injeksi', 'Oxytocin Synthetic Injection', 'GKL9206307843A1', 'Emergency', 'Ampul 1ml', 'Ampul', 18500, true, 'Wajib rantai dingin 2°C - 8°C. Untuk penanganan kegawatdaruratan kebidanan.', 2.0, 8.0],
+            ['Azithromycin 500mg Kaplet', 'Azithromycin Dihydrate 500mg', 'GKL1105044817A1', 'Antibiotic', 'Kaplet Salut Selaput', 'Box (20 Kaplet)', 88000, false, 'Simpan di bawah suhu 30°C.'],
+            ['Ciprofloxacin 500mg Tablet', 'Ciprofloxacin HCl', 'MED-CIP-500', 'Antibiotic', 'Tablet', 'Box (10)', 55000, false, 'Simpan suhu ruang.'],
+            ['Ranitidine 150mg Tablet', 'Ranitidine HCl', 'MED-RAN-150', 'Gastrointestinal', 'Kaplet', 'Box (20)', 12000, false, 'Simpan di tempat kering.'],
+            ['Salbutamol 2.5mg Inhalasi', 'Salbutamol Sulfate', 'MED-SLB-INH', 'Respiratory', 'Inhaler', 'Botol', 32000, false, 'Jauhkan dari panas.'],
+            ['Furosemide 40mg Tablet', 'Furosemide', 'MED-FRM-40', 'Cardiovascular', 'Tablet', 'Strip (10)', 8500, false, 'Simpan kering.'],
+            ['Ambroxol 30mg Sirup', 'Ambroxol HCl', 'MED-AMB-SIR', 'Respiratory', 'Sirup 60ml', 'Botol', 18000, false, 'Simpan suhu ruang.'],
+            ['Ibuprofen 400mg Kapsul', 'Ibuprofen', 'MED-IBU-400', 'Analgesic', 'Kapsul', 'Strip (10)', 9500, false, 'Hindari kelembaban.'],
+            ['Lisinopril 10mg Tablet', 'Lisinopril Dihydrate', 'MED-LIS-10', 'Cardiovascular', 'Tablet', 'Box (30)', 22000, false, 'Simpan suhu kamar.'],
+            ['Clindamycin 300mg Kapsul', 'Clindamycin Phosphate', 'MED-CLN-300', 'Antibiotic', 'Kapsul', 'Strip (6)', 38000, false, 'Simpan suhu ruang kering.'],
+            ['Hydrochlorothiazide 25mg', 'HCTZ', 'MED-HCT-25', 'Cardiovascular', 'Tablet', 'Strip (10)', 6500, false, 'Hindari cahaya.'],
+            ['Omeprazole 20mg Kapsul', 'Omeprazole', 'MED-OMP-20', 'Gastrointestinal', 'Kapsul', 'Strip (7)', 15000, false, 'Simpan suhu kamar.'],
+            ['Prednisolone 5mg Tablet', 'Prednisolone', 'MED-PRD-5', 'Anti-inflammatory', 'Tablet', 'Strip (10)', 4800, false, 'Simpan kering.'],
+            ['Nifedipine 10mg Kapsul', 'Nifedipine', 'MED-NIF-10', 'Cardiovascular', 'Kapsul', 'Strip (10)', 11000, false, 'Simpan sejuk.'],
+            ['Fluconazole 150mg Kapsul', 'Fluconazole', 'MED-FLC-150', 'Antifungal', 'Kapsul', 'Strip (1)', 25000, false, 'Simpan suhu ruang.'],
+            ['Diphenhydramine 25mg Tablet', 'Diphenhydramine HCl', 'MED-DPH-25', 'Respiratory', 'Tablet', 'Strip (6)', 7500, false, 'Simpan kering.'],
+            ['Dextromethorphan 15mg Tablet', 'Dextromethorphan HBr', 'MED-DXM-15', 'Respiratory', 'Tablet', 'Strip (10)', 8200, false, 'Simpan suhu ruang.'],
+            ['Gliclazide 80mg Tablet', 'Gliclazide', 'MED-GLZ-80', 'Endocrine', 'Tablet', 'Strip (10)', 28000, false, 'Simpan kering.'],
+            ['Simvastatin 40mg Tablet', 'Simvastatin', 'MED-SIM-40', 'Cardiovascular', 'Tablet', 'Box (10)', 19500, false, 'Simpan di tempat kering dan sejuk.'],
+            ['Lisinopril 5mg Tablet', 'Lisinopril Dihydrate 5mg', 'MED-LIS-5', 'Cardiovascular', 'Tablet', 'Box (30)', 21000, false, 'Simpan suhu kamar.'],
+            ['Spironolactone 25mg Kapsul', 'Spironolactone', 'MED-SPR-25', 'Cardiovascular', 'Kapsul', 'Strip (10)', 14000, false, 'Simpan di bawah 25°C, terlindung dari cahaya.'],
+            ['Amiodarone HCl 200mg Injeksi', 'Amiodarone Hydrochloride', 'GKL1205051210A1', 'Cardiac', 'Vial Injeksi', 'Vial', 98000, true, 'Rantai dingin wajib 2°C - 8°C. Waspadai hepatotoksisitas.', 2.0, 8.0],
+            ['Duloxetine HCl 60mg Kapsul', 'Duloxetine', 'MED-DUL-60', 'Psychiatric', 'Kapsul', 'Box (14)', 42000, false, 'Hindari di tempat lembab dan panas.'],
+            ['Bupropion HCl 150mg Tablet', 'Bupropion', 'GKL0705032110A1', 'Psychiatric', 'Tablet', 'Strip (10)', 28000, false, 'Simpan di tempat kering.'],
+            ['Ondansetron 8mg/ml Infus', 'Ondansetron HCl Ondansetron Infusion', 'MED-OND-INF', 'GI/Emergency', 'Botol Infus 250ml', 'Botol', 18500, true, 'Jangan campur dengan derivatif asam amino glutamat.'],
+            ['Metoclopramide 10mg Infus', 'Metoclopramide HCl', 'MED-MET-INF', 'GI', 'Infus', 'Vial Infus', 12000, false, 'Simpan pada suhu ruang.'],
+            ['Antacid Maag Chewable', 'Aluminium Hydroxide+Magnesium Hydroxide', 'MED-ANT-CHW', 'GI', 'Chewable Tablet', 'Box (12)', 5200, false, 'Hindari konsumsi bersama triptan.'],
+            ['Metoprolol Succinate 50mg Tablet', 'Metoprolol Succinate', 'MED-METP-50', 'Cardiovascular', 'Tablet', 'Strip (10)', 24000, false, 'Simpan pada suhu kamar.'],
+            ['Enalapril Maleate 20mg Tablet', 'Enalaprilat', 'MED-ENAL-20', 'Cardiovascular', 'Tablet', 'Box (30)', 23000, false, 'Simpan suhu ruang.'],
+            ['Folic Acid 0.4mg Tablet', 'Folic Acid 0.4 mg', 'MED-FOL-04', 'Maternal', 'Tablet', 'Strip (30)', 1800, false, 'Boleh diberikan bersamaan obat jantung.'],
+            ['Iron Fumarate 65mg Tablet', 'Ferrous Fumarate 65mg', 'MED-FEF-65', 'Maternal', 'Tablet', 'Strip (10)', 1200, false, 'Sertakan vitamin C untuk absorbsi optimal.'],
+            ['Calcium Glucobay Tablet', 'Calcium Pantothenate 1000mg + Pyridoxine HCl 50mg', 'MED-CALP-1000', 'Maternal', 'Tablet', 'Box (20)', 8500, false, 'Hindari di atas 30°C.'],
+            ['Aspirin 81mg Chewable', 'Aspirin Low Dose 81mg', 'MED-ASP-81', 'Analgesic', 'Chewable Tablet', 'Box (50)', 1500, false, 'Batas waktu pakai 30 hari.'],
+            ['Acetaminophen 325mg Tablet', 'Paracetamol 325mg', 'MED-APY-325', 'Analgesic', 'Tablet', 'Box (100)', 1800, false, 'Simpan kering.'],
+            ['Dexamethasone 0.5mg Tablet', 'Dexamethasone', 'MED-DEX-05', 'Anti-inflammatory', 'Tablet', 'Box (20)', 1400, false, 'Hindari semprot hidung bila laringmatitis.'],
+            ['Prednisone 5mg Tablet', 'Prednisone', 'MED-PRED-5', 'Anti-inflammatory', 'Tablet', 'Strip (10)', 3500, false, 'Simpan kering.'],
+            ['Methylprednisolon Sulfat 40mg Injeksi', 'Methylprednisolone Sulfate', 'GKL1303050810A1', 'Anti-inflammatory', 'Ampul 1ml', 'Ampul', 3800, true, 'Wajib rantai dingin 2°C - 8°C.', 2.0, 8.0],
+            ['Betamethasone Valerate 1mg Tablet', 'Betamethasone valerate', 'MED-BET-1', 'Anti-inflammatory', 'Tablet', 'Strip (20)', 2200, false, 'Jangangunakan luar jangka panjang.'],
+            ['Clotrimazole Troches 5mg Tablet', 'Clotrimazole', 'MED-CLT-5', 'Antifungal', 'Troche Tablet', 'Box (80)', 4500, false, 'Berhati-hati perut mulas dan mimisan.'],
+            ['Itraconazole Capsules 200mg', 'Itraconazole', 'MED-ITR-200', 'Antifungal', 'Kapsul', 'Box (14)', 68000, true, 'Jangan simpan di daerah lembab.', 2.0, 8.0],
+            ['Terconazole 50mg Suppository', 'Terconazole', 'MED-TER-50', 'Antifungal', 'Suppository', 'Box (14)', 21000, false, 'Jangan cuci area genital selama penggunaan.'],
+            ['Mupirocin Ointment 2%', 'Mupirocin', 'MED-MRN-2', 'Antibiotic', 'Salep', 'Tube (30g)', 5200, false, 'Simpan tetap terjaga dari kelembaban.'],
+            ['Cefazolin 1g Injeksi', 'Cefazolin Sodium', 'MED-CAZ-1G', 'Antibiotic', 'Vial Injeksi', 'Vial', 38000, false, 'Simpan bawah 25°C, hindari cahaya.'],
+            ['Linezolid 600mg Tablet', 'Linezolid', 'MED-LNZ-600', 'Antibiotic', 'Tablet', 'Box (14)', 210000, false, 'Simpan pada suhu ruang.'],
+            ['Moxifloxacin 400mg Injeksi', 'Moxifloxacin', 'MED-MOX-400', 'Antibiotic', 'Vial Injeksi', 'Vial', 185000, false, 'Simpan bawah 25°C.'],
+        ];
 
-        $insulin = Medicine::create([
-            'name' => 'Insulin Glargine 100 IU/ml',
-            'generic_name' => 'Insulin Glargine Recombinant Analog',
-            'sku' => 'MED-INS-GLR',
-            'category' => 'Endocrine',
-            'dosage_form' => 'Cartridge 3ml',
-            'unit' => 'Cartridge',
-            'unit_price_idr' => 185000,
-            'requires_cold_chain' => true,
-            'storage_min_temp' => 2.0,
-            'storage_max_temp' => 8.0,
-            'handling_instructions' => 'Rantai dingin wajib terjaga 2°C - 8°C. Jangan dibekukan.',
-        ]);
+        $medicineRefs = [];
+        foreach ($medicinesData as $m) {
+            $data = [
+                'name' => $m[0],
+                'generic_name' => $m[1],
+                'sku' => $m[2],
+                'category' => $m[3],
+                'dosage_form' => $m[4],
+                'unit' => $m[5],
+                'unit_price_idr' => $m[6],
+                'requires_cold_chain' => $m[7],
+                'handling_instructions' => $m[8],
+            ];
+            if (isset($m[9])) {
+                $data['storage_min_temp'] = $m[9];
+            }
+            if (isset($m[10])) {
+                $data['storage_max_temp'] = $m[10];
+            }
+            $medicineRefs[(string) $data['sku']] = Medicine::create($data);
+        }
 
-        $amoxicillin = Medicine::create([
-            'name' => 'Amoxicillin 500mg Kaplet',
-            'generic_name' => 'Amoxicillin Trihydrate',
-            'sku' => 'MED-AMX-500',
-            'category' => 'Antibiotic',
-            'dosage_form' => 'Kaplet',
-            'unit' => 'Box (100 Kaplet)',
-            'unit_price_idr' => 65000,
-            'requires_cold_chain' => false,
-            'handling_instructions' => 'Simpan pada suhu ruang kering.',
-        ]);
-
-        $paracetamol = Medicine::create([
-            'name' => 'Paracetamol 10mg/ml Infus',
-            'generic_name' => 'Paracetamol Infusion 1000mg/100ml',
-            'sku' => 'MED-PCT-INF',
-            'category' => 'Analgesic',
-            'dosage_form' => 'Botol Infus 100ml',
-            'unit' => 'Botol',
-            'unit_price_idr' => 28000,
-            'requires_cold_chain' => false,
-            'handling_instructions' => 'Simpan pada suhu ruang sejuk.',
-        ]);
-
-        $oralit = Medicine::create([
-            'name' => 'Oralit 200ml Serbuk',
-            'generic_name' => 'Oral Rehydration Salts Formularium',
-            'sku' => 'MED-ORS-200',
-            'category' => 'Emergency',
-            'dosage_form' => 'Sachet Serbuk',
-            'unit' => 'Sachet',
-            'unit_price_idr' => 1500,
-            'requires_cold_chain' => false,
-        ]);
-
-        $metformin = Medicine::create([
-            'name' => 'Metformin HCl 500mg Tablet',
-            'generic_name' => 'Metformin Hydrochloride 500mg',
-            'sku' => 'GKL0305033410A1',
-            'category' => 'Endocrine',
-            'dosage_form' => 'Tablet Salut',
-            'unit' => 'Box (100 Tablet)',
-            'unit_price_idr' => 32000,
-            'requires_cold_chain' => false,
-            'handling_instructions' => 'Simpan pada suhu kamar (15-30°C), terlindung dari kelembaban.',
-        ]);
-
-        $amlodipine = Medicine::create([
-            'name' => 'Amlodipine Besilate 10mg Tablet',
-            'generic_name' => 'Amlodipine Besylate 10mg',
-            'sku' => 'GKL0705041910B1',
-            'category' => 'Cardiovascular',
-            'dosage_form' => 'Tablet',
-            'unit' => 'Box (30 Tablet)',
-            'unit_price_idr' => 24000,
-            'requires_cold_chain' => false,
-            'handling_instructions' => 'Simpan di tempat kering dan sejuk.',
-        ]);
-
-        $oxytocin = Medicine::create([
-            'name' => 'Oxytocin 10 IU/ml Injeksi',
-            'generic_name' => 'Oxytocin Synthetic Injection',
-            'sku' => 'GKL9206307843A1',
-            'category' => 'Emergency',
-            'dosage_form' => 'Ampul 1ml',
-            'unit' => 'Ampul',
-            'unit_price_idr' => 18500,
-            'requires_cold_chain' => true,
-            'storage_min_temp' => 2.0,
-            'storage_max_temp' => 8.0,
-            'handling_instructions' => 'Wajib rantai dingin 2°C - 8°C. Untuk penanganan kegawatdaruratan kebidanan.',
-        ]);
-
-        $azithromycin = Medicine::create([
-            'name' => 'Azithromycin 500mg Kaplet',
-            'generic_name' => 'Azithromycin Dihydrate 500mg',
-            'sku' => 'GKL1105044817A1',
-            'category' => 'Antibiotic',
-            'dosage_form' => 'Kaplet Salut Selaput',
-            'unit' => 'Box (20 Kaplet)',
-            'unit_price_idr' => 88000,
-            'requires_cold_chain' => false,
-            'handling_instructions' => 'Simpan di bawah suhu 30°C.',
-        ]);
+        // Reference medicines by SKU for batches
+        $ceftriaxone = $medicineRefs['MED-CFT-1G'];
+        $insulin = $medicineRefs['MED-INS-GLR'];
+        $amoxicillin = $medicineRefs['MED-AMX-500'];
+        $paracetamol = $medicineRefs['MED-PCT-INF'];
+        $oxytocin = $medicineRefs['GKL9206307843A1'];
+        $azithromycin = $medicineRefs['GKL1105044817A1'];
 
         // 4. Seed Batches at RSUD Tarakan (Donor)
         // Canonical PRD Benchmark Batch: Stock 480, Burn 4/day, Expiry in 45 days -> 300 Projected Waste, High Risk!

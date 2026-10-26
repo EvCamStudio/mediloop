@@ -16,7 +16,7 @@ class FacilitySettingsController extends Controller
         $user = $request->user();
 
         if (! $user instanceof User || ! $user->facility instanceof Facility) {
-            abort(403, 'Akun Anda belum terhubung ke fasilitas.');
+            abort(403, __('facility.errors.no_facility'));
         }
 
         return view('facility.settings', ['facility' => $user->facility]);
@@ -27,7 +27,7 @@ class FacilitySettingsController extends Controller
         $user = $request->user();
 
         if (! $user instanceof User || ! $user->facility instanceof Facility) {
-            abort(403, 'Akun Anda belum terhubung ke fasilitas.');
+            abort(403, __('facility.errors.no_facility'));
         }
 
         $facility = $user->facility;
@@ -49,11 +49,11 @@ class FacilitySettingsController extends Controller
             'actor_id' => $user->id,
             'facility_id' => $facility->id,
             'action' => 'FACILITY_UPDATED',
-            'description' => "Kontak dan lokasi {$facility->name} diperbarui oleh kepala fasilitas.",
+            'description' => __('facility.audit.contact_updated', ['facility' => $facility->name]),
             'ip_address' => $request->ip(),
             'created_at' => now(),
         ]);
 
-        return back()->with('status', 'Profil fasilitas diperbarui.');
+        return back()->with('status', __('facility.settings.updated'));
     }
 }

@@ -1,0 +1,106 @@
+<?php
+
+return [
+
+    'meta_description' => 'MediLoop helps healthcare facilities prevent expired medicine destruction through safe, documented, staff-led redistribution coordination.',
+    'title' => 'MediLoop — Decision-Support Platform for Inter-Facility Medicine Redistribution',
+    'top_badge' => 'Decision Support Only',
+    'nav' => [
+        'simulator' => 'Simulation Calculator',
+        'principles' => 'System Principles',
+        'open_dashboard' => 'Open Dashboard',
+    ],
+
+    'hero' => [
+        'badge' => 'Medicine Grant & Redistribution Decision-Support System for Healthcare Facilities',
+        'title' => 'Prevent Expired Medicine Destruction Through Inter-Facility Coordination.',
+        'body' => 'MediLoop detects surplus medicine at risk of expiry in hospitals and matches it with the real needs of nearby primary care facilities in a measurable, safe, and regulation-compliant way.',
+        'cta_simulation' => 'Start Simulation',
+        'cta_algorithm' => 'Test the Waste Prediction Algorithm',
+        'phi_title' => 'Zero Patient Data',
+        'phi_body' => 'Batch logistics without medical record identities (PHI).',
+        'approval_title' => 'Human Approval',
+        'approval_body' => 'Must be authorised by the Head of Pharmacy Installation.',
+        'invariant_title' => 'Absolute Invariant',
+        'invariant_body' => 'Stock only mutates when the physical delivery is confirmed.',
+    ],
+
+    'chips' => [
+        'waste_projection' => 'Projected waste :count units',
+        'remaining_days' => ':days days left',
+        'facility_recommendation' => 'Facility recommendation',
+        'cold_chain_ready' => 'Cold chain ready',
+        'example_score' => 'Example score 92%',
+        'simulation_note' => 'PRD case simulation — sample data, not operational data.',
+    ],
+
+    'simulator' => [
+        'eyebrow' => 'PRD Section 9 Algorithm',
+        'title' => 'Waste Prediction & Clinical Risk Simulation Calculator',
+        'subtitle' => 'Adjust the stock, daily burn rate, and remaining days to expiry below to see the mathematical calculation in real time.',
+        'preset_label' => 'Choose a scenario preset:',
+        'medicine_select' => 'Select medicine type:',
+        'choose_medicine' => 'Select a medicine...',
+        'preset_benchmark' => 'PRD benchmark: Ceftriaxone (480 stock, 4/day, 45 days)',
+        'preset_critical' => 'Critical: Cold-chain insulin (120 stock, 1/day, 28 days)',
+        'preset_safe' => 'Safe: Amoxicillin (300 stock, 8/day, 80 days)',
+        'stock_label' => 'Current physical stock (S)',
+        'burn_label' => 'Daily consumption rate (B)',
+        'expiry_label' => 'Remaining time to expiry (D_exp)',
+        'unit' => 'Unit',
+        'unit_per_day' => 'Unit/day',
+        'days' => 'Days',
+        'results_title' => 'Algorithm evaluation result:',
+        'days_to_deplete' => 'Days to deplete (D_dep):',
+        'projected_consumption' => 'Projected consumption:',
+        'projected_waste' => 'Projected waste (W):',
+        'waste_ratio' => 'Waste ratio:',
+        'risk_classification' => 'Clinical risk classification:',
+        'recommendation' => 'Recommended action:',
+        'initial_days' => '120.0 days',
+        'initial_consumed' => '180 units',
+        'initial_waste' => '300 units',
+        'initial_badge' => '[HIGH RISK: 300 units projected to be wasted]',
+        'initial_action' => 'Redistribution must be proposed to a secondary facility',
+        'js' => [
+            'infinite' => 'Indefinite',
+            'days_suffix' => ':value days',
+            'unit_suffix' => ':value units',
+            'low_badge' => '[LOW: Consumption is sufficient before expiry]',
+            'low_action' => 'Stock is safe and does not require redistribution.',
+            'critical_badge' => '[CRITICAL: Expires in 30 days or less, :count units at risk of destruction]',
+            'critical_action' => 'Urgent! Coordinate a transfer today.',
+            'high_badge' => '[HIGH RISK: :count units (:ratio%) projected waste]',
+            'high_action' => 'A redistribution proposal must be submitted to candidate facilities.',
+            'medium_badge' => '[MEDIUM: :count units projected surplus]',
+            'medium_action' => 'Monitor weekly consumption rate increases.',
+        ],
+    ],
+
+    'principles' => [
+        'eyebrow' => 'Governance & Compliance',
+        'title' => '4 Architectural Constraints & Regulatory Principles',
+        'subtitle' => 'MediLoop is purpose-built to meet Indonesian pharmaceutical distribution standards without gaps for uncontrolled commercialisation or personal data violations.',
+        'one_title' => 'Not an Open Marketplace (Decision Support Only)',
+        'one_body' => 'The system does not perform automatic transactions or free trading. MediLoop acts purely as a data-driven decision-support tool. Every grant redistribution proposal requires tiered manual approval from the Head of Pharmacy Installation and the relevant Facility Director.',
+        'two_title' => 'Zero Patient Personal Data (Zero PHI)',
+        'two_body' => 'The system stores no medical records, patient identities, or individual prescriptions. The processed data is purely logistics aggregates: manufacturer batch numbers, expiry dates, and average daily stock consumption in line with the Personal Data Protection Law (UU PDP).',
+        'three_title' => 'Smart Matching & Intake Cap',
+        'three_body' => 'Recipient candidates are scored using Haversine distance (30%), real need (50%), and cold-chain readiness (20%). An intake cap algorithm prevents moved medicine from experiencing secondary expiry at the recipient.',
+        'four_title' => 'Non-Destructive Stock Invariant',
+        'four_body' => 'Donor inventory balances are never reduced during proposing, approval, or courier transit. Donor stock reduction and recipient stock addition happen atomically ONLY when the medicine is physically verified by the recipient officer.',
+    ],
+
+    'cta' => [
+        'title' => 'Ready to Test the Full Medicine Redistribution Flow?',
+        'body' => 'Sign in with your healthcare facility account to test the proposing, approval, acceptance, and oversight audit flow. New facilities can request verification without creating an account first.',
+        'sign_in' => 'Sign in to Dashboard',
+        'request_facility' => 'Request a Facility',
+    ],
+
+    'footer' => [
+        'competition' => 'Developed for the 2026 Digital Health Service Innovation Competition.',
+        'standards' => 'No external framework dependency for domain calculations · WCAG 2.2 Level AA',
+    ],
+
+];

@@ -1,4 +1,4 @@
-@extends('layouts.mediloop', ['title' => 'Rekomendasi & Pengusulan Transfer'])
+@extends('layouts.mediloop', ['title' => __('transfers.propose.page_title')])
 
 @section('content')
 @php
@@ -16,19 +16,19 @@
 @endphp
 
 <div class="ml-page-admin">
-    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
-        <a href="{{ route('dashboard') }}">Dashboard</a>
+    <nav class="ml-breadcrumb" aria-label="{{ __('transfers.breadcrumb_aria') }}">
+        <a href="{{ route('dashboard') }}">{{ __('navigation.dashboard') }}</a>
         <span class="ml-breadcrumb-sep">/</span>
-        <a href="{{ route('transfers.index') }}">Transfers &amp; Alokasi</a>
+        <a href="{{ route('transfers.index') }}">{{ __('transfers.breadcrumb') }}</a>
         <span class="ml-breadcrumb-sep">/</span>
-        <span>Usulan: {{ $batch->medicine->name }} ({{ $batch->batch_number }})</span>
+        <span>{{ __('transfers.propose.breadcrumb', ['batch' => $batch->batch_number]) }}</span>
     </nav>
 
     <header class="ml-page-head">
         <div>
-            <p class="ml-page-eyebrow">Rekomendasi redistribusi</p>
-            <h1 class="ml-page-title">Cari penerima untuk {{ $batch->medicine->name }}</h1>
-            <p class="ml-page-sub">Kandidat diperingkatkan dari kebutuhan, jarak, dan kesiapan logistik.</p>
+            <p class="ml-page-eyebrow">{{ __('transfers.propose.eyebrow') }}</p>
+            <h1 class="ml-page-title">{{ __('transfers.propose.title', ['medicine' => $batch->medicine->name]) }}</h1>
+            <p class="ml-page-sub">{{ __('transfers.propose.subtitle') }}</p>
         </div>
     </header>
 
@@ -38,11 +38,8 @@
             <path d="M12 8v4m0 4h.01" />
         </svg>
         <div>
-            <strong>Kepatuhan regulasi kefarmasian</strong>
-            <p>
-                MediLoop adalah sistem pendukung keputusan, bukan marketplace. Redistribusi tetap memerlukan
-                persetujuan Kepala Instalasi Farmasi donor dan verifikasi penerimaan fisik oleh Kepala Fasilitas penerima.
-            </p>
+            <strong>{{ __('transfers.compliance.title') }}</strong>
+            <p>{{ __('transfers.compliance.proposal') }}</p>
         </div>
     </div>
 
@@ -51,63 +48,61 @@
             <section class="ml-card" aria-labelledby="source-title">
                 <div class="ml-card-head ml-card-head-split">
                     <div>
-                        <h2 class="ml-card-title" id="source-title">Batch sumber</h2>
-                        <p class="ml-card-sub">{{ $batch->facility->name }} · batch {{ $batch->batch_number }}</p>
+                        <h2 class="ml-card-title" id="source-title">{{ __('transfers.propose.source.title') }}</h2>
+                        <p class="ml-card-sub">{{ __('transfers.propose.source.meta', ['facility' => $batch->facility->name, 'batch' => $batch->batch_number]) }}</p>
                     </div>
-                    <span class="ml-risk ml-risk-high">Risiko tinggi</span>
+                    <span class="ml-risk ml-risk-high">{{ __('transfers.risk.high') }}</span>
                 </div>
                 <div class="ml-card-body">
                     <div class="ml-metric-grid">
                         <div class="ml-metric">
-                            <span class="ml-metric-label">Stok donor</span>
+                            <span class="ml-metric-label">{{ __('transfers.propose.metrics.donor_stock') }}</span>
                             <span class="ml-metric-value">{{ number_format($batch->current_stock) }} <small>{{ $batch->medicine->unit }}</small></span>
                         </div>
                         <div class="ml-metric">
-                            <span class="ml-metric-label">Laju pakai</span>
-                            <span class="ml-metric-value">{{ $batch->daily_burn_rate }} <small>unit/hari</small></span>
+                            <span class="ml-metric-label">{{ __('transfers.propose.metrics.burn_rate') }}</span>
+                            <span class="ml-metric-value">{{ $batch->daily_burn_rate }} <small>{{ __('transfers.units.per_day') }}</small></span>
                         </div>
                         <div class="ml-metric">
-                            <span class="ml-metric-label">Sisa kedaluwarsa</span>
-                            <span class="ml-metric-value">{{ $batch->days_to_expiry }} <small>hari</small></span>
+                            <span class="ml-metric-label">{{ __('transfers.propose.metrics.remaining_expiry') }}</span>
+                            <span class="ml-metric-value">{{ $batch->days_to_expiry }} <small>{{ __('common.days') }}</small></span>
                         </div>
                         <div class="ml-metric is-risk">
-                            <span class="ml-metric-label">Proyeksi terbuang</span>
-                            <span class="ml-metric-value">{{ number_format($batch->projected_waste) }} <small>unit</small></span>
+                            <span class="ml-metric-label">{{ __('transfers.propose.metrics.projected_waste') }}</span>
+                            <span class="ml-metric-value">{{ number_format($batch->projected_waste) }} <small>{{ __('common.units') }}</small></span>
                         </div>
                     </div>
-                    <p class="ml-help">
-                        Proyeksi limbah dihitung dari selisih stok dan laju pemakaian sampai tanggal kedaluwarsa.
-                    </p>
+                    <p class="ml-help">{{ __('transfers.propose.source.help') }}</p>
                 </div>
             </section>
 
             <section class="ml-card" aria-labelledby="candidates-title">
                 <div class="ml-card-head ml-card-head-split">
                     <div>
-                        <h2 class="ml-card-title" id="candidates-title">Kandidat penerima</h2>
-                        <p class="ml-card-sub">50% kebutuhan · 30% jarak udara · 20% logistik</p>
+                        <h2 class="ml-card-title" id="candidates-title">{{ __('transfers.propose.candidates.title') }}</h2>
+                        <p class="ml-card-sub">{{ __('transfers.propose.candidates.weights') }}</p>
                     </div>
-                    <span class="ml-tab-count">{{ count($candidates) }} faskes</span>
+                    <span class="ml-tab-count">{{ trans_choice('transfers.propose.candidates.count', count($candidates), ['count' => count($candidates)]) }}</span>
                 </div>
 
-                <div class="ml-sort-row" role="group" aria-label="Urutkan kandidat">
+                <div class="ml-sort-row" role="group" aria-label="{{ __('transfers.propose.candidates.sort_aria') }}">
                     <a
                         href="{{ route('transfers.propose', array_filter(['batch' => $batch, 'sort' => 'score', 'recipient_id' => $defaultCandidate['facility']->id ?? null])) }}"
                         class="ml-sort-pill {{ $sort === 'score' ? 'is-active' : '' }}"
                         @if($sort === 'score') aria-current="true" @endif
-                    >Skor terbaik</a>
+                    >{{ __('transfers.propose.candidates.sort_best') }}</a>
                     <a
                         href="{{ route('transfers.propose', array_filter(['batch' => $batch, 'sort' => 'distance', 'recipient_id' => $defaultCandidate['facility']->id ?? null])) }}"
                         class="ml-sort-pill {{ $sort === 'distance' ? 'is-active' : '' }}"
                         @if($sort === 'distance') aria-current="true" @endif
-                    >Terdekat</a>
-                    <span class="ml-sort-note">Jarak udara (Haversine), bukan jarak tempuh jalan.</span>
+                    >{{ __('transfers.propose.candidates.sort_nearest') }}</a>
+                    <span class="ml-sort-note">{{ __('transfers.propose.candidates.sort_note') }}</span>
                 </div>
 
                 @if(count($candidates) === 0)
                     <div class="ml-empty-state">
-                        <p class="ml-empty-title">Belum ada kandidat penerima</p>
-                        <p class="ml-empty-copy">Tidak ada fasilitas yang memenuhi syarat rantai dingin dan jarak saat ini.</p>
+                        <p class="ml-empty-title">{{ __('transfers.propose.candidates.empty_title') }}</p>
+                        <p class="ml-empty-copy">{{ __('transfers.propose.candidates.empty_copy') }}</p>
                     </div>
                 @else
                     <ol class="ml-candidate-list" id="candidateList">
@@ -130,10 +125,10 @@
                                         {{ $candidate['facility']->city ?? $candidate['facility']->address }}
                                     </div>
                                     <div class="ml-candidate-metrics">
-                                        <span>Kebutuhan <strong>{{ $candidate['need_score'] }}%</strong></span>
-                                        <span>Jarak <strong>{{ $candidate['proximity_score'] }}%</strong></span>
-                                        <span>Logistik <strong>{{ $candidate['logistics_score'] }}%</strong></span>
-                                        <span>Kapasitas <strong>{{ $candidate['recipient_intake_cap'] }} unit</strong></span>
+                                        <span>{{ __('transfers.propose.candidates.need') }} <strong>{{ $candidate['need_score'] }}%</strong></span>
+                                        <span>{{ __('transfers.propose.candidates.distance') }} <strong>{{ $candidate['proximity_score'] }}%</strong></span>
+                                        <span>{{ __('transfers.propose.candidates.logistics') }} <strong>{{ $candidate['logistics_score'] }}%</strong></span>
+                                        <span>{{ __('transfers.propose.candidates.capacity') }} <strong>{{ $candidate['recipient_intake_cap'] }} {{ __('common.units') }}</strong></span>
                                     </div>
                                 </div>
                                 <div class="ml-candidate-side">
@@ -154,36 +149,36 @@
                 <input type="hidden" id="selectedFacilityId" name="recipient_facility_id" value="{{ $defaultCandidate['facility']->id ?? '' }}">
 
                 <div class="ml-card-head">
-                    <h2 class="ml-card-title">Ajukan transfer</h2>
-                    <p class="ml-card-sub">Usulan diteruskan ke Kepala Instalasi Farmasi donor.</p>
+                    <h2 class="ml-card-title">{{ __('transfers.propose.form.title') }}</h2>
+                    <p class="ml-card-sub">{{ __('transfers.propose.form.subtitle') }}</p>
                 </div>
                 <div class="ml-card-body">
                     <x-form.summary />
                     <x-form.error for="batch_id" />
 
                     <div class="ml-field">
-                        <label for="selectedFacilityName" class="ml-label">Fasilitas penerima</label>
+                        <label for="selectedFacilityName" class="ml-label">{{ __('transfers.propose.form.recipient_facility') }}</label>
                         <input type="text" id="selectedFacilityName" readonly value="{{ $defaultCandidate['facility']->name ?? '' }}" class="ml-input" @if($errors->has('recipient_facility_id')) aria-invalid="true" aria-describedby="recipient_facility_id-error" @endif>
                         <x-form.error for="recipient_facility_id" />
                     </div>
 
                     <div class="ml-field">
-                        <label for="quantity" class="ml-label">Jumlah unit <span class="ml-required">*</span></label>
-                        <input type="number" id="quantity" name="quantity" min="1" max="{{ $batch->current_stock }}" value="{{ $defaultQty }}" class="ml-input is-mono @error('quantity') is-invalid @enderror" required data-error-required="Jumlah unit wajib diisi." data-error-min="Jumlah minimal 1 unit." data-error-max="Jumlah melebihi stok tersedia ({{ number_format($batch->current_stock) }} unit).">
-                        <p class="ml-help">Maksimal {{ number_format($batch->current_stock) }} {{ $batch->medicine->unit }} tersedia di donor.</p>
+                        <label for="quantity" class="ml-label">{{ __('transfers.propose.form.quantity') }} <span class="ml-required">*</span></label>
+                        <input type="number" id="quantity" name="quantity" min="1" max="{{ $batch->current_stock }}" value="{{ $defaultQty }}" class="ml-input is-mono @error('quantity') is-invalid @enderror" required data-error-required="{{ __('transfers.propose.form.quantity_required') }}" data-error-min="{{ __('transfers.propose.form.quantity_min') }}" data-error-max="{{ __('transfers.propose.form.quantity_max', ['max' => number_format($batch->current_stock)]) }}">
+                        <p class="ml-help">{{ __('transfers.propose.form.quantity_help', ['max' => number_format($batch->current_stock), 'unit' => $batch->medicine->unit]) }}</p>
                         <x-form.error for="quantity" />
                     </div>
 
                     <div class="ml-field">
-                        <label for="notes" class="ml-label">Catatan justifikasi</label>
-                        <textarea id="notes" name="notes" class="ml-textarea @error('notes') is-invalid @enderror" rows="4" maxlength="500" data-error-maxlength="Catatan maksimal 500 karakter." placeholder="Jelaskan kebutuhan penerima dan alasan redistribusi.">Pengusulan redistribusi surplus stok {{ $batch->medicine->name }} untuk mencegah pemusnahan obat kedaluwarsa dan mendukung ketersediaan di fasilitas sekitar.</textarea>
+                        <label for="notes" class="ml-label">{{ __('transfers.propose.form.notes') }}</label>
+                        <textarea id="notes" name="notes" class="ml-textarea @error('notes') is-invalid @enderror" rows="4" maxlength="500" data-error-maxlength="{{ __('transfers.propose.form.notes_maxlength') }}" placeholder="{{ __('transfers.propose.form.notes_placeholder') }}">{{ __('transfers.propose.form.notes_default', ['medicine' => $batch->medicine->name]) }}</textarea>
                         <x-form.error for="notes" />
                     </div>
 
                     <div class="ml-action-row">
-                        <span class="ml-help">Pengusul: <strong>{{ $user->name }}</strong></span>
+                        <span class="ml-help">{{ __('transfers.propose.form.proposer') }} <strong>{{ $user->name }}</strong></span>
                         <button type="submit" class="ml-btn-primary">
-                            Ajukan transfer
+                            {{ __('transfers.propose.form.submit') }}
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                         </button>
                     </div>

@@ -1,16 +1,18 @@
-const DEFAULT_MESSAGES = {
-    required: 'Kolom ini wajib diisi.',
-    email: 'Format email belum benar, contoh: nama@faskes.id.',
-    number: 'Masukkan angka yang valid.',
-    date: 'Masukkan tanggal yang valid.',
-    min: 'Nilai terlalu kecil.',
-    max: 'Nilai terlalu besar.',
-    step: 'Nilai tidak sesuai kelipatan yang diizinkan.',
-    minlength: 'Isian terlalu pendek.',
-    maxlength: 'Isian terlalu panjang.',
-    pattern: 'Format isian belum sesuai.',
-    invalid: 'Isian belum valid.',
-};
+import { t } from './i18n';
+
+const defaultMessages = () => ({
+    required: t('js.validation.required'),
+    email: t('js.validation.email'),
+    number: t('js.validation.number'),
+    date: t('js.validation.date'),
+    min: t('js.validation.min'),
+    max: t('js.validation.max'),
+    step: t('js.validation.step'),
+    minlength: t('js.validation.minlength'),
+    maxlength: t('js.validation.maxlength'),
+    pattern: t('js.validation.pattern'),
+    invalid: t('js.validation.invalid'),
+});
 
 const VALIDATED_FORM_SELECTOR = 'form[data-validate]';
 const ERROR_SELECTOR = '[data-field-error]';
@@ -85,22 +87,24 @@ const messageFor = (field) => {
     }
 
     if (key === 'min' && field.min !== '') {
-        return `Nilai minimal ${field.min}.`;
+        return t('js.validation.min_value', { min: field.min });
     }
 
     if (key === 'max' && field.max !== '') {
-        return `Nilai maksimal ${field.max}.`;
+        return t('js.validation.max_value', { max: field.max });
     }
 
     if (key === 'minlength' && field.minLength > 0) {
-        return `Minimal ${field.minLength} karakter.`;
+        return t('js.validation.min_characters', { min: field.minLength });
     }
 
     if (key === 'maxlength' && field.maxLength > 0) {
-        return `Maksimal ${field.maxLength} karakter.`;
+        return t('js.validation.max_characters', { max: field.maxLength });
     }
 
-    return DEFAULT_MESSAGES[key] ?? DEFAULT_MESSAGES.invalid;
+    const messages = defaultMessages();
+
+    return messages[key] ?? messages.invalid;
 };
 
 const errorElementFor = (field) => {

@@ -1,16 +1,16 @@
 @component('mail::message')
-# Undangan MediLoop
+# {{ __('emails.invitation.heading') }}
 
-Anda diundang untuk bergabung dengan **{{ $facilityName }}** sebagai **{{ $roleLabel }}**.
+{{ __('emails.invitation.intro', ['facility' => $facilityName, 'role' => $roleLabel]) }}
 
 @component('mail::button', ['url' => $url])
-Terima undangan
+{{ __('emails.invitation.accept') }}
 @endcomponent
 
-Tautan ini berlaku sampai **{{ $expiresAt->format('d M Y H:i') }}** dan hanya dapat digunakan satu kali.
+{{ __('emails.invitation.expiry', ['date' => $expiresAt->format('d M Y H:i')]) }}
 
-Jika Anda tidak merasa diundang, abaikan email ini.
+{{ __('emails.invitation.ignore') }}
 
-Terima kasih,<br>
+{{ __('emails.invitation.thanks') }}<br>
 MediLoop
 @endcomponent

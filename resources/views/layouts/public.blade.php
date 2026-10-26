@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ filled($title ?? null) ? $title.' — MediLoop' : 'MediLoop' }}</title>
-    <meta name="description" content="MediLoop — pendaftaran fasilitas kesehatan dan onboarding tim.">
+    <meta name="description" content="{{ __('public.meta_description') }}">
     @include('partials.favicons')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script type="application/json" id="js-translations">@json(__('js'))</script>
     <style>
         :root {
             --pub-navy: #0B1F4B;
@@ -864,7 +865,7 @@
     @yield('head')
 </head>
 <body>
-    <a href="#main-content" class="pub-skip">Lewati ke konten</a>
+    <a href="#main-content" class="pub-skip">{{ __('public.skip_to_content') }}</a>
 
     <header class="pub-header">
         <div class="pub-header-inner">
@@ -876,13 +877,14 @@
             </a>
 
             @if(! request()->routeIs('invitations.*'))
-                <nav class="pub-nav" aria-label="Navigasi umum">
+                <nav class="pub-nav" aria-label="{{ __('navigation.public') }}">
+
                     @auth
-                        <a href="{{ route('dashboard') }}">Dashboard</a>
+                        <a href="{{ route('dashboard') }}">{{ __('navigation.dashboard') }}</a>
                     @else
-                        <a href="{{ route('login') }}">Masuk</a>
+                        <a href="{{ route('login') }}">{{ __('navigation.sign_in') }}</a>
                         @if(! request()->routeIs('facility-requests.*'))
-                            <a href="{{ route('facility-requests.create') }}" class="pub-btn pub-btn-primary">Ajukan Fasilitas</a>
+                            <a href="{{ route('facility-requests.create') }}" class="pub-btn pub-btn-primary">{{ __('public.request_facility') }}</a>
                         @endif
                     @endauth
                 </nav>
@@ -895,7 +897,7 @@
     </main>
 
     <footer class="pub-footer">
-        MediLoop — sistem pendukung keputusan redistribusi obat. Tidak memuat data pasien dan tidak memberikan saran dosis medis.
+        {{ __('public.footer') }}
     </footer>
 
     @yield('scripts')

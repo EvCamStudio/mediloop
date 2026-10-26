@@ -46,7 +46,7 @@ test('network page ranks partner facilities from nearest and excludes dinkes', f
     $response = $this->actingAs($user)->get(route('network.index'));
 
     $response->assertOk()
-        ->assertSee('Peta Jaringan')
+        ->assertSee('Facility Network Map')
         ->assertSeeInOrder([$near->name, $far->name])
         ->assertDontSee($dinkes->name)
         ->assertSee('network-map', false);
@@ -108,7 +108,7 @@ test('network page still renders for auditors without a linked facility', functi
     $response = $this->actingAs($auditor)->get(route('network.index'));
 
     $response->assertOk()
-        ->assertSee('Jarak tidak tersedia');
+        ->assertSee('Distance unavailable');
 
     $rows = $response->viewData('rows');
 
@@ -154,7 +154,7 @@ test('propose page can rank recipients by nearest distance', function () {
         'sort' => 'distance',
     ]));
 
-    $response->assertOk()->assertSee('Terdekat');
+    $response->assertOk()->assertSee('Nearest');
 
     $candidates = $response->viewData('candidates');
 

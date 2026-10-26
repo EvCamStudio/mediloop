@@ -1,12 +1,12 @@
-@extends('layouts.mediloop', ['title' => 'Stok & Batch Obat'])
+@extends('layouts.mediloop', ['title' => __('batches.page_title')])
 
 @section('content')
 @php
     $riskLabels = [
-        'CRITICAL' => 'Kritis',
-        'HIGH' => 'Tinggi',
-        'MEDIUM' => 'Sedang',
-        'LOW' => 'Rendah',
+        'CRITICAL' => __('batches.risk.critical'),
+        'HIGH' => __('batches.risk.high'),
+        'MEDIUM' => __('batches.risk.medium'),
+        'LOW' => __('batches.risk.low'),
     ];
 
     $filterParams = array_filter([
@@ -15,11 +15,11 @@
     ], fn ($value) => $value !== null && $value !== '');
 
     $statusTabs = [
-        ['label' => 'Semua', 'value' => ''],
-        ['label' => 'Aktif', 'value' => 'ACTIVE'],
-        ['label' => 'Dicadangkan', 'value' => 'RESERVED'],
-        ['label' => 'Habis', 'value' => 'DEPLETED'],
-        ['label' => 'Kedaluwarsa', 'value' => 'EXPIRED'],
+        ['label' => __('common.all'), 'value' => ''],
+        ['label' => __('batches.status.active'), 'value' => 'ACTIVE'],
+        ['label' => __('batches.status.reserved'), 'value' => 'RESERVED'],
+        ['label' => __('batches.status.depleted'), 'value' => 'DEPLETED'],
+        ['label' => __('batches.status.expired'), 'value' => 'EXPIRED'],
     ];
 
     $hasFilters = $currentSearch !== ''
@@ -35,7 +35,21 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span>{{ session('status') }}</span>
-                <button type="button" class="ml-alert-close" onclick="this.closest('.ml-alert').remove()" aria-label="Tutup notifikasi">&times;</button>
+                <button type="button" class="ml-alert-close" onclick="this.closest('.ml-alert').remove()" aria-label="{{ __('batches.close_notification') }}">&times;</button>
+            </div>
+        </div>
+    @endif
+
+    @if($errors->has('csv_file'))
+        <div class="ml-alert ml-alert-danger" role="alert" style="margin-bottom: 1.25rem; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 0.875rem 1.25rem; border-radius: 0.75rem;">
+            <div class="ml-alert-row" style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    <span><strong>Gagal Impor CSV:</strong> {{ $errors->first('csv_file') }}</span>
+                </div>
+                <button type="button" onclick="this.closest('.ml-alert-danger').remove()" aria-label="Tutup notifikasi" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #991b1b;">&times;</button>
             </div>
         </div>
     @endif
@@ -65,20 +79,20 @@
         </div>
     @endif
 
-    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
-        <a href="{{ route('dashboard') }}">Dashboard</a>
+    <nav class="ml-breadcrumb" aria-label="{{ __('batches.breadcrumb_aria') }}">
+        <a href="{{ route('dashboard') }}">{{ __('navigation.dashboard') }}</a>
         <span class="ml-breadcrumb-sep">/</span>
-        <span>Stok &amp; batch</span>
+        <span>{{ __('batches.breadcrumb_batches') }}</span>
     </nav>
 
     <header class="ml-page-head">
         <div>
-            <p class="ml-page-eyebrow">Inventaris farmasi</p>
+            <p class="ml-page-eyebrow">{{ __('batches.eyebrow') }}</p>
             <div class="ml-page-title-row">
-                <h1 class="ml-page-title">Stok &amp; batch obat</h1>
-                <span class="ml-facility-chip">{{ $facility?->name ?? 'Fasilitas kesehatan' }}</span>
+                <h1 class="ml-page-title">{{ __('batches.title') }}</h1>
+                <span class="ml-facility-chip">{{ $facility?->name ?? __('batches.facility_fallback') }}</span>
             </div>
-            <p class="ml-page-sub">Pantau sisa umur batch, proyeksi limbah, dan kandidat redistribusi sebelum obat kedaluwarsa.</p>
+            <p class="ml-page-sub">{{ __('batches.subtitle') }}</p>
         </div>
 
         @if(! $user->isDinkesAuditor())
@@ -93,13 +107,13 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M12 4v16m8-8H4" />
                     </svg>
-                    <span>Input batch</span>
+                    <span>{{ __('batches.input_batch') }}</span>
                 </a>
             </div>
         @endif
     </header>
 
-    <nav class="ml-registry-tabs" aria-label="Filter status batch">
+    <nav class="ml-registry-tabs" aria-label="{{ __('batches.status_filter_aria') }}">
         @foreach($statusTabs as $tab)
             @php
                 $tabParams = $tab['value'] === ''
@@ -120,40 +134,40 @@
     <section class="ml-registry-panel" aria-labelledby="inventory-title">
         <div class="ml-section-header ml-section-header-split">
             <div>
-                <h2 class="ml-section-title" id="inventory-title">Matriks inventaris</h2>
+                <h2 class="ml-section-title" id="inventory-title">{{ __('batches.inventory.title') }}</h2>
                 <p class="ml-section-sub">
-                    {{ number_format($batches->total(), 0, ',', '.') }} batch pada tampilan ini, diurutkan dari kedaluwarsa terdekat.
+                    {{ trans_choice('batches.inventory.subtitle', $batches->total(), ['count' => number_format($batches->total(), 0, ',', '.')]) }}
                 </p>
             </div>
             @if(! $batches->isEmpty())
-                <div class="ml-inventory-legend" role="group" aria-label="Klasifikasi risiko batch">
-                    <span class="ml-risk ml-risk-critical">Kritis &le;30 hari</span>
-                    <span class="ml-risk ml-risk-high">Tinggi &le;60 hari</span>
-                    <span class="ml-risk ml-risk-medium">Sedang &le;90 hari</span>
-                    <span class="ml-risk ml-risk-low">Rendah</span>
+                <div class="ml-inventory-legend" role="group" aria-label="{{ __('batches.inventory.legend_aria') }}">
+                    <span class="ml-risk ml-risk-critical">{{ __('batches.inventory.legend_critical') }}</span>
+                    <span class="ml-risk ml-risk-high">{{ __('batches.inventory.legend_high') }}</span>
+                    <span class="ml-risk ml-risk-medium">{{ __('batches.inventory.legend_medium') }}</span>
+                    <span class="ml-risk ml-risk-low">{{ __('batches.inventory.legend_low') }}</span>
                 </div>
             @endif
         </div>
 
-        <form method="GET" action="{{ route('batches.index') }}" class="ml-registry-toolbar" aria-label="Cari dan filter batch">
+        <form method="GET" action="{{ route('batches.index') }}" class="ml-registry-toolbar" aria-label="{{ __('batches.toolbar.aria') }}">
             @if($currentStatus !== '')
                 <input type="hidden" name="status" value="{{ $currentStatus }}">
             @endif
 
             <div class="ml-registry-search">
-                <label for="filter-search" class="ml-sr-only">Cari batch obat</label>
+                <label for="filter-search" class="ml-sr-only">{{ __('batches.toolbar.search_label') }}</label>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                     <circle cx="11" cy="11" r="7" />
                     <path d="M20 20l-3.5-3.5" />
                 </svg>
-                <input id="filter-search" name="search" type="search" class="ml-input" value="{{ $currentSearch }}" placeholder="Cari obat, nomor batch, atau lokasi rak">
+                <input id="filter-search" name="search" type="search" class="ml-input" value="{{ $currentSearch }}" placeholder="{{ __('batches.toolbar.search_placeholder') }}">
             </div>
 
             @if($user->isDinkesAuditor() && isset($facilitiesList))
                 <div class="ml-registry-filter">
-                    <label for="filter-facility" class="ml-sr-only">Pilih fasilitas</label>
+                    <label for="filter-facility" class="ml-sr-only">{{ __('batches.toolbar.facility_label') }}</label>
                     <select id="filter-facility" name="facility_id" class="ml-select">
-                        <option value="">Semua fasilitas</option>
+                        <option value="">{{ __('batches.toolbar.all_facilities') }}</option>
                         @foreach($facilitiesList as $facilityOption)
                             <option value="{{ $facilityOption->id }}" @selected((string) request('facility_id') === (string) $facilityOption->id)>
                                 {{ $facilityOption->name }}
@@ -164,9 +178,9 @@
             @endif
 
             <div class="ml-registry-toolbar-actions">
-                <button type="submit" class="ml-btn-primary">Terapkan</button>
+                <button type="submit" class="ml-btn-primary">{{ __('common.apply') }}</button>
                 @if($hasFilters)
-                    <a href="{{ route('batches.index') }}" class="ml-btn-quiet">Reset</a>
+                    <a href="{{ route('batches.index') }}" class="ml-btn-quiet">{{ __('common.reset') }}</a>
                 @endif
             </div>
         </form>
@@ -176,34 +190,34 @@
                 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
-                <p class="ml-empty-title">Belum ada batch pada filter ini</p>
+                <p class="ml-empty-title">{{ __('batches.empty.title') }}</p>
                 <p class="ml-empty-copy">
                     @if($hasFilters)
-                        Tidak ada batch yang cocok dengan pencarian atau status yang dipilih. Ubah filter untuk melihat data lain.
+                        {{ __('batches.empty.filtered') }}
                     @else
-                        Data batch yang Anda input akan langsung dianalisis untuk mendeteksi risiko limbah kedaluwarsa.
+                        {{ __('batches.empty.default') }}
                     @endif
                 </p>
                 @if($hasFilters)
-                    <a href="{{ route('batches.index') }}" class="ml-btn-quiet">Hapus filter</a>
+                    <a href="{{ route('batches.index') }}" class="ml-btn-quiet">{{ __('batches.clear_filters') }}</a>
                 @elseif(! $user->isDinkesAuditor())
-                    <a href="{{ route('batches.create') }}" class="ml-btn-primary">Input batch</a>
+                    <a href="{{ route('batches.create') }}" class="ml-btn-primary">{{ __('batches.input_batch') }}</a>
                 @endif
             </div>
         @else
             <div class="ml-table-responsive">
                 <table class="ml-table ml-table-airy ml-table-inventory">
                     <caption class="ml-sr-only">
-                        Daftar batch obat beserta stok, stok habis, proyeksi limbah, dan aksi redistribusi.
+                        {{ __('batches.table.caption') }}
                     </caption>
                     <thead>
                         <tr>
-                            <th scope="col" style="min-width: 220px;">Obat &amp; spesifikasi</th>
-                            <th scope="col" style="min-width: 220px;">Batch &amp; lokasi</th>
-                            <th scope="col" style="min-width: 150px;">Stok</th>
-                            <th scope="col" style="min-width: 220px;">Kedaluwarsa &amp; runway</th>
-                            <th scope="col" style="min-width: 170px;">Proyeksi limbah</th>
-                            <th scope="col" class="is-right" style="min-width: 230px;"><span class="ml-sr-only">Aksi</span></th>
+                            <th scope="col" style="min-width: 220px;">{{ __('batches.table.medicine') }}</th>
+                            <th scope="col" style="min-width: 220px;">{{ __('batches.table.batch_location') }}</th>
+                            <th scope="col" style="min-width: 150px;">{{ __('common.stock') }}</th>
+                            <th scope="col" style="min-width: 220px;">{{ __('batches.table.expiry_runway') }}</th>
+                            <th scope="col" style="min-width: 170px;">{{ __('batches.table.projected_waste') }}</th>
+                            <th scope="col" class="is-right" style="min-width: 230px;"><span class="ml-sr-only">{{ __('common.actions') }}</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -222,12 +236,12 @@
                                 $simId = 'sim-'.$batch->id;
                             @endphp
                             <tr>
-                                <td data-label="Obat">
+                                <td data-label="{{ __('batches.table.medicine_short') }}">
                                     <div class="ml-cell-title">{{ $batch->medicine->name }}</div>
                                     <div class="ml-cell-meta">
                                         {{ $batch->medicine->dosage_form }} &middot; {{ $batch->medicine->category }}
                                         @if($batch->medicine->requires_cold_chain)
-                                            <span class="ml-cold-chain" role="img" title="Perlu rantai dingin" aria-label="Perlu rantai dingin">
+                                            <span class="ml-cold-chain" role="img" title="{{ __('batches.cold_chain_required') }}" aria-label="{{ __('batches.cold_chain_required') }}">
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                                     <path d="M12 2v20M2 12h20M4.9 4.9l14.2 14.2M19.1 4.9L4.9 19.1" />
                                                 </svg>
@@ -236,31 +250,32 @@
                                     </div>
                                 </td>
 
-                                <td data-label="Batch &amp; lokasi">
+                                <td data-label="{{ __('batches.table.batch_location') }}">
                                     <div class="ml-batch-cell">
                                         <span class="ml-batch-code">{{ $batch->batch_number }}</span>
-                                        <div class="ml-cell-meta">{{ $batch->storage_location ?? 'Gudang Farmasi Utama' }}</div>
+                                        <div class="ml-cell-meta">{{ $batch->storage_location ?? __('batches.default_storage_location') }}</div>
                                     </div>
                                 </td>
 
-                                <td data-label="Stok">
+                                <td data-label="{{ __('common.stock') }}">
                                     <div class="ml-stock-cell">
                                         <div class="ml-stock-main">
                                             <span class="ml-stock-value">{{ number_format($batch->current_stock) }}</span>
                                             <span class="ml-stock-unit">{{ $batch->medicine->unit }}</span>
                                         </div>
-                                        <div class="ml-cell-meta">~{{ $batch->daily_burn_rate }} unit/hari</div>
+                                        <div class="ml-cell-meta">~{{ trans_choice('batches.units.per_day', $batch->daily_burn_rate, ['count' => $batch->daily_burn_rate]) }}</div>
                                     </div>
                                 </td>
+                                </td>
 
-                                <td data-label="Kedaluwarsa &amp; runway">
+                                <td data-label="{{ __('batches.table.expiry_runway') }}">
                                     <div class="ml-runway-text">
                                         <span class="{{ $isUrgent ? 'is-risk' : 'is-safe' }}">
-                                            {{ $daysToExpiry <= 0 ? 'Sudah kedaluwarsa' : number_format($daysToExpiry).' hari lagi' }}
+                                            {{ $daysToExpiry <= 0 ? __('batches.already_expired') : trans_choice('batches.days_remaining', $daysToExpiry, ['count' => number_format($daysToExpiry)]) }}
                                         </span>
                                         <span class="ml-runway-sep" aria-hidden="true">&middot;</span>
                                         <span>
-                                            {{ $daysToDeplete === null ? 'stok tidak habis' : 'stok habis '.number_format($daysToDeplete, 0).' hari' }}
+                                            {{ $daysToDeplete === null ? __('batches.stock_never_depletes') : __('batches.stock_depletes_in', ['days' => number_format($daysToDeplete, 0)]) }}
                                         </span>
                                     </div>
 
@@ -280,44 +295,48 @@
                                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
                                             <path d="M12 5v14M5 12h14" />
                                         </svg>
-                                        Simulasi laju konsumsi
+                                        {{ __('batches.simulator.toggle') }}
                                     </button>
                                 </td>
 
-                                <td data-label="Proyeksi limbah">
+                                <td data-label="{{ __('batches.table.projected_waste') }}">
                                     <div class="ml-waste-cell">
                                         <span class="ml-risk ml-risk-{{ $riskTone }}">{{ $riskLabel }}</span>
                                         @if($projectedWaste > 0)
-                                            <span class="ml-waste-value">{{ number_format($projectedWaste) }} unit</span>
+                                            <span class="ml-waste-value">{{ trans_choice('batches.units.unit', $projectedWaste, ['count' => number_format($projectedWaste)]) }}</span>
                                             <span class="ml-cell-meta">Rp {{ number_format($projectedWaste * (float) $batch->unit_price_idr, 0, ',', '.') }}</span>
                                         @else
-                                            <span class="ml-waste-value is-safe">0 unit</span>
-                                            <span class="ml-cell-meta">Tidak ada proyeksi limbah</span>
+                                            <span class="ml-waste-value is-safe">{{ trans_choice('batches.units.unit', 0, ['count' => number_format(0)]) }}</span>
+                                            <span class="ml-cell-meta">{{ __('batches.no_projected_waste') }}</span>
                                         @endif
                                     </div>
                                 </td>
 
-                                <td class="is-right" data-label="Aksi" style="white-space: nowrap;">
+                                <td class="is-right" data-label="{{ __('common.actions') }}" style="white-space: nowrap;">
                                     <div class="ml-inventory-actions">
                                         @if($batch->current_stock > 0 && ! $user->isDinkesAuditor())
-                                            <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-primary ml-btn-sm" title="Usulkan redistribusi batch ini">
-                                                <span>Usulkan</span>
+                                            <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-primary ml-btn-sm" title="{{ __('batches.propose') }}">
+                                                <span>{{ __('batches.propose') }}</span>
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
                                                     <path d="M5 12h14M13 6l6 6-6 6" />
                                                 </svg>
                                             </a>
+                                        @elseif($batch->current_stock > 0 && ! $user->isDinkesAuditor())
+                                            <a href="{{ route('transfers.propose', $batch) }}" class="ml-btn-quiet ml-btn-sm" title="Usulkan redistribusi batch ini">
+                                                <span>Usulkan</span>
+                                            </a>
                                         @endif
 
                                         @if(! $user->isDinkesAuditor())
-                                            <a href="{{ route('batches.edit', $batch) }}" class="ml-btn-quiet ml-btn-sm">Edit</a>
+                                            <a href="{{ route('batches.edit', $batch) }}" class="ml-btn-quiet ml-btn-sm">{{ __('common.edit') }}</a>
 
-                                            <form method="POST" action="{{ route('batches.destroy', $batch) }}" onsubmit='return confirm(@js("Apakah Anda yakin ingin menghapus data batch {$batch->batch_number}?"))'>
+                                            <form method="POST" action="{{ route('batches.destroy', $batch) }}" onsubmit='return confirm(@js(__('batches.confirm_delete', ['batch' => $batch->batch_number])))'>
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="ml-btn-quiet ml-btn-sm is-danger">Hapus</button>
+                                                <button type="submit" class="ml-btn-quiet ml-btn-sm is-danger">{{ __('common.delete') }}</button>
                                             </form>
                                         @else
-                                            <span class="ml-cell-meta">Hanya baca</span>
+                                            <span class="ml-cell-meta">{{ __('common.read_only') }}</span>
                                         @endif
                                     </div>
                                 </td>
@@ -328,11 +347,11 @@
                                     <div class="ml-simulator">
                                         <div class="ml-simulator-head">
                                             <div>
-                                                <p class="ml-page-eyebrow">Simulator keputusan</p>
-                                                <h3 class="ml-simulator-title">Uji laju konsumsi {{ $batch->medicine->name }}</h3>
-                                                <p class="ml-simulator-sub">Geser laju pemakaian untuk melihat dampaknya pada proyeksi limbah dan sisa umur stok.</p>
+                                                <p class="ml-page-eyebrow">{{ __('batches.simulator.eyebrow') }}</p>
+                                                <h3 class="ml-simulator-title">{{ __('batches.simulator.title', ['medicine' => $batch->medicine->name]) }}</h3>
+                                                <p class="ml-simulator-sub">{{ __('batches.simulator.subtitle') }}</p>
                                             </div>
-                                            <button type="button" class="ml-icon-btn" onclick="toggleSimulator('{{ $simId }}')" aria-label="Tutup simulator">
+                                            <button type="button" class="ml-icon-btn" onclick="toggleSimulator('{{ $simId }}')" aria-label="{{ __('batches.simulator.close_aria') }}">
                                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                                     <path d="M18 6L6 18M6 6l12 12" />
                                                 </svg>
@@ -342,9 +361,9 @@
                                         <div class="ml-simulator-grid">
                                             <div>
                                                 <label for="rate-{{ $simId }}" class="ml-simulator-label">
-                                                    Laju konsumsi harian:
+                                                    {{ __('batches.simulator.daily_rate') }}
                                                     <output id="label-{{ $simId }}" class="ml-simulator-current">{{ $batch->daily_burn_rate }}</output>
-                                                    unit/hari
+                                                    {{ __('batches.units.per_day_label') }}
                                                 </label>
                                                 <input
                                                     id="rate-{{ $simId }}"
@@ -358,27 +377,27 @@
                                                     oninput="runSimulation('{{ $simId }}', {{ (int) $batch->current_stock }}, {{ $daysToExpiry }}, this.value)"
                                                 >
                                                 <div class="ml-simulator-scale" id="scale-{{ $simId }}">
-                                                    <span>0,5 unit/hari</span>
-                                                    <span>{{ $batch->daily_burn_rate }} saat ini</span>
-                                                    <span>{{ max(20, (float) $batch->daily_burn_rate * 3) }} unit/hari</span>
+                                                    <span>0,5 {{ __('batches.units.per_day_label') }}</span>
+                                                    <span>{{ __('batches.simulator.current', ['count' => $batch->daily_burn_rate]) }}</span>
+                                                    <span>{{ trans_choice('batches.units.per_day', max(20, (float) $batch->daily_burn_rate * 3), ['count' => max(20, (float) $batch->daily_burn_rate * 3)]) }}</span>
                                                 </div>
                                             </div>
 
                                             <div class="ml-simulator-metrics">
                                                 <div class="ml-simulator-metric">
-                                                    <span class="ml-simulator-metric-label">Proyeksi limbah</span>
+                                                    <span class="ml-simulator-metric-label">{{ __('batches.simulator.projected_waste') }}</span>
                                                     <span id="waste-{{ $simId }}" class="ml-simulator-metric-value {{ $projectedWaste > 0 ? 'is-risk' : 'is-safe' }}">
-                                                        {{ number_format($projectedWaste) }} unit
+                                                        {{ trans_choice('batches.units.unit', $projectedWaste, ['count' => number_format($projectedWaste)]) }}
                                                     </span>
                                                 </div>
                                                 <div class="ml-simulator-metric">
-                                                    <span class="ml-simulator-metric-label">Stok habis</span>
+                                                    <span class="ml-simulator-metric-label">{{ __('batches.simulator.stock_depleted') }}</span>
                                                     <span id="deplete-{{ $simId }}" class="ml-simulator-metric-value">
-                                                        {{ $daysToDeplete === null ? 'Tidak habis' : number_format($daysToDeplete, 0).' hari' }}
+                                                        {{ $daysToDeplete === null ? __('batches.simulator.never_depletes') : trans_choice('batches.days_remaining', (int) $daysToDeplete, ['count' => number_format($daysToDeplete, 0)]) }}
                                                     </span>
                                                 </div>
                                                 <div class="ml-simulator-metric">
-                                                    <span class="ml-simulator-metric-label">Status risiko</span>
+                                                    <span class="ml-simulator-metric-label">{{ __('batches.simulator.risk_status') }}</span>
                                                     <span id="risk-{{ $simId }}" class="ml-risk ml-risk-{{ $riskTone }}">{{ $riskLabel }}</span>
                                                 </div>
                                             </div>
@@ -541,29 +560,29 @@
         const wasteRatio = currentStock > 0 ? projectedWaste / currentStock : 0;
 
         let newRisk = 'LOW';
-        let newRiskLabel = 'Rendah';
+        let newRiskLabel = @json(__('batches.risk.low'));
 
         if (projectedWaste > 0) {
             if (remainingDays <= 30) {
                 newRisk = 'CRITICAL';
-                newRiskLabel = 'Kritis';
+                newRiskLabel = @json(__('batches.risk.critical'));
             } else if (remainingDays <= 60 || wasteRatio >= 0.25) {
                 newRisk = 'HIGH';
-                newRiskLabel = 'Tinggi';
+                newRiskLabel = @json(__('batches.risk.high'));
             } else if (remainingDays <= 90) {
                 newRisk = 'MEDIUM';
-                newRiskLabel = 'Sedang';
+                newRiskLabel = @json(__('batches.risk.medium'));
             }
         }
 
         const wasteElement = document.getElementById('waste-' + id);
-        wasteElement.textContent = numberFormatter.format(projectedWaste) + ' unit';
+        wasteElement.textContent = numberFormatter.format(projectedWaste) + ' ' + @json(__('common.units'));
         wasteElement.className = 'ml-simulator-metric-value ' + (projectedWaste > 0 ? 'is-risk' : 'is-safe');
 
         const depleteElement = document.getElementById('deplete-' + id);
         depleteElement.textContent = daysToDeplete === null
-            ? 'Tidak habis'
-            : decimalFormatter.format(daysToDeplete) + ' hari';
+            ? @json(__('batches.simulator.never_depletes'))
+            : decimalFormatter.format(daysToDeplete) + ' ' + @json(__('common.day'));
 
         const riskElement = document.getElementById('risk-' + id);
         riskElement.textContent = newRiskLabel;

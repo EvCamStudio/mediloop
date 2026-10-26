@@ -1,9 +1,11 @@
+import { intlLocale, t } from './i18n';
+
 const getElement = (id) => document.getElementById(id);
 
 const isBatchFormPresent = () => getElement('batchForm') !== null;
 
-const numberFormatter = new Intl.NumberFormat('id-ID');
-const decimalFormatter = new Intl.NumberFormat('id-ID', {
+const numberFormatter = new Intl.NumberFormat(intlLocale());
+const decimalFormatter = new Intl.NumberFormat(intlLocale(), {
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
 });
@@ -74,32 +76,32 @@ const autofillUnitPrice = () => {
 const buildRiskLevel = (projectedWaste, daysToExpiry, wasteRatio) => {
     if (projectedWaste > 0 && daysToExpiry <= 30) {
         return {
-            label: 'Kritis',
+            label: t('js.batch_form.risk_critical'),
             className: 'ml-risk ml-risk-critical',
-            note: 'Sisa masa edar ≤30 hari; prioritaskan redistribusi.',
+            note: t('js.batch_form.risk_critical_note'),
         };
     }
 
     if (projectedWaste > 0 && (daysToExpiry <= 60 || wasteRatio >= 0.25)) {
         return {
-            label: 'Tinggi',
+            label: t('js.batch_form.risk_high'),
             className: 'ml-risk ml-risk-high',
-            note: 'Risiko tinggi; evaluasi kebutuhan redistribusi.',
+            note: t('js.batch_form.risk_high_note'),
         };
     }
 
     if (projectedWaste > 0) {
         return {
-            label: 'Sedang',
+            label: t('js.batch_form.risk_medium'),
             className: 'ml-risk ml-risk-medium',
-            note: 'Pantau laju pakai dan sisa masa edar.',
+            note: t('js.batch_form.risk_medium_note'),
         };
     }
 
     return {
-        label: 'Rendah',
+        label: t('js.batch_form.risk_low'),
         className: 'ml-risk ml-risk-low',
-        note: 'Stok diproyeksikan habis sebelum kedaluwarsa.',
+        note: t('js.batch_form.risk_low_note'),
     };
 };
 
@@ -136,15 +138,15 @@ const updatePreview = () => {
     const projectedWaste = Math.max(0, stock - expectedConsumption);
     const wasteRatio = stock > 0 ? projectedWaste / stock : 0;
 
-    elements.daysExpiry.innerHTML = `${numberFormatter.format(daysToExpiry)} <small>hari</small>`;
+    elements.daysExpiry.innerHTML = `${numberFormatter.format(daysToExpiry)} ${t('js.batch_form.days_to_expiry')}`;
 
     if (burnRate > 0) {
-        elements.daysDeplete.innerHTML = `${decimalFormatter.format(stock / burnRate)} <small>hari</small>`;
+        elements.daysDeplete.innerHTML = `${decimalFormatter.format(stock / burnRate)} ${t('js.batch_form.days_to_deplete')}`;
     } else {
-        elements.daysDeplete.innerHTML = 'Tidak habis <small>0/hari</small>';
+        elements.daysDeplete.innerHTML = t('js.batch_form.never_depletes');
     }
 
-    elements.waste.innerHTML = `${numberFormatter.format(projectedWaste)} <small>unit (${Math.round(wasteRatio * 100)}%)</small>`;
+    elements.waste.innerHTML = `${numberFormatter.format(projectedWaste)} ${t('js.batch_form.unit_ratio', { ratio: Math.round(wasteRatio * 100) })}`;
 
     const level = buildRiskLevel(projectedWaste, daysToExpiry, wasteRatio);
 

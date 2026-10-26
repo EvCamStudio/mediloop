@@ -12,6 +12,7 @@ export default defineConfig({
                 'resources/js/passkeys.js',
                 'resources/js/network-map.js',
                 'resources/js/facility-map-picker.js',
+                'resources/js/analytics.js',
             ],
             refresh: true,
             fonts: [

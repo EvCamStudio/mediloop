@@ -48,4 +48,5 @@ yarn-error.log
 *.bak
 
 .vercel
+test-output*.txt
 .env*

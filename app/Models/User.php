@@ -30,6 +30,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $joined_at
  * @property string|null $license_sip
  * @property string|null $job_title
+ * @property string|null $locale
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $two_factor_secret
@@ -39,7 +40,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'facility_id', 'role', 'status', 'invited_by', 'joined_at', 'license_sip', 'job_title'])]
+#[Fillable(['name', 'email', 'password', 'facility_id', 'role', 'status', 'invited_by', 'joined_at', 'license_sip', 'job_title', 'locale'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
@@ -87,12 +88,12 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 
     public function isDinkesAuditor(): bool
     {
-        return in_array($this->role, [UserRole::DinkesAuditor->value, UserRole::Sysadmin->value], true);
+        return $this->role === UserRole::Sysadmin->value;
     }
 
     public function isFacilityApprover(): bool
     {
-        return $this->role === UserRole::FacilityApprover->value;
+        return $this->role === UserRole::FacilityStaff->value;
     }
 
     public function isFacilityStaff(): bool

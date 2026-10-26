@@ -19,7 +19,7 @@ class FacilityTeamController extends Controller
         $user = $request->user();
 
         if (! $user instanceof User || ! $user->facility instanceof Facility) {
-            abort(403, 'Akun Anda belum terhubung ke fasilitas.');
+            abort(403, __('facility.errors.no_facility'));
         }
 
         $facility = $user->facility;
@@ -42,7 +42,7 @@ class FacilityTeamController extends Controller
         $user = $request->user();
 
         if (! $user instanceof User || ! $user->facility instanceof Facility) {
-            abort(403, 'Akun Anda belum terhubung ke fasilitas.');
+            abort(403, __('facility.errors.no_facility'));
         }
 
         $facility = $user->facility;
@@ -59,7 +59,7 @@ class FacilityTeamController extends Controller
             $user,
         );
 
-        return back()->with('status', 'Undangan dikirim. Tautan berlaku selama 7 hari.');
+        return back()->with('status', __('facility.team.invitation_sent'));
     }
 
     public function destroy(
@@ -70,12 +70,12 @@ class FacilityTeamController extends Controller
         $user = $request->user();
 
         if (! $user instanceof User || $invitation->facility_id !== $user->facility_id) {
-            abort(403, 'Undangan ini bukan milik fasilitas Anda.');
+            abort(403, __('facility.team.invitation_not_owned'));
         }
 
         $invitations->revoke($invitation, $user);
 
-        return back()->with('status', 'Undangan dibatalkan.');
+        return back()->with('status', __('facility.team.invitation_revoked'));
     }
 
     /**
@@ -84,11 +84,11 @@ class FacilityTeamController extends Controller
     private function invitableRoles(User $user): array
     {
         $roles = [
-            UserRole::FacilityStaff->value => 'Staf Farmasi',
+            UserRole::FacilityStaff->value => __('enums.user_role.facility_staff'),
         ];
 
         if ($user->isSysadmin()) {
-            $roles = [UserRole::FacilityApprover->value => 'Kepala Fasilitas'] + $roles;
+            $roles = [UserRole::FacilityStaff->value => __('enums.user_role.facility_staff')] + $roles;
         }
 
         return $roles;

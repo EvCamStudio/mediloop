@@ -11,9 +11,9 @@ enum UserStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Invited => 'Diundang',
-            self::Active => 'Aktif',
-            self::Suspended => 'Ditangguhkan',
+            self::Invited => __('enums.user_status.invited'),
+            self::Active => __('enums.user_status.active'),
+            self::Suspended => __('enums.user_status.suspended'),
         };
     }
 }

@@ -22,6 +22,15 @@
     --color-brand-risk: #D9480F;
     --color-brand-warning: #B7791F;
 
+    /* Risk and chart tokens (never rely on colour alone for status). */
+    --color-risk-critical: #B91C1C;
+    --color-risk-high: #C2410C;
+    --color-risk-medium: #B7791F;
+    --color-risk-low: #475569;
+    --color-chart-grid: #E2E8F0;
+    --color-warning-surface: #FFF7ED;
+    --color-warning-ink: #9A3412;
+
     /* Validation feedback tokens; all meet WCAG AA contrast on surface-raised. */
     --color-feedback-danger: #B91C1C;
     --color-feedback-danger-ink: #7F1D1D;

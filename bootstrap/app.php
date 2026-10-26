@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureFacilityApprover;
 use App\Http\Middleware\EnsureFacilityIsActive;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\EnsureUserIsSysadmin;
+use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,6 +18,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->web(append: [SetLocale::class]);
 
         $middleware->alias([
             'active' => EnsureUserIsActive::class,

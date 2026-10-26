@@ -13,11 +13,11 @@ enum FacilityType: string
     public function label(): string
     {
         return match ($this) {
-            self::Rsud => 'RSUD',
-            self::Puskesmas => 'Puskesmas',
-            self::Klinik => 'Klinik',
-            self::RsSwasta => 'RS Swasta',
-            self::Dinkes => 'Dinkes',
+            self::Rsud => __('enums.facility_type.rsud'),
+            self::Puskesmas => __('enums.facility_type.puskesmas'),
+            self::Klinik => __('enums.facility_type.klinik'),
+            self::RsSwasta => __('enums.facility_type.rs_swasta'),
+            self::Dinkes => __('enums.facility_type.dinkes'),
         };
     }
 

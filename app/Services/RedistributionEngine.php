@@ -430,7 +430,7 @@ class RedistributionEngine
                         : $donorBatch->daily_burn_rate,
                     'expiry_date' => $donorBatch->expiry_date,
                     'unit_price_idr' => $donorBatch->unit_price_idr,
-                    'storage_location' => 'Gudang Farmasi Penerima',
+                    'storage_location' => __('transfers.default_storage_location'),
                     'status' => 'ACTIVE',
                 ]);
             }
@@ -448,7 +448,12 @@ class RedistributionEngine
                 'facility_id' => $transfer->recipient_facility_id,
                 'transfer_id' => $transfer->id,
                 'action' => 'TRANSFER_COMPLETED',
-                'description' => "Transfer {$transfer->transfer_code} successfully completed. Received {$transfer->quantity} units of {$donorBatch->medicine->name} (Batch: {$donorBatch->batch_number}).",
+                'description' => __('transfers.messages.audit_completed', [
+                    'code' => $transfer->transfer_code,
+                    'quantity' => $transfer->quantity,
+                    'medicine' => $donorBatch->medicine->name,
+                    'batch' => $donorBatch->batch_number,
+                ]),
                 'state_delta' => [
                     'donor_facility_id' => $transfer->donor_facility_id,
                     'recipient_facility_id' => $transfer->recipient_facility_id,
