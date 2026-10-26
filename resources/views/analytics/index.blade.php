@@ -67,7 +67,7 @@
                 <select name="facility_id" id="facility_id" class="ml-analytics-select">
                     <option value="">{{ __('analytics.all_facilities') }}</option>
                     @foreach($facilitiesList as $facilityOption)
-                        <option value="{{ $facilityOption->id }}" @selected((int) request('facility_id') === $facilityOption->id)>
+                        <option value="{{ $facilityOption->id }}" @selected((int) request('facility_id') === $facilityOption->id)
                             {{ $facilityOption->name }}
                         </option>
                     @endforeach
@@ -100,7 +100,7 @@
             <span class="ml-analytics-kpi-label">{{ __('analytics.kpi.efficiency_label') }}</span>
             <span class="ml-analytics-kpi-value">{{ Formatter::percent($kpis['efficiency_score']) }}</span>
             <div class="ml-analytics-progress" role="img" aria-label="{{ Formatter::percent($kpis['efficiency_score']) }}">
-                <span style="width: {{ max(0, min(100, $kpis['efficiency_score'])) }}%"></span>
+                <div style="width: {{ max(0, min(100, $kpis['efficiency_score'])) }}%"></div>
             </div>
             <div class="ml-analytics-kpi-meta">
                 <span>{{ __('analytics.kpi.efficiency_note') }}</span>
@@ -132,189 +132,12 @@
             @endif
         </section>
     @else
-        <div class="ml-analytics-panels">
-            <section class="ml-card ml-analytics-panel is-five" aria-labelledby="risk-chart-title">
-                <div class="ml-analytics-panel-head">
-                    <div>
-                        <h2 class="ml-analytics-panel-title" id="risk-chart-title">{{ __('analytics.risk.title') }}</h2>
-                        <p class="ml-analytics-panel-sub">{{ __('analytics.risk.subtitle') }}</p>
-                    </div>
-                    <span class="ml-analytics-panel-meta">
-                        {{ trans_choice('analytics.risk.batch_count', $kpis['batch_count'], ['count' => Formatter::number($kpis['batch_count'])]) }}
-                    </span>
-                </div>
-
-                <div class="ml-analytics-chart">
-                    <canvas id="riskDonutChart" role="img" aria-label="{{ __('analytics.charts.risk_aria') }}"></canvas>
-                </div>
-
-                <ul class="ml-analytics-legend">
-                    @foreach($riskLegend as $item)
-                        <li>
-                            <span class="ml-analytics-dot is-{{ $item['key'] }}" aria-hidden="true"></span>
-                            <span>{{ $item['label'] }}</span>
-                            <strong>{{ Formatter::number($item['count']) }}</strong>
-                        </li>
-                    @endforeach
-                </ul>
-
-                <table class="sr-only">
-                    <caption>{{ __('analytics.risk.title') }}</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">{{ __('analytics.risk.title') }}</th>
-                            <th scope="col">{{ __('analytics.units.batches') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($riskLegend as $item)
-                            <tr>
-                                <th scope="row">{{ $item['label'] }}</th>
-                                <td>{{ Formatter::number($item['count']) }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </section>
-
-            <section class="ml-card ml-analytics-panel is-seven" aria-labelledby="category-chart-title">
-                <div class="ml-analytics-panel-head">
-                    <div>
-                        <h2 class="ml-analytics-panel-title" id="category-chart-title">{{ __('analytics.category.title') }}</h2>
-                        <p class="ml-analytics-panel-sub">{{ __('analytics.category.subtitle') }}</p>
-                    </div>
-                    <span class="ml-analytics-panel-meta">{{ __('analytics.currency') }}</span>
-                </div>
-
-                <div class="ml-analytics-chart is-tall">
-                    <canvas id="categoryWasteChart" role="img" aria-label="{{ __('analytics.charts.category_aria') }}"></canvas>
-                </div>
-
-                <table class="sr-only">
-                    <caption>{{ __('analytics.category.title') }}</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">{{ __('analytics.category.title') }}</th>
-                            <th scope="col">{{ __('analytics.charts.waste_value') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($categories as $category)
-                            <tr>
-                                <th scope="row">{{ $category['name'] }}</th>
-                                <td>{{ Formatter::idr($category['waste_value']) }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </section>
-
-            <section class="ml-card ml-analytics-panel is-five" aria-labelledby="horizon-chart-title">
-                <div class="ml-analytics-panel-head">
-                    <div>
-                        <h2 class="ml-analytics-panel-title" id="horizon-chart-title">{{ __('analytics.horizon.title') }}</h2>
-                        <p class="ml-analytics-panel-sub">{{ __('analytics.horizon.subtitle') }}</p>
-                    </div>
-                </div>
-
-                <div class="ml-analytics-chart">
-                    <canvas id="expiryHorizonChart" role="img" aria-label="{{ __('analytics.charts.horizon_aria') }}"></canvas>
-                </div>
-
-                <table class="sr-only">
-                    <caption>{{ __('analytics.horizon.title') }}</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">{{ __('analytics.horizon.title') }}</th>
-                            <th scope="col">{{ __('analytics.units.batches') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($expiryBuckets as $bucketKey => $bucketCount)
-                            <tr>
-                                <th scope="row">{{ __('analytics.horizon.'.$bucketKey) }}</th>
-                                <td>{{ Formatter::number($bucketCount) }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </section>
-
-            <section class="ml-card ml-analytics-panel is-seven" aria-labelledby="surplus-title">
-                <div class="ml-analytics-panel-head">
-                    <div>
-                        <h2 class="ml-analytics-panel-title" id="surplus-title">{{ __('analytics.surplus.title') }}</h2>
-                        <p class="ml-analytics-panel-sub">{{ __('analytics.surplus.subtitle') }}</p>
-                    </div>
-                    <a href="{{ route('batches.index') }}" class="ml-analytics-inline-link">
-                        {{ __('analytics.surplus.manage_stock') }}
-                    </a>
-                </div>
-
-                <div class="ml-analytics-table-wrap">
-                    <table class="ml-analytics-table">
-                        <thead>
-                            <tr>
-                                <th scope="col">{{ __('analytics.surplus.medicine_batch') }}</th>
-                                <th scope="col">{{ __('analytics.surplus.stock_burn') }}</th>
-                                <th scope="col">{{ __('analytics.surplus.deplete_vs_expiry') }}</th>
-                                <th scope="col">{{ __('analytics.surplus.surplus_ratio') }}</th>
-                                <th scope="col" class="is-numeric">{{ __('analytics.surplus.potential_waste') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($analytics['surplus'] as $item)
-                                <tr>
-                                    <td>
-                                        <span class="ml-analytics-medicine">{{ $item['medicine_name'] }}</span>
-                                        <span class="ml-analytics-code">{{ $item['batch_number'] }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="ml-analytics-table-value">{{ Formatter::number($item['current_stock']) }} {{ __('analytics.units.units') }}</span>
-                                        <span class="ml-analytics-table-sub">{{ Formatter::number($item['daily_burn_rate'], 1) }} {{ __('analytics.units.per_day') }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="ml-analytics-table-value">{{ str_replace(':days', Formatter::number($item['days_to_deplete'], 1), __('analytics.surplus.days_to_deplete')) }}</span>
-                                        <span class="ml-analytics-table-sub is-risk">{{ str_replace(':days', Formatter::number($item['days_to_expiry']), __('analytics.surplus.days_to_expiry')) }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="ml-analytics-ratio is-{{ $item['surplus_ratio'] >= 2 ? 'critical' : 'high' }}">
-                                            {{ str_replace(':ratio', Formatter::number($item['surplus_ratio'], 1), __('analytics.surplus.ratio')) }}
-                                        </span>
-                                    </td>
-                                    <td class="is-numeric">
-                                        <span class="ml-analytics-table-value">{{ Formatter::number($item['projected_waste']) }} {{ __('analytics.units.units') }}</span>
-                                        <span class="ml-analytics-table-sub">{{ Formatter::idr($item['waste_value']) }}</span>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="ml-analytics-table-empty">{{ __('analytics.surplus.empty') }}</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section class="ml-card ml-analytics-panel" aria-labelledby="bar-chart-title">
-                <div class="ml-analytics-panel-head">
-                    <div>
-                        <h2 class="ml-analytics-panel-title" id="bar-chart-title">{{ __('analytics.bar_chart.title') }}</h2>
-                        <p class="ml-analytics-panel-sub">{{ __('analytics.bar_chart.subtitle') }}</p>
-                    </div>
-                </div>
-                <div class="ml-analytics-chart is-tall">
-                    <canvas id="barChart" role="img" aria-label="{{ __('analytics.bar_chart.aria') }}"></canvas>
-                </div>
-            </section>
-        </div>
+        <livewire:analytics.charts :facilityId="$facility?->id" :isRegional="$isRegional" />
     @endif
 </div>
 @endsection
 
 @section('scripts')
-<script type="application/json" id="analytics-data">@json($chartData)</script>
 @vite('resources/js/analytics.js')
 @endsection
 
@@ -411,7 +234,7 @@
         border-radius: 999px;
         background: var(--ml-surface);
     }
-    .ml-analytics-progress span {
+    .ml-analytics-progress div {
         display: block;
         height: 100%;
         border-radius: inherit;

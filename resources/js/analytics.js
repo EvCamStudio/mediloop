@@ -1,14 +1,37 @@
 import Chart from 'chart.js/auto';
 
-const dataElement = document.getElementById('analytics-data');
-
-if (dataElement) {
+/**
+ * Inisialisasi semua chart dengan data dari element yang tersedia.
+ * Mendeteksi data dari #analytics-data (blade lama) atau #analytics-data-livewire (Livewire component).
+ * Fungsi ini dapat dipanggil kembali saat Livewire memperbarui DOM.
+ */
+function reinitializeCharts() {
+    // Coba dapatkan data dari Livewire component terlebih dahulu
     let analytics = {};
-    try {
-        analytics = JSON.parse(dataElement.textContent ?? '{}');
-    } catch (e) {
-        console.error('Analytics data parse error', e);
+
+    const livewireDataEl = document.getElementById('analytics-data-livewire');
+    if (livewireDataEl) {
+        try {
+            analytics = JSON.parse(livewireDataEl.textContent ?? '{}');
+        } catch (e) {
+            console.error('Analytics Livewire data parse error', e);
+        }
     }
+
+    // Jika tidak ada Livewire data, coba ambil dari blade lama
+    if (Object.keys(analytics).length === 0) {
+        const dataElement = document.getElementById('analytics-data');
+        if (dataElement) {
+            try {
+                analytics = JSON.parse(dataElement.textContent ?? '{}');
+            } catch (e) {
+                console.error('Analytics data parse error', e);
+            }
+        }
+    }
+
+    if (Object.keys(analytics).length === 0) return;
+
     const rootStyles = getComputedStyle(document.documentElement);
     const cssValue = (name) => rootStyles.getPropertyValue(name).trim();
     const documentLocale = document.documentElement.lang || 'en';
@@ -56,9 +79,16 @@ if (dataElement) {
         },
     };
 
+    /**
+     * Render pie/donut chart (risk)
+     */
     const renderRiskChart = () => {
         const canvas = document.getElementById('riskDonutChart');
         if (!(canvas instanceof HTMLCanvasElement)) return;
+
+        // Destroy existing chart if present
+        const existing = Chart.getChart(canvas);
+        if (existing) existing.destroy();
 
         new Chart(canvas, {
             type: 'doughnut',
@@ -90,11 +120,20 @@ if (dataElement) {
                 },
             },
         });
+
+            // Store references for potential destroy on reinit
+    window.riskChart = Chart.getChart(canvas);
     };
 
+    /**
+     * Render bar chart kategori waste
+     */
     const renderCategoryChart = () => {
         const canvas = document.getElementById('categoryWasteChart');
         if (!(canvas instanceof HTMLCanvasElement)) return;
+
+        const existing = Chart.getChart(canvas);
+        if (existing) existing.destroy();
 
         new Chart(canvas, {
             type: 'bar',
@@ -135,11 +174,19 @@ if (dataElement) {
                 },
             },
         });
+
+        window.categoryWasteChart = { instance: Chart.getChart(canvas) };
     };
 
+    /**
+     * Render bar chart expiry horizon
+     */
     const renderHorizonChart = () => {
         const canvas = document.getElementById('expiryHorizonChart');
         if (!(canvas instanceof HTMLCanvasElement)) return;
+
+        const existing = Chart.getChart(canvas);
+        if (existing) existing.destroy();
 
         new Chart(canvas, {
             type: 'bar',
@@ -176,11 +223,20 @@ if (dataElement) {
                 },
             },
         });
+
+        window.expiryHorizonChart = { instance: Chart.getChart(canvas) };
     };
 
+    /**
+     * Render bar chart utama (waste per kategori)
+     */
     const renderBarChart = () => {
         const canvas = document.getElementById('barChart');
         if (!(canvas instanceof HTMLCanvasElement)) return;
+
+        const existing = Chart.getChart(canvas);
+        if (existing) existing.destroy();
+
         new Chart(canvas, {
             type: 'bar',
             data: {
@@ -209,10 +265,21 @@ if (dataElement) {
                 },
             },
         });
+
+        window.barChart = { instance: Chart.getChart(canvas) };
     };
 
+    // Render semua chart
     renderRiskChart();
     renderCategoryChart();
     renderHorizonChart();
     renderBarChart();
 }
+
+// Re-initialize charts ketika Livewire memperbarui DOM
+// Livewire v3 men-trigger event 'livewire:navigated' saat navigasi dan 'livewire:update' saat data berubah
+document.addEventListener('livewire:navigated', reinitializeCharts);
+document.addEventListener('livewire:update', reinitializeCharts);
+
+// Jalankan inisialisasi pertama saat halaman dimuat
+reinitializeCharts();
