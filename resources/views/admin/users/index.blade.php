@@ -1,68 +1,68 @@
-@extends('layouts.mediloop', ['title' => 'Pengguna'])
+@extends('layouts.mediloop', ['title' => __('admin.users.title')])
 
 @section('content')
 <div class="ml-page-admin">
-    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
-        <a href="{{ route('admin.dashboard') }}">Administrasi</a>
+    <nav class="ml-breadcrumb" aria-label="{{ __('admin.breadcrumb') }}">
+        <a href="{{ route('admin.dashboard') }}">{{ __('admin.administration') }}</a>
         <span class="ml-breadcrumb-sep">/</span>
-        <span>Pengguna</span>
+        <span>{{ __('admin.users.breadcrumb') }}</span>
     </nav>
 
     <header class="ml-page-head">
         <div>
-            <h1 class="ml-page-title">Akun pengguna</h1>
-            <p class="ml-page-sub">Akun hanya dibuat melalui undangan fasilitas yang sudah terverifikasi.</p>
+            <h1 class="ml-page-title">{{ __('admin.users.heading') }}</h1>
+            <p class="ml-page-sub">{{ __('admin.users.subtitle') }}</p>
         </div>
     </header>
 
     <section class="ml-section">
-        <form method="GET" action="{{ route('admin.users.index') }}" class="ml-toolbar" aria-label="Filter pengguna">
+        <form method="GET" action="{{ route('admin.users.index') }}" class="ml-toolbar" aria-label="{{ __('admin.users.filter_aria') }}">
             <div style="flex: 1; min-width: 220px;">
-                <label for="search" class="ml-label">Cari</label>
-                <input id="search" name="search" type="search" class="ml-input" value="{{ $search }}" placeholder="Nama atau email">
+                <label for="search" class="ml-label">{{ __('common.search') }}</label>
+                <input id="search" name="search" type="search" class="ml-input" value="{{ $search }}" placeholder="{{ __('admin.users.search_placeholder') }}">
             </div>
             <div style="width: 190px;">
-                <label for="role" class="ml-label">Peran</label>
+                <label for="role" class="ml-label">{{ __('common.role') }}</label>
                 <select id="role" name="role" class="ml-select">
-                    <option value="">Semua peran</option>
+                    <option value="">{{ __('admin.users.all_roles') }}</option>
                     @foreach(\App\Enums\UserRole::cases() as $roleOption)
                         <option value="{{ $roleOption->value }}" @selected($role === $roleOption->value)>{{ $roleOption->label() }}</option>
                     @endforeach
                 </select>
             </div>
             <div style="width: 170px;">
-                <label for="status" class="ml-label">Status</label>
+                <label for="status" class="ml-label">{{ __('common.status') }}</label>
                 <select id="status" name="status" class="ml-select">
-                    <option value="">Semua status</option>
+                    <option value="">{{ __('admin.users.all_statuses') }}</option>
                     @foreach(\App\Enums\UserStatus::cases() as $statusOption)
                         <option value="{{ $statusOption->value }}" @selected($status === $statusOption->value)>{{ $statusOption->label() }}</option>
                     @endforeach
                 </select>
             </div>
             <div style="display: flex; gap: 8px; align-self: flex-end;">
-                <button type="submit" class="ml-btn-primary">Terapkan</button>
+                <button type="submit" class="ml-btn-primary">{{ __('common.apply') }}</button>
                 @if($search !== '' || $role !== '' || $status !== '')
-                    <a href="{{ route('admin.users.index') }}" class="ml-btn-quiet">Reset</a>
+                    <a href="{{ route('admin.users.index') }}" class="ml-btn-quiet">{{ __('common.reset') }}</a>
                 @endif
             </div>
         </form>
 
         @if($users->isEmpty())
             <div class="ml-empty-state">
-                <p class="ml-empty-title">Tidak ada pengguna</p>
-                <p class="ml-empty-copy">Ubah filter atau kirim undangan dari detail fasilitas.</p>
+                <p class="ml-empty-title">{{ __('admin.users.empty_title') }}</p>
+                <p class="ml-empty-copy">{{ __('admin.users.empty_copy') }}</p>
             </div>
         @else
             <div class="ml-table-responsive">
                 <table class="ml-table ml-table-airy">
-                    <caption class="ml-sr-only">Daftar akun pengguna MediLoop</caption>
+                    <caption class="ml-sr-only">{{ __('admin.users.table_caption') }}</caption>
                     <thead>
                         <tr>
-                            <th scope="col">Nama</th>
-                            <th scope="col">Peran</th>
-                            <th scope="col">Fasilitas</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Bergabung</th>
+                            <th scope="col">{{ __('common.name') }}</th>
+                            <th scope="col">{{ __('common.role') }}</th>
+                            <th scope="col">{{ __('admin.facility') }}</th>
+                            <th scope="col">{{ __('common.status') }}</th>
+                            <th scope="col">{{ __('admin.users.joined') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,7 +77,7 @@
                                     @if($account->facility)
                                         <a href="{{ route('admin.facilities.show', $account->facility) }}" class="ml-link-action">{{ $account->facility->name }}</a>
                                     @else
-                                        <span class="ml-cell-meta">Platform</span>
+                                        <span class="ml-cell-meta">{{ __('admin.users.platform') }}</span>
                                     @endif
                                 </td>
                                 <td>@include('admin.partials.status', ['status' => $account->status, 'label' => \App\Enums\UserStatus::tryFrom($account->status)?->label() ?? $account->status])</td>

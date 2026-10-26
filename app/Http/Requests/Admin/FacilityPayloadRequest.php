@@ -57,18 +57,18 @@ class FacilityPayloadRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama fasilitas wajib diisi.',
-            'code.required' => 'Kode fasilitas wajib diisi.',
-            'code.unique' => 'Kode fasilitas sudah digunakan.',
-            'type.required' => 'Pilih jenis fasilitas.',
-            'address.required' => 'Alamat wajib diisi.',
-            'city.required' => 'Kota/kabupaten wajib diisi.',
-            'province.required' => 'Provinsi wajib diisi.',
-            'latitude.required' => 'Tentukan titik lokasi pada peta.',
-            'longitude.required' => 'Tentukan titik lokasi pada peta.',
-            'contact_person.required' => 'Nama penanggung jawab wajib diisi.',
-            'phone.required' => 'Nomor telepon wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
+            'name.required' => __('admin.validation.name_required'),
+            'code.required' => __('admin.validation.code_required'),
+            'code.unique' => __('admin.validation.code_unique'),
+            'type.required' => __('admin.validation.type_required'),
+            'address.required' => __('admin.validation.address_required'),
+            'city.required' => __('admin.validation.city_required'),
+            'province.required' => __('admin.validation.province_required'),
+            'latitude.required' => __('admin.validation.location_required'),
+            'longitude.required' => __('admin.validation.location_required'),
+            'contact_person.required' => __('admin.validation.contact_person_required'),
+            'phone.required' => __('admin.validation.phone_required'),
+            'email.email' => __('admin.validation.email_invalid'),
         ];
     }
 }

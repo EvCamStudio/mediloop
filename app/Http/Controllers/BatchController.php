@@ -98,7 +98,7 @@ class BatchController extends Controller
         $user = Auth::user();
 
         if ($user->isDinkesAuditor() && ! $user->isSysadmin()) {
-            abort(403, 'Auditor Dinas Kesehatan hanya memiliki hak akses pantau (Read-Only).');
+            abort(403, __('batches.errors.auditor_read_only'));
         }
 
         $medicines = Medicine::orderBy('name', 'asc')->get();
@@ -119,7 +119,7 @@ class BatchController extends Controller
         $user = Auth::user();
 
         if ($user->isDinkesAuditor() && ! $user->isSysadmin()) {
-            abort(403, 'Auditor Dinas Kesehatan hanya memiliki hak akses pantau.');
+            abort(403, __('batches.errors.auditor_read_only_short'));
         }
 
         $facilityId = $user->facility_id;
@@ -128,7 +128,7 @@ class BatchController extends Controller
         }
 
         if (! $facilityId) {
-            return back()->withErrors(['facility_id' => 'Akun pengguna belum terasosiasi dengan fasilitas kesehatan.'])->withInput();
+            return back()->withErrors(['facility_id' => __('batches.errors.no_facility')])->withInput();
         }
 
         $isNewMedicine = $request->boolean('is_new_medicine');
@@ -188,7 +188,7 @@ class BatchController extends Controller
 
         if ($exists) {
             return back()->withErrors([
-                'batch_number' => 'Nomor batch ini sudah terdaftar untuk obat tersebut di fasilitas Anda.',
+                'batch_number' => __('batches.errors.batch_duplicate'),
             ])->withInput();
         }
 
@@ -202,7 +202,7 @@ class BatchController extends Controller
             'daily_burn_rate' => $validatedBatch['daily_burn_rate'],
             'expiry_date' => $validatedBatch['expiry_date'],
             'unit_price_idr' => $unitPrice,
-            'storage_location' => $validatedBatch['storage_location'] ?? 'Gudang Farmasi Utama',
+            'storage_location' => $validatedBatch['storage_location'] ?? __('batches.default_storage_location'),
             'status' => 'ACTIVE',
         ]);
 
@@ -210,12 +210,18 @@ class BatchController extends Controller
             'actor_id' => $user->id,
             'facility_id' => $facilityId,
             'action' => 'BATCH_REGISTERED',
-            'description' => "Pencatatan batch baru {$batch->batch_number} ({$medicine->name}) sejumlah {$batch->current_stock} {$medicine->unit} oleh {$user->name}.",
+            'description' => __('batches.audit.registered', [
+                'batch' => $batch->batch_number,
+                'medicine' => $medicine->name,
+                'stock' => $batch->current_stock,
+                'unit' => $medicine->unit,
+                'user' => $user->name,
+            ]),
             'created_at' => now(),
         ]);
 
         return redirect()->route('batches.index')
-            ->with('status', "Data stok batch {$batch->batch_number} ({$medicine->name}) berhasil disimpan ke sistem!");
+            ->with('status', __('batches.flash.stored', ['batch' => $batch->batch_number, 'medicine' => $medicine->name]));
     }
 
     /**
@@ -226,7 +232,7 @@ class BatchController extends Controller
         $user = Auth::user();
 
         if (! $user->isDinkesAuditor() && $user->facility_id !== $batch->facility_id) {
-            abort(403, 'Anda tidak memiliki hak akses untuk mengedit batch fasilitas lain.');
+            abort(403, __('batches.errors.not_allowed_edit_other'));
         }
 
         $batch->load(['medicine', 'facility']);
@@ -245,7 +251,7 @@ class BatchController extends Controller
         $user = Auth::user();
 
         if (! $user->isDinkesAuditor() && $user->facility_id !== $batch->facility_id) {
-            abort(403, 'Anda tidak berwenang mengedit batch ini.');
+            abort(403, __('batches.errors.not_allowed_update'));
         }
 
         $validated = $request->validate([
@@ -266,12 +272,17 @@ class BatchController extends Controller
             'actor_id' => $user->id,
             'facility_id' => $batch->facility_id,
             'action' => 'BATCH_UPDATED',
-            'description' => "Pembaruan data batch {$batch->batch_number} ({$medicineName}). Stok diubah dari {$oldStock} menjadi {$batch->current_stock}.",
+            'description' => __('batches.audit.updated', [
+                'batch' => $batch->batch_number,
+                'medicine' => $medicineName,
+                'old' => $oldStock,
+                'new' => $batch->current_stock,
+            ]),
             'created_at' => now(),
         ]);
 
         return redirect()->route('batches.index')
-            ->with('status', "Data batch {$batch->batch_number} berhasil diperbarui.");
+            ->with('status', __('batches.flash.updated', ['batch' => $batch->batch_number]));
     }
 
     /**
@@ -282,7 +293,7 @@ class BatchController extends Controller
         $user = Auth::user();
 
         if (! $user->isDinkesAuditor() && $user->facility_id !== $batch->facility_id) {
-            abort(403, 'Anda tidak berwenang menghapus batch ini.');
+            abort(403, __('batches.errors.not_allowed_delete'));
         }
 
         // Prevent deletion if active transfers exist
@@ -292,7 +303,7 @@ class BatchController extends Controller
 
         if ($hasActiveTransfers) {
             return back()->withErrors([
-                'delete_error' => 'Batch ini sedang terlibat dalam proses transfer aktif dan tidak dapat dihapus.',
+                'delete_error' => __('batches.errors.active_transfer'),
             ]);
         }
 
@@ -306,11 +317,15 @@ class BatchController extends Controller
             'actor_id' => $user->id,
             'facility_id' => $facilityId,
             'action' => 'BATCH_DELETED',
-            'description' => "Penghapusan data batch {$batchNumber} ({$medicineName}) oleh {$user->name}.",
+            'description' => __('batches.audit.deleted', [
+                'batch' => $batchNumber,
+                'medicine' => $medicineName,
+                'user' => $user->name,
+            ]),
             'created_at' => now(),
         ]);
 
         return redirect()->route('batches.index')
-            ->with('status', "Batch {$batchNumber} berhasil dihapus dari inventaris.");
+            ->with('status', __('batches.flash.deleted', ['batch' => $batchNumber]));
     }
 }

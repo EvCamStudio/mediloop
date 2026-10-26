@@ -163,7 +163,7 @@ class MediLoopSeeder extends Seeder
         }
 
         // 2. Seed Multi-Role Demonstration Accounts
-        $password = Hash::make((string) env('DEMO_PASSWORD', 'password'));
+        $password = Hash::make((string) config('seed.demo_password', 'password'));
 
         User::create([
             'name' => 'Administrator MediLoop',
@@ -191,7 +191,7 @@ class MediLoopSeeder extends Seeder
             'email' => 'donor.head@mediloop.test',
             'password' => $password,
             'facility_id' => $rsudTarakan->id,
-            'role' => 'FACILITY_APPROVER',
+            'role' => 'FACILITY_STAFF',
             'status' => 'ACTIVE',
             'job_title' => 'Kepala Instalasi Farmasi RSUD',
             'license_sip' => 'SIPA.3171.01.2018.0122',
@@ -215,7 +215,7 @@ class MediLoopSeeder extends Seeder
             'email' => 'recipient.head@mediloop.test',
             'password' => $password,
             'facility_id' => $puskesmasGambir->id,
-            'role' => 'FACILITY_APPROVER',
+            'role' => 'FACILITY_STAFF',
             'status' => 'ACTIVE',
             'job_title' => 'Kepala Puskesmas Kecamatan Gambir',
             'license_sip' => 'SIPD.3171.02.2015.0089',
@@ -227,7 +227,7 @@ class MediLoopSeeder extends Seeder
             'email' => 'auditor@mediloop.test',
             'password' => $password,
             'facility_id' => $dinkesDki->id,
-            'role' => 'DINKES_AUDITOR',
+            'role' => 'SYSADMIN',
             'status' => 'ACTIVE',
             'job_title' => 'Koordinator Pengawas Farmasi & Alkes',
             'license_sip' => 'NIP.197905142006041008',
@@ -345,6 +345,39 @@ class MediLoopSeeder extends Seeder
             'requires_cold_chain' => false,
             'handling_instructions' => 'Simpan di bawah suhu 30°C.',
         ]);
+
+        $extraMedicines = [
+            ['Ciprofloxacin 500mg Tablet', 'Ciprofloxacin HCl', 'MED-CIP-500', 'Antibiotic', 'Tablet', 'Box (10)', 55000, false, 'Simpan suhu ruang.'],
+            ['Ranitidine 150mg Tablet', 'Ranitidine HCl', 'MED-RAN-150', 'Gastrointestinal', 'Kaplet', 'Box (20)', 12000, false, 'Simpan di tempat kering.'],
+            ['Salbutamol 2.5mg Inhalasi', 'Salbutamol Sulfate', 'MED-SLB-INH', 'Respiratory', 'Inhaler', 'Botol', 32000, false, 'Jauhkan dari panas.'],
+            ['Furosemide 40mg Tablet', 'Furosemide', 'MED-FRM-40', 'Cardiovascular', 'Tablet', 'Strip (10)', 8500, false, 'Simpan kering.'],
+            ['Ambroxol 30mg Sirup', 'Ambroxol HCl', 'MED-AMB-SIR', 'Respiratory', 'Sirup 60ml', 'Botol', 18000, false, 'Simpan suhu ruang.'],
+            ['Ibuprofen 400mg Kapsul', 'Ibuprofen', 'MED-IBU-400', 'Analgesic', 'Kapsul', 'Strip (10)', 9500, false, 'Hindari kelembaban.'],
+            ['Lisinopril 10mg Tablet', 'Lisinopril Dihydrate', 'MED-LIS-10', 'Cardiovascular', 'Tablet', 'Box (30)', 22000, false, 'Simpan suhu kamar.'],
+            ['Clindamycin 300mg Kapsul', 'Clindamycin Phosphate', 'MED-CLN-300', 'Antibiotic', 'Kapsul', 'Strip (6)', 38000, false, 'Simpan suhu ruang kering.'],
+            ['Hydrochlorothiazide 25mg', 'HCTZ', 'MED-HCT-25', 'Cardiovascular', 'Tablet', 'Strip (10)', 6500, false, 'Hindari cahaya.'],
+            ['Omeprazole 20mg Kapsul', 'Omeprazole', 'MED-OMP-20', 'Gastrointestinal', 'Kapsul', 'Strip (7)', 15000, false, 'Simpan suhu kamar.'],
+            ['Prednisolone 5mg Tablet', 'Prednisolone', 'MED-PRD-5', 'Anti-inflammatory', 'Tablet', 'Strip (10)', 4800, false, 'Simpan kering.'],
+            ['Nifedipine 10mg Kapsul', 'Nifedipine', 'MED-NIF-10', 'Cardiovascular', 'Kapsul', 'Strip (10)', 11000, false, 'Simpan sejuk.'],
+            ['Fluconazole 150mg Kapsul', 'Fluconazole', 'MED-FLC-150', 'Antifungal', 'Kapsul', 'Strip (1)', 25000, false, 'Simpan suhu ruang.'],
+            ['Diphenhydramine 25mg Tablet', 'Diphenhydramine HCl', 'MED-DPH-25', 'Respiratory', 'Tablet', 'Strip (6)', 7500, false, 'Simpan kering.'],
+            ['Dextromethorphan 15mg Tablet', 'Dextromethorphan HBr', 'MED-DXM-15', 'Respiratory', 'Tablet', 'Strip (10)', 8200, false, 'Simpan suhu ruang.'],
+            ['Gliclazide 80mg Tablet', 'Gliclazide', 'MED-GLZ-80', 'Endocrine', 'Tablet', 'Strip (10)', 28000, false, 'Simpan kering.'],
+        ];
+
+        foreach ($extraMedicines as $m) {
+            Medicine::create([
+                'name' => $m[0],
+                'generic_name' => $m[1],
+                'sku' => $m[2],
+                'category' => $m[3],
+                'dosage_form' => $m[4],
+                'unit' => $m[5],
+                'unit_price_idr' => $m[6],
+                'requires_cold_chain' => $m[7],
+                'handling_instructions' => $m[8],
+            ]);
+        }
 
         // 4. Seed Batches at RSUD Tarakan (Donor)
         // Canonical PRD Benchmark Batch: Stock 480, Burn 4/day, Expiry in 45 days -> 300 Projected Waste, High Risk!

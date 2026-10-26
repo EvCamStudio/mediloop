@@ -29,8 +29,8 @@ class AcceptInvitationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama lengkap wajib diisi.',
-            'password.confirmed' => 'Konfirmasi password tidak sama.',
+            'name.required' => __('invitations.validation.name_required'),
+            'password.confirmed' => __('invitations.validation.password_confirmation_mismatch'),
         ];
     }
 }

@@ -8,10 +8,10 @@
 @endphp
 
 <div class="ml-page-admin">
-    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
-        <a href="{{ route('admin.dashboard') }}">Administrasi</a>
+    <nav class="ml-breadcrumb" aria-label="{{ __('admin.breadcrumb') }}">
+        <a href="{{ route('admin.dashboard') }}">{{ __('admin.administration') }}</a>
         <span class="ml-breadcrumb-sep">/</span>
-        <a href="{{ route('admin.facilities.index') }}">Fasilitas</a>
+        <a href="{{ route('admin.facilities.index') }}">{{ __('admin.facilities') }}</a>
         <span class="ml-breadcrumb-sep">/</span>
         <span>{{ $facility->name }}</span>
     </nav>
@@ -22,7 +22,7 @@
 
     @if($errors->any())
         <div class="ml-alert ml-alert-error" role="alert">
-            <strong>Periksa kembali isian berikut:</strong>
+            <strong>{{ __('admin.errors_heading') }}</strong>
             <ul>
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -35,7 +35,7 @@
         <div class="ml-passport-main">
             <span class="ml-passport-mark" aria-hidden="true">{{ $initials }}</span>
             <div class="ml-passport-copy">
-                <p class="ml-passport-eyebrow">{{ $facility->type_label }} · {{ $facility->ownership ? ucfirst(strtolower($facility->ownership)) : 'Kepemilikan belum diisi' }}</p>
+                <p class="ml-passport-eyebrow">{{ $facility->type_label }} · {{ $facility->ownership ? ucfirst(strtolower($facility->ownership)) : __('admin.ownership_not_filled') }}</p>
                 <div class="ml-passport-title-row">
                     <h1 class="ml-page-title">{{ $facility->name }}</h1>
                     @include('admin.partials.status', ['status' => $facility->status, 'label' => $facility->status_label])
@@ -43,10 +43,10 @@
                 <p class="ml-passport-meta">
                     <span class="ml-cell-mono">{{ $facility->code }}</span>
                     <span class="ml-meta-dot">·</span>
-                    {{ collect([$facility->city, $facility->province])->filter()->implode(', ') ?: 'Wilayah belum diisi' }}
+                    {{ collect([$facility->city, $facility->province])->filter()->implode(', ') ?: __('admin.region_not_filled') }}
                     @if($facility->updated_at)
                         <span class="ml-meta-dot">·</span>
-                        Diperbarui {{ $facility->updated_at->format('d M Y') }}
+                        {{ __('admin.updated_on', ['date' => $facility->updated_at->format('d M Y')]) }}
                     @endif
                 </p>
             </div>
@@ -57,22 +57,22 @@
                     <path d="M12 20h9" />
                     <path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" />
                 </svg>
-                Edit data
+                {{ __('admin.facility_detail.edit_data') }}
             </a>
             @if($facility->status === \App\Enums\FacilityStatus::Pending->value)
                 <form method="POST" action="{{ route('admin.facilities.verify', $facility) }}">
                     @csrf
-                    <button type="submit" class="ml-btn-primary">Verifikasi fasilitas</button>
+                    <button type="submit" class="ml-btn-primary">{{ __('admin.facility_detail.verify_facility') }}</button>
                 </form>
             @elseif($facility->status === \App\Enums\FacilityStatus::Suspended->value)
                 <form method="POST" action="{{ route('admin.facilities.reactivate', $facility) }}">
                     @csrf
-                    <button type="submit" class="ml-btn-primary">Aktifkan kembali</button>
+                    <button type="submit" class="ml-btn-primary">{{ __('admin.facility_detail.reactivate') }}</button>
                 </form>
             @elseif($facility->status === \App\Enums\FacilityStatus::Active->value)
-                <form method="POST" action="{{ route('admin.facilities.suspend', $facility) }}" onsubmit="return confirm('Tangguhkan fasilitas ini? Anggota tim tidak dapat mengakses fitur operasional sampai diaktifkan kembali.');">
+                <form method="POST" action="{{ route('admin.facilities.suspend', $facility) }}" onsubmit="return confirm('{{ __('admin.facility_detail.suspend_confirm') }}');">
                     @csrf
-                    <button type="submit" class="ml-btn-danger-quiet">Tangguhkan</button>
+                    <button type="submit" class="ml-btn-danger-quiet">{{ __('admin.facility_detail.suspend') }}</button>
                 </form>
             @endif
         </div>
@@ -83,51 +83,51 @@
             <section class="ml-card" aria-labelledby="profile-title">
                 <div class="ml-card-head ml-card-head-split">
                     <div>
-                        <h2 class="ml-card-title" id="profile-title">Identitas &amp; operasional</h2>
-                        <p class="ml-card-sub">Data yang dipakai pada pencocokan dan audit redistribusi.</p>
+                        <h2 class="ml-card-title" id="profile-title">{{ __('admin.facility_detail.profile_title') }}</h2>
+                        <p class="ml-card-sub">{{ __('admin.facility_detail.profile_subtitle') }}</p>
                     </div>
                     <span class="ml-card-index" aria-hidden="true">01</span>
                 </div>
                 <div class="ml-card-body">
                     <div class="ml-detail-grid">
                         <div>
-                            <div class="ml-detail-label">Kode fasilitas</div>
+                            <div class="ml-detail-label">{{ __('admin.facility_code') }}</div>
                             <div class="ml-detail-value is-mono">{{ $facility->code }}</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Jenis</div>
+                            <div class="ml-detail-label">{{ __('common.type') }}</div>
                             <div class="ml-detail-value">{{ $facility->type_label }}</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Kepemilikan</div>
+                            <div class="ml-detail-label">{{ __('admin.ownership') }}</div>
                             <div class="ml-detail-value">{{ $facility->ownership ? ucfirst(strtolower($facility->ownership)) : '—' }}</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Nomor izin</div>
+                            <div class="ml-detail-label">{{ __('admin.license_number') }}</div>
                             <div class="ml-detail-value">{{ $facility->license_number ?: '—' }}</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Penanggung jawab</div>
+                            <div class="ml-detail-label">{{ __('admin.contact_person') }}</div>
                             <div class="ml-detail-value">{{ $facility->contact_person ?: '—' }}</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Telepon</div>
+                            <div class="ml-detail-label">{{ __('common.phone') }}</div>
                             <div class="ml-detail-value">{{ $facility->phone ?: '—' }}</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Email fasilitas</div>
+                            <div class="ml-detail-label">{{ __('admin.facility_email') }}</div>
                             <div class="ml-detail-value">{{ $facility->email ?: '—' }}</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Rantai dingin</div>
+                            <div class="ml-detail-label">{{ __('admin.cold_chain') }}</div>
                             <div class="ml-detail-value">
                                 <span class="ml-inline-status {{ $facility->cold_chain_ready ? 'is-on' : 'is-off' }}">
-                                    {{ $facility->cold_chain_ready ? 'Tersedia (2–8°C)' : 'Tidak tersedia' }}
+                                    {{ $facility->cold_chain_ready ? __('admin.cold_chain_available') : __('common.not_available') }}
                                 </span>
                             </div>
                         </div>
                         <div class="is-full">
-                            <div class="ml-detail-label">Alamat</div>
+                            <div class="ml-detail-label">{{ __('common.address') }}</div>
                             <div class="ml-detail-value">
                                 {{ $facility->address }}
                                 @if($facility->district) · {{ $facility->district }} @endif
@@ -136,7 +136,7 @@
                         </div>
                         @if($facility->notes)
                             <div class="is-full">
-                                <div class="ml-detail-label">Catatan verifikasi</div>
+                                <div class="ml-detail-label">{{ __('admin.verification_notes') }}</div>
                                 <div class="ml-detail-value">{{ $facility->notes }}</div>
                             </div>
                         @endif
@@ -147,17 +147,17 @@
             <section class="ml-card" aria-labelledby="location-title">
                 <div class="ml-card-head ml-card-head-split">
                     <div>
-                        <h2 class="ml-card-title" id="location-title">Lokasi operasional</h2>
-                        <p class="ml-card-sub">Titik koordinat yang dipakai untuk menghitung jarak antar fasilitas.</p>
+                        <h2 class="ml-card-title" id="location-title">{{ __('admin.facility_detail.location_title') }}</h2>
+                        <p class="ml-card-sub">{{ __('admin.facility_detail.location_subtitle') }}</p>
                     </div>
                     <span class="ml-card-index" aria-hidden="true">02</span>
                 </div>
                 <div class="ml-card-body">
-                    <div id="facility-map" class="ml-map-picker" data-lat="{{ $facility->latitude }}" data-lng="{{ $facility->longitude }}" data-readonly="true" role="application" tabindex="0" aria-label="Peta lokasi fasilitas" aria-describedby="map-coordinates"></div>
+                    <div id="facility-map" class="ml-map-picker" data-lat="{{ $facility->latitude }}" data-lng="{{ $facility->longitude }}" data-readonly="true" role="application" tabindex="0" aria-label="{{ __('admin.facility_detail.map_aria') }}" aria-describedby="map-coordinates"></div>
                     <div class="ml-map-coordinates">
                         <span>
-                            <span class="ml-detail-label">Koordinat</span>
-                            {{ collect([$facility->city, $facility->province])->filter()->implode(', ') ?: 'Wilayah belum diisi' }}
+                            <span class="ml-detail-label">{{ __('admin.coordinates') }}</span>
+                            {{ collect([$facility->city, $facility->province])->filter()->implode(', ') ?: __('admin.region_not_filled') }}
                         </span>
                         <code id="map-coordinates">{{ number_format((float) $facility->latitude, 7, '.', '') }}, {{ number_format((float) $facility->longitude, 7, '.', '') }}</code>
                     </div>
@@ -167,15 +167,15 @@
             <section class="ml-card" aria-labelledby="audit-title">
                 <div class="ml-card-head ml-card-head-split">
                     <div>
-                        <h2 class="ml-card-title" id="audit-title">Jejak audit</h2>
-                        <p class="ml-card-sub">Aktivitas terbaru untuk fasilitas ini.</p>
+                        <h2 class="ml-card-title" id="audit-title">{{ __('admin.facility_detail.audit_title') }}</h2>
+                        <p class="ml-card-sub">{{ __('admin.facility_detail.audit_subtitle') }}</p>
                     </div>
                     <span class="ml-card-index" aria-hidden="true">03</span>
                 </div>
                 @if($auditLogs->isEmpty())
                     <div class="ml-empty-state">
-                        <p class="ml-empty-title">Belum ada aktivitas</p>
-                        <p class="ml-empty-copy">Aktivitas verifikasi dan tim akan muncul di sini.</p>
+                        <p class="ml-empty-title">{{ __('admin.facility_detail.no_activity_title') }}</p>
+                        <p class="ml-empty-copy">{{ __('admin.facility_detail.no_activity_copy') }}</p>
                     </div>
                 @else
                     <ol class="ml-audit-list">
@@ -184,7 +184,7 @@
                                 <span class="ml-audit-dot" aria-hidden="true"></span>
                                 <div class="ml-audit-time">{{ $log->created_at?->format('d M Y · H:i') }}</div>
                                 <div class="ml-audit-body">
-                                    <strong>{{ $log->actor?->name ?? 'Sistem' }}</strong>
+                                    <strong>{{ $log->actor?->name ?? __('admin.system') }}</strong>
                                     <span>{{ $log->description }}</span>
                                     <code>{{ $log->action }}</code>
                                 </div>
@@ -198,17 +198,17 @@
         <aside>
             <section class="ml-card ml-verification-card" aria-labelledby="verification-title">
                 <div class="ml-card-head">
-                    <h2 class="ml-card-title" id="verification-title">Kesiapan verifikasi</h2>
-                    <p class="ml-card-sub">{{ $completedChecks }} dari {{ $totalChecks }} dokumen inti tersedia.</p>
+                    <h2 class="ml-card-title" id="verification-title">{{ __('admin.facility_detail.verification_title') }}</h2>
+                    <p class="ml-card-sub">{{ __('admin.verification_documents', ['completed' => $completedChecks, 'total' => $totalChecks]) }}</p>
                 </div>
                 <div class="ml-card-body">
                     <div class="ml-verification-status">
                         @include('admin.partials.status', ['status' => $facility->status, 'label' => $facility->status_label])
                         <span class="ml-verification-date">
                             @if($facility->verified_at)
-                                Diverifikasi {{ $facility->verified_at->format('d M Y') }}
+                                {{ __('admin.facility_detail.verified_on', ['date' => $facility->verified_at->format('d M Y')]) }}
                             @else
-                                Belum diverifikasi
+                                {{ __('admin.facility_detail.not_verified') }}
                             @endif
                         </span>
                     </div>
@@ -224,24 +224,24 @@
                                     @endif
                                 </span>
                                 <span>{{ $item['label'] }}</span>
-                                <span class="ml-sr-only">{{ $item['complete'] ? 'Lengkap' : 'Belum lengkap' }}</span>
+                                <span class="ml-sr-only">{{ $item['complete'] ? __('admin.complete') : __('admin.incomplete') }}</span>
                             </li>
                         @endforeach
                     </ul>
 
                     <div class="ml-verification-meta">
                         <div>
-                            <span class="ml-detail-label">Sumber data</span>
+                            <span class="ml-detail-label">{{ __('admin.facility_detail.data_source') }}</span>
                             @if($requestRecord)
-                                <a href="{{ route('admin.facility-requests.show', $requestRecord) }}" class="ml-link-action">Pengajuan fasilitas</a>
+                                <a href="{{ route('admin.facility-requests.show', $requestRecord) }}" class="ml-link-action">{{ __('admin.facility_request') }}</a>
                                 <div class="ml-cell-meta">{{ $requestRecord->created_at->format('d M Y') }}</div>
                             @else
-                                <div class="ml-detail-value">Input administrator</div>
+                                <div class="ml-detail-value">{{ __('admin.facility_detail.admin_input') }}</div>
                             @endif
                         </div>
                         @if($facility->verifiedBy)
                             <div>
-                                <span class="ml-detail-label">Diverifikasi oleh</span>
+                                <span class="ml-detail-label">{{ __('admin.facility_detail.verified_by') }}</span>
                                 <div class="ml-detail-value">{{ $facility->verifiedBy->name }}</div>
                             </div>
                         @endif
@@ -250,21 +250,21 @@
                     @if($facility->status === \App\Enums\FacilityStatus::Pending->value)
                         <form method="POST" action="{{ route('admin.facilities.verify', $facility) }}" class="ml-verification-action">
                             @csrf
-                            <button type="submit" class="ml-btn-primary">Verifikasi &amp; aktifkan</button>
+                            <button type="submit" class="ml-btn-primary">{{ __('admin.facility_detail.verify_and_activate') }}</button>
                         </form>
-                        <p class="ml-help">Pastikan izin, alamat, dan koordinat sudah sesuai sebelum mengaktifkan.</p>
+                        <p class="ml-help">{{ __('admin.facility_detail.verify_hint') }}</p>
                     @endif
                 </div>
             </section>
 
             <section class="ml-card" aria-labelledby="team-title">
                 <div class="ml-card-head">
-                    <h2 class="ml-card-title" id="team-title">Tim fasilitas</h2>
-                    <p class="ml-card-sub">{{ $facility->users->count() }} akun terhubung.</p>
+                    <h2 class="ml-card-title" id="team-title">{{ __('admin.facility_detail.team_title') }}</h2>
+                    <p class="ml-card-sub">{{ trans_choice('admin.facility_detail.team_connected', $facility->users->count(), ['count' => $facility->users->count()]) }}</p>
                 </div>
                 <div class="ml-card-body">
                     @if($facility->users->isEmpty())
-                        <p class="ml-help" style="margin-top: 0;">Belum ada akun. Undang kepala fasilitas setelah verifikasi.</p>
+                        <p class="ml-help" style="margin-top: 0;">{{ __('admin.facility_detail.no_accounts') }}</p>
                     @else
                         <div class="ml-member-list">
                             @foreach($facility->users as $member)
@@ -282,20 +282,20 @@
 
                     @if($invitations->isNotEmpty())
                         <div class="ml-invitation-block">
-                            <div class="ml-detail-label">Undangan menunggu</div>
+                            <div class="ml-detail-label">{{ __('admin.facility_detail.pending_invitations') }}</div>
                             @foreach($invitations as $invitation)
                                 <div class="ml-invitation-row">
                                     <div>
                                         <div class="ml-detail-value">{{ $invitation->email }}</div>
                                         <div class="ml-cell-meta">
                                             {{ \App\Enums\UserRole::tryFrom($invitation->role)?->label() ?? $invitation->role }}
-                                            · berlaku sampai {{ $invitation->expires_at->format('d M Y') }}
+                                            · {{ __('admin.facility_detail.expires_on', ['date' => $invitation->expires_at->format('d M Y')]) }}
                                         </div>
                                     </div>
                                     <form method="POST" action="{{ route('admin.facilities.invitations.destroy', [$facility, $invitation]) }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="ml-link-action ml-link-danger">Batalkan</button>
+                                        <button type="submit" class="ml-link-action ml-link-danger">{{ __('common.cancel') }}</button>
                                     </form>
                                 </div>
                             @endforeach
@@ -305,23 +305,23 @@
                     @if($facility->isActive())
                         <form method="POST" action="{{ route('admin.facilities.invitations.store', $facility) }}" class="ml-invite-form">
                             @csrf
-                            <div class="ml-detail-label">Undang anggota baru</div>
+                            <div class="ml-detail-label">{{ __('admin.facility_detail.invite_member') }}</div>
                             <div class="ml-field">
-                                <label for="invite_email" class="ml-label">Email anggota</label>
-                                <input id="invite_email" name="email" type="email" class="ml-input" placeholder="nama@faskes.id" required autocomplete="email">
+                                <label for="invite_email" class="ml-label">{{ __('admin.facility_detail.member_email') }}</label>
+                                <input id="invite_email" name="email" type="email" class="ml-input" placeholder="{{ __('admin.facility_detail.email_placeholder') }}" required autocomplete="email">
                             </div>
                             <div class="ml-field">
-                                <label for="invite_role" class="ml-label">Peran</label>
+                                <label for="invite_role" class="ml-label">{{ __('common.role') }}</label>
                                 <select id="invite_role" name="role" class="ml-select">
-                                    <option value="FACILITY_APPROVER">Kepala Fasilitas</option>
-                                    <option value="FACILITY_STAFF">Staf Farmasi</option>
+                                    <option value="FACILITY_APPROVER">{{ __('enums.user_role.facility_approver') }}</option>
+                                    <option value="FACILITY_STAFF">{{ __('enums.user_role.facility_staff') }}</option>
                                 </select>
                             </div>
-                            <button type="submit" class="ml-btn-quiet">Kirim undangan</button>
+                            <button type="submit" class="ml-btn-quiet">{{ __('admin.facility_detail.send_invitation') }}</button>
                         </form>
                     @else
                         <p class="ml-alert ml-alert-info" style="margin: 18px 0 0;">
-                            Fasilitas harus aktif sebelum mengundang anggota tim.
+                            {{ __('admin.facility_detail.facility_must_be_active') }}
                         </p>
                     @endif
                 </div>

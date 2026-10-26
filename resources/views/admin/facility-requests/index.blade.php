@@ -1,26 +1,26 @@
-@extends('layouts.mediloop', ['title' => 'Pengajuan Fasilitas'])
+@extends('layouts.mediloop', ['title' => __('admin.requests.title')])
 
 @section('content')
 @php
     $tabs = [
-        ['label' => 'Semua', 'value' => '', 'count' => $counts['total']],
-        ['label' => 'Menunggu', 'value' => 'PENDING', 'count' => $counts['pending']],
-        ['label' => 'Disetujui', 'value' => 'APPROVED', 'count' => $counts['approved']],
-        ['label' => 'Ditolak', 'value' => 'REJECTED', 'count' => $counts['rejected']],
+        ['label' => __('common.all'), 'value' => '', 'count' => $counts['total']],
+        ['label' => __('admin.status.pending'), 'value' => 'PENDING', 'count' => $counts['pending']],
+        ['label' => __('admin.status.approved'), 'value' => 'APPROVED', 'count' => $counts['approved']],
+        ['label' => __('admin.status.rejected'), 'value' => 'REJECTED', 'count' => $counts['rejected']],
     ];
 @endphp
 
 <div class="ml-page-admin">
-    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
-        <a href="{{ route('admin.dashboard') }}">Administrasi</a>
+    <nav class="ml-breadcrumb" aria-label="{{ __('admin.breadcrumb') }}">
+        <a href="{{ route('admin.dashboard') }}">{{ __('admin.administration') }}</a>
         <span class="ml-breadcrumb-sep">/</span>
-        <span>Pengajuan fasilitas</span>
+        <span>{{ __('admin.facility_request') }}</span>
     </nav>
 
     <header class="ml-page-head">
         <div>
-            <h1 class="ml-page-title">Pengajuan fasilitas</h1>
-            <p class="ml-page-sub">Verifikasi identitas, izin, dan lokasi sebelum membuat fasilitas aktif.</p>
+            <h1 class="ml-page-title">{{ __('admin.requests.heading') }}</h1>
+            <p class="ml-page-sub">{{ __('admin.requests.subtitle') }}</p>
         </div>
     </header>
 
@@ -28,7 +28,7 @@
         <div class="ml-alert ml-alert-success" role="status">{{ session('status') }}</div>
     @endif
 
-    <nav class="ml-registry-tabs" aria-label="Filter status pengajuan">
+    <nav class="ml-registry-tabs" aria-label="{{ __('admin.requests.filter_status_aria') }}">
         @foreach($tabs as $tab)
             <a
                 href="{{ $tab['value'] === '' ? route('admin.facility-requests.index') : route('admin.facility-requests.index', ['status' => $tab['value']]) }}"
@@ -42,26 +42,25 @@
     </nav>
 
     <section class="ml-registry-panel" aria-labelledby="requests-table-title">
-        <h2 id="requests-table-title" class="ml-sr-only">Daftar pengajuan fasilitas</h2>
+        <h2 id="requests-table-title" class="ml-sr-only">{{ __('admin.requests.list_aria') }}</h2>
 
         @if($requests->isEmpty())
             <div class="ml-empty-state">
-                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M9 12h6m-6 4h6M7 3h10a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V5a2 2 0 0 1 2-2z"/></svg>
-                <p class="ml-empty-title">Tidak ada pengajuan</p>
-                <p class="ml-empty-copy">Pengajuan baru dari fasilitas akan muncul di sini.</p>
-                <a href="{{ route('admin.facility-requests.index') }}" class="ml-btn-quiet">Lihat semua</a>
+                <p class="ml-empty-title">{{ __('admin.requests.empty_title') }}</p>
+                <p class="ml-empty-copy">{{ __('admin.requests.empty_copy') }}</p>
+                <a href="{{ route('admin.facility-requests.index') }}" class="ml-btn-quiet">{{ __('common.view_all') }}</a>
             </div>
         @else
             <div class="ml-table-responsive">
                 <table class="ml-table ml-table-airy ml-table-registry ml-table-requests">
-                    <caption class="ml-sr-only">Daftar pengajuan fasilitas</caption>
+                    <caption class="ml-sr-only">{{ __('admin.requests.table_caption') }}</caption>
                     <thead>
                         <tr>
-                            <th scope="col">Fasilitas</th>
-                            <th scope="col">Lokasi</th>
-                            <th scope="col">Diajukan</th>
-                            <th scope="col">Status</th>
-                            <th scope="col"><span class="ml-sr-only">Aksi</span></th>
+                            <th scope="col">{{ __('admin.facility') }}</th>
+                            <th scope="col">{{ __('admin.location') }}</th>
+                            <th scope="col">{{ __('admin.submitted') }}</th>
+                            <th scope="col">{{ __('common.status') }}</th>
+                            <th scope="col"><span class="ml-sr-only">{{ __('common.actions') }}</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -80,19 +79,19 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td data-label="Lokasi">
+                                <td data-label="{{ __('admin.location') }}">
                                     <div>{{ $requestRecord->city ?: '—' }}</div>
-                                    <div class="ml-cell-meta">{{ $requestRecord->province ?: 'Wilayah belum diisi' }}</div>
+                                    <div class="ml-cell-meta">{{ $requestRecord->province ?: __('admin.region_not_filled') }}</div>
                                 </td>
-                                <td data-label="Diajukan" class="ml-cell-meta">
+                                <td data-label="{{ __('admin.submitted') }}" class="ml-cell-meta">
                                     {{ $requestRecord->created_at->format('d M Y') }}
                                 </td>
-                                <td data-label="Status">
+                                <td data-label="{{ __('common.status') }}">
                                     @include('admin.partials.status', ['status' => $requestRecord->status, 'label' => $requestRecord->status_label])
                                 </td>
                                 <td class="is-right">
                                     <a href="{{ route('admin.facility-requests.show', $requestRecord) }}" class="ml-row-open">
-                                        Review
+                                        {{ __('admin.review') }}
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                             <path d="M5 12h14M13 6l6 6-6 6" />
                                         </svg>

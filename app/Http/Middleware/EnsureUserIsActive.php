@@ -21,7 +21,7 @@ class EnsureUserIsActive
             $request->session()->regenerateToken();
 
             return redirect()->route('login')->withErrors([
-                'email' => 'Akun Anda sedang tidak aktif. Hubungi administrator platform.',
+                'email' => __('http.user_inactive'),
             ]);
         }
 

@@ -46,10 +46,10 @@ class FacilityRequestController extends Controller
         return view('admin.facility-requests.show', [
             'requestRecord' => $facilityRequest,
             'verificationChecklist' => [
-                ['label' => 'Nomor izin fasilitas', 'complete' => filled($facilityRequest->license_number)],
-                ['label' => 'Alamat lengkap', 'complete' => filled($facilityRequest->address)],
-                ['label' => 'Titik koordinat', 'complete' => filled($facilityRequest->latitude) && filled($facilityRequest->longitude)],
-                ['label' => 'Kontak penanggung jawab', 'complete' => filled($facilityRequest->contact_person) && filled($facilityRequest->phone)],
+                ['label' => __('admin.checklist.license_number'), 'complete' => filled($facilityRequest->license_number)],
+                ['label' => __('admin.checklist.address'), 'complete' => filled($facilityRequest->address)],
+                ['label' => __('admin.checklist.coordinates'), 'complete' => filled($facilityRequest->latitude) && filled($facilityRequest->longitude)],
+                ['label' => __('admin.checklist.contact'), 'complete' => filled($facilityRequest->contact_person) && filled($facilityRequest->phone)],
             ],
         ]);
     }
@@ -60,14 +60,14 @@ class FacilityRequestController extends Controller
         FacilityOnboardingService $onboarding,
     ): RedirectResponse {
         if (! $facilityRequest->isPending()) {
-            return back()->withErrors(['request' => 'Pengajuan ini sudah direview.']);
+            return back()->withErrors(['request' => __('admin.errors.already_reviewed')]);
         }
 
         $facility = $onboarding->approveRequest($facilityRequest, $request->user());
 
         return redirect()
             ->route('admin.facilities.show', $facility)
-            ->with('status', 'Pengajuan disetujui. Fasilitas aktif dan siap diundang anggotanya.');
+            ->with('status', __('admin.messages.approved'));
     }
 
     public function reject(
@@ -76,20 +76,20 @@ class FacilityRequestController extends Controller
         FacilityOnboardingService $onboarding,
     ): RedirectResponse {
         if (! $facilityRequest->isPending()) {
-            return back()->withErrors(['request' => 'Pengajuan ini sudah direview.']);
+            return back()->withErrors(['request' => __('admin.errors.already_reviewed')]);
         }
 
         $validated = $request->validate([
             'rejection_reason' => ['required', 'string', 'min:10', 'max:1000'],
         ], [
-            'rejection_reason.required' => 'Alasan penolakan wajib diisi agar pengaju dapat memperbaiki data.',
-            'rejection_reason.min' => 'Tulis alasan yang cukup jelas (minimal 10 karakter).',
+            'rejection_reason.required' => __('admin.validation.rejection_reason_required_for_submitter'),
+            'rejection_reason.min' => __('admin.validation.rejection_reason_min'),
         ]);
 
         $onboarding->rejectRequest($facilityRequest, $request->user(), $validated['rejection_reason']);
 
         return redirect()
             ->route('admin.facility-requests.index')
-            ->with('status', 'Pengajuan ditolak dengan catatan.');
+            ->with('status', __('admin.messages.rejected'));
     }
 }

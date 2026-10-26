@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FacilityController as AdminFacilityController;
 use App\Http\Controllers\Admin\FacilityRequestController as AdminFacilityRequestController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\BatchController;
 use App\Http\Controllers\DashboardController;
@@ -11,12 +12,18 @@ use App\Http\Controllers\FacilityRequestController;
 use App\Http\Controllers\FacilitySettingsController;
 use App\Http\Controllers\FacilityTeamController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\TransferController;
 use Illuminate\Support\Facades\Route;
 
 // Public Landing Page
 Route::view('/', 'welcome')->name('home');
+
+// Interface language preference (public and authenticated visitors)
+Route::post('/locale', [LocaleController::class, 'update'])
+    ->middleware('throttle:30,1')
+    ->name('locale.update');
 
 // Laravel Boost fallback to prevent MethodNotAllowed error on browser access
 Route::get('/_boost/browser-logs', function () {
@@ -39,6 +46,7 @@ Route::post('/invitations/{token}', [InvitationController::class, 'accept'])
 // Protected Healthcare Decision-Support Routes
 Route::middleware(['auth', 'active', 'facility.active'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
     Route::get('/network', [NetworkController::class, 'index'])->name('network.index');
 
     // Pharmaceutical Inventory & Batch Data Management

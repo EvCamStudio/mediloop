@@ -49,6 +49,6 @@ class InvitationController extends Controller
 
         return redirect()
             ->route('dashboard')
-            ->with('status', "Selamat datang di MediLoop, {$user->name}.");
+            ->with('status', __('invitations.accept.welcome', ['name' => $user->name]));
     }
 }

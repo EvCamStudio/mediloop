@@ -12,10 +12,10 @@ enum FacilityStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Pending => 'Menunggu verifikasi',
-            self::Active => 'Aktif',
-            self::Suspended => 'Ditangguhkan',
-            self::Inactive => 'Nonaktif',
+            self::Pending => __('enums.facility_status.pending'),
+            self::Active => __('enums.facility_status.active'),
+            self::Suspended => __('enums.facility_status.suspended'),
+            self::Inactive => __('enums.facility_status.inactive'),
         };
     }
 

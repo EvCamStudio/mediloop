@@ -53,7 +53,7 @@ class TransferController extends Controller
 
         // Ensure user belongs to the donor facility or is authorized
         if (! $user->isDinkesAuditor() && $user->facility_id !== $batch->facility_id) {
-            abort(403, 'Anda hanya dapat mengusulkan redistribusi untuk fasilitas Anda sendiri.');
+            abort(403, __('transfers.messages.propose_forbidden'));
         }
 
         $sort = $request->string('sort')->toString();
@@ -90,15 +90,15 @@ class TransferController extends Controller
             ->firstOrFail();
 
         if (! $user instanceof User || (! $user->isSysadmin() && $user->facility_id !== $batch->facility_id)) {
-            abort(403, 'Anda hanya dapat mengusulkan redistribusi untuk fasilitas Anda sendiri.');
+            abort(403, __('transfers.messages.propose_forbidden'));
         }
 
         if ($batch->status !== 'ACTIVE' || $batch->facility === null) {
-            return back()->withErrors(['batch_id' => 'Batch ini tidak tersedia untuk redistribusi.']);
+            return back()->withErrors(['batch_id' => __('transfers.messages.batch_unavailable')]);
         }
 
         if ($validated['quantity'] > $batch->current_stock) {
-            return back()->withErrors(['quantity' => 'Jumlah transfer melebihi stok yang tersedia.']);
+            return back()->withErrors(['quantity' => __('transfers.messages.quantity_exceeds_stock')]);
         }
 
         $recipient = Facility::query()
@@ -106,7 +106,7 @@ class TransferController extends Controller
             ->firstOrFail();
 
         if ($recipient->is($batch->facility) || ! $recipient->isActive() || $recipient->type === 'DINKES') {
-            return back()->withErrors(['recipient_facility_id' => 'Fasilitas penerima harus aktif dan berbeda dari fasilitas donor.']);
+            return back()->withErrors(['recipient_facility_id' => __('transfers.messages.recipient_invalid')]);
         }
 
         // Distance & Scoring
@@ -164,12 +164,17 @@ class TransferController extends Controller
             'facility_id' => $batch->facility_id,
             'transfer_id' => $transfer->id,
             'action' => 'TRANSFER_PROPOSED',
-            'description' => "Pengusulan transfer {$transferCode} oleh {$user->name} untuk {$validated['quantity']} unit ke {$recipient->name}.",
+            'description' => __('transfers.messages.audit_proposed', [
+                'code' => $transferCode,
+                'name' => $user->name,
+                'quantity' => $validated['quantity'],
+                'recipient' => $recipient->name,
+            ]),
             'created_at' => now(),
         ]);
 
         return redirect()->route('transfers.show', $transfer)
-            ->with('status', "Usulan transfer {$transferCode} berhasil diajukan dan menunggu persetujuan Kepala Instalasi Farmasi.");
+            ->with('status', __('transfers.messages.proposed_flash', ['code' => $transferCode]));
     }
 
     /**
@@ -189,7 +194,7 @@ class TransferController extends Controller
         ], true);
 
         if (! $user->isDinkesAuditor() && ! $isParty) {
-            abort(403, 'Anda tidak memiliki akses ke transfer ini.');
+            abort(403, __('transfers.messages.access_denied'));
         }
 
         $transfer->load([
@@ -221,13 +226,13 @@ class TransferController extends Controller
         }
 
         if ($transfer->status !== 'PROPOSED') {
-            return back()->withErrors(['status' => 'Transfer ini tidak berada pada tahap persetujuan donor.']);
+            return back()->withErrors(['status' => __('transfers.messages.not_proposed_stage')]);
         }
 
         $isDonor = $user->isSysadmin() || $user->facility_id === $transfer->donor_facility_id;
 
         if (! $isDonor || ! $user->canApproveDonorTransfer()) {
-            abort(403, 'Hanya Kepala Instalasi Farmasi faskes donor yang dapat menyetujui pengeluaran obat.');
+            abort(403, __('transfers.messages.approve_forbidden'));
         }
 
         $transfer->update([
@@ -241,11 +246,14 @@ class TransferController extends Controller
             'facility_id' => $transfer->donor_facility_id,
             'transfer_id' => $transfer->id,
             'action' => 'TRANSFER_APPROVED',
-            'description' => "Persetujuan formal pengeluaran obat disahkan oleh {$user->name} ({$user->job_title}).",
+            'description' => __('transfers.messages.audit_approved', [
+                'name' => $user->name,
+                'job_title' => $user->job_title,
+            ]),
             'created_at' => now(),
         ]);
 
-        return back()->with('status', 'Usulan transfer telah disetujui donor. Menunggu konfirmasi kesediaan penerima.');
+        return back()->with('status', __('transfers.messages.approved_flash'));
     }
 
     /**
@@ -260,13 +268,13 @@ class TransferController extends Controller
         }
 
         if ($transfer->status !== 'APPROVED') {
-            return back()->withErrors(['status' => 'Transfer ini belum disetujui faskes donor.']);
+            return back()->withErrors(['status' => __('transfers.messages.not_approved_stage')]);
         }
 
         $isRecipient = $user->isSysadmin() || $user->facility_id === $transfer->recipient_facility_id;
 
         if (! $isRecipient || ! $user->canAcceptRecipientTransfer()) {
-            abort(403, 'Hanya perwakilan faskes penerima yang dapat menerima transfer ini.');
+            abort(403, __('transfers.messages.accept_forbidden'));
         }
 
         $transfer->update([
@@ -280,11 +288,13 @@ class TransferController extends Controller
             'facility_id' => $transfer->recipient_facility_id,
             'transfer_id' => $transfer->id,
             'action' => 'TRANSFER_ACCEPTED',
-            'description' => "Faskes penerima ({$transfer->recipientFacility->name}) menyetujui penerimaan alokasi obat.",
+            'description' => __('transfers.messages.audit_accepted', [
+                'facility' => $transfer->recipientFacility->name,
+            ]),
             'created_at' => now(),
         ]);
 
-        return back()->with('status', 'Transfer diterima oleh faskes tujuan. Faskes donor dapat segera memproses pengiriman.');
+        return back()->with('status', __('transfers.messages.accepted_flash'));
     }
 
     /**
@@ -299,13 +309,13 @@ class TransferController extends Controller
         }
 
         if ($transfer->status !== 'ACCEPTED') {
-            return back()->withErrors(['status' => 'Pengiriman hanya dapat diproses setelah faskes penerima menyetujui transfer.']);
+            return back()->withErrors(['status' => __('transfers.messages.not_accepted_stage')]);
         }
 
         $isDonor = $user->isSysadmin() || $user->facility_id === $transfer->donor_facility_id;
 
         if (! $isDonor || (! $user->isSysadmin() && ! $user->hasFacilityRole())) {
-            abort(403, 'Hanya staf faskes donor yang dapat memberangkatkan pengiriman.');
+            abort(403, __('transfers.messages.dispatch_forbidden'));
         }
 
         $validated = $request->validate([
@@ -325,11 +335,14 @@ class TransferController extends Controller
             'facility_id' => $transfer->donor_facility_id,
             'transfer_id' => $transfer->id,
             'action' => 'IN_TRANSIT',
-            'description' => "Obat diberangkatkan menggunakan {$validated['courier_type']} dengan nomor resi/kontrol: {$validated['tracking_number']}.",
+            'description' => __('transfers.messages.audit_dispatched', [
+                'courier' => $validated['courier_type'],
+                'tracking' => $validated['tracking_number'],
+            ]),
             'created_at' => now(),
         ]);
 
-        return back()->with('status', 'Status pengiriman diperbarui menjadi Dalam Perjalanan (In Transit).');
+        return back()->with('status', __('transfers.messages.in_transit_flash'));
     }
 
     /**
@@ -344,18 +357,18 @@ class TransferController extends Controller
         }
 
         if ($transfer->status !== 'IN_TRANSIT') {
-            return back()->withErrors(['status' => 'Penerimaan fisik hanya dapat dikonfirmasi saat obat dalam perjalanan.']);
+            return back()->withErrors(['status' => __('transfers.messages.not_in_transit_stage')]);
         }
 
         $isRecipient = $user->isSysadmin() || $user->facility_id === $transfer->recipient_facility_id;
 
         if (! $isRecipient || ! $user->canConfirmPhysicalArrival()) {
-            abort(403, 'Hanya Kepala/Direktur faskes penerima yang berwenang memvalidasi penerimaan fisik obat.');
+            abort(403, __('transfers.messages.complete_forbidden'));
         }
 
         RedistributionEngine::completeTransfer($transfer, $user);
 
-        return back()->with('status', 'Penerimaan fisik berhasil diverifikasi! Stok obat telah dimutasi secara atomik.');
+        return back()->with('status', __('transfers.messages.completed_flash'));
     }
 
     /**
@@ -370,7 +383,7 @@ class TransferController extends Controller
         }
 
         if (! in_array($transfer->status, ['PROPOSED', 'APPROVED', 'ACCEPTED'], true)) {
-            return back()->withErrors(['status' => 'Transfer pada tahap ini tidak dapat dibatalkan.']);
+            return back()->withErrors(['status' => __('transfers.messages.cancel_not_allowed')]);
         }
 
         $isParty = $user->isSysadmin() || in_array($user->facility_id, [
@@ -379,10 +392,10 @@ class TransferController extends Controller
         ], true);
 
         if (! $isParty) {
-            abort(403, 'Anda tidak berwenang membatalkan transfer ini.');
+            abort(403, __('transfers.messages.cancel_forbidden'));
         }
 
-        $reason = $request->input('reason', 'Dibatalkan oleh pengguna.');
+        $reason = $request->input('reason', __('transfers.messages.cancel_reason_default'));
 
         $transfer->update([
             'status' => 'CANCELLED',
@@ -394,10 +407,13 @@ class TransferController extends Controller
             'facility_id' => $user->facility_id,
             'transfer_id' => $transfer->id,
             'action' => 'TRANSFER_CANCELLED',
-            'description' => "Transfer {$transfer->transfer_code} dibatalkan. Alasan: {$reason}",
+            'description' => __('transfers.messages.audit_cancelled', [
+                'code' => $transfer->transfer_code,
+                'reason' => $reason,
+            ]),
             'created_at' => now(),
         ]);
 
-        return back()->with('status', 'Transfer berhasil dibatalkan.');
+        return back()->with('status', __('transfers.messages.cancelled_flash'));
     }
 }

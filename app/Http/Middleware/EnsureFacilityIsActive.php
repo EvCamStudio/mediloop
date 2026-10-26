@@ -21,7 +21,7 @@ class EnsureFacilityIsActive
         }
 
         if ($user->facility && ! $user->facility->isActive()) {
-            abort(403, 'Fasilitas Anda belum aktif. Selesaikan verifikasi terlebih dahulu.');
+            abort(403, __('http.facility_inactive'));
         }
 
         return $next($request);

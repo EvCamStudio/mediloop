@@ -27,7 +27,7 @@ class FacilityOnboardingService
             'status' => FacilityStatus::Pending->value,
         ]);
 
-        $this->log($actor, 'FACILITY_CREATED', "Fasilitas {$facility->name} dibuat dan menunggu verifikasi.", $facility);
+        $this->log($actor, 'FACILITY_CREATED', __('facility.audit.created', ['facility' => $facility->name]), $facility);
 
         return $facility;
     }
@@ -43,7 +43,7 @@ class FacilityOnboardingService
             'cold_chain_ready', 'contact_person', 'phone', 'email', 'notes',
         ]));
 
-        $this->log($actor, 'FACILITY_UPDATED', "Data fasilitas {$facility->name} diperbarui.", $facility);
+        $this->log($actor, 'FACILITY_UPDATED', __('facility.audit.updated', ['facility' => $facility->name]), $facility);
     }
 
     public function approveRequest(FacilityRequest $request, User $reviewer): Facility
@@ -68,7 +68,7 @@ class FacilityOnboardingService
                 'rejection_reason' => null,
             ]);
 
-            $this->log($reviewer, 'FACILITY_APPROVED', "Pengajuan {$request->name} disetujui.", $facility);
+            $this->log($reviewer, 'FACILITY_APPROVED', __('facility.audit.request_approved', ['facility' => $request->name]), $facility);
 
             return $facility;
         });
@@ -83,7 +83,7 @@ class FacilityOnboardingService
             'rejection_reason' => $reason,
         ]);
 
-        $this->log($reviewer, 'FACILITY_REJECTED', "Pengajuan {$request->name} ditolak: {$reason}");
+        $this->log($reviewer, 'FACILITY_REJECTED', __('facility.audit.request_rejected', ['facility' => $request->name, 'reason' => $reason]));
     }
 
     public function verifyFacility(Facility $facility, User $reviewer): void
@@ -94,14 +94,14 @@ class FacilityOnboardingService
             'verified_by' => $reviewer->id,
         ]);
 
-        $this->log($reviewer, 'FACILITY_VERIFIED', "Fasilitas {$facility->name} diverifikasi.", $facility);
+        $this->log($reviewer, 'FACILITY_VERIFIED', __('facility.audit.verified', ['facility' => $facility->name]), $facility);
     }
 
     public function suspendFacility(Facility $facility, User $actor): void
     {
         $facility->update(['status' => FacilityStatus::Suspended->value]);
 
-        $this->log($actor, 'FACILITY_SUSPENDED', "Fasilitas {$facility->name} ditangguhkan.", $facility);
+        $this->log($actor, 'FACILITY_SUSPENDED', __('facility.audit.suspended', ['facility' => $facility->name]), $facility);
     }
 
     public function reactivateFacility(Facility $facility, User $actor): void
@@ -112,7 +112,7 @@ class FacilityOnboardingService
             'verified_by' => $facility->verified_by ?? $actor->id,
         ]);
 
-        $this->log($actor, 'FACILITY_REACTIVATED', "Fasilitas {$facility->name} diaktifkan kembali.", $facility);
+        $this->log($actor, 'FACILITY_REACTIVATED', __('facility.audit.reactivated', ['facility' => $facility->name]), $facility);
     }
 
     /**

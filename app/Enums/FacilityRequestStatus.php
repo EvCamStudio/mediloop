@@ -11,9 +11,9 @@ enum FacilityRequestStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::Pending => 'Menunggu review',
-            self::Approved => 'Disetujui',
-            self::Rejected => 'Ditolak',
+            self::Pending => __('enums.request_status.pending'),
+            self::Approved => __('enums.request_status.approved'),
+            self::Rejected => __('enums.request_status.rejected'),
         };
     }
 }

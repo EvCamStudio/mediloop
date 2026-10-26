@@ -6,6 +6,7 @@
     <title>{{ filled($title ?? null) ? $title.' - MediLoop' : 'MediLoop' }}</title>
     @include('partials.favicons')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script type="application/json" id="js-translations">@json(__('js'))</script>
     @livewireStyles
     <style>
         /* MediLoop design system — legacy aliases map to app.css tokens. */
@@ -1812,12 +1813,16 @@
             border-radius: 12px;
             overflow: hidden;
         }
+        /* Global card alignment — semua card sejajar */
+        .ml-card { display: flex; flex-direction: column; height: 100%; }
+        .ml-card-body { flex-grow: 1; min-height: 120px; }
         .ml-card + .ml-card { margin-top: 20px; }
         .ml-card-head {
             padding: 18px 20px;
             border-bottom: 1px solid var(--ml-border);
         }
-        .ml-card-body { padding: 20px; }
+        .ml-card-body { padding: 20px; flex-grow: 1; }
+        .ml-empty-state { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .ml-card-title {
             margin: 0;
             font-family: var(--font-heading);
@@ -1834,10 +1839,16 @@
         .ml-two-col {
             display: grid;
             grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.8fr);
+            grid-template-rows: 1fr;
             gap: 20px;
-            align-items: start;
+            align-items: stretch;
         }
         .ml-sticky { position: sticky; top: 84px; }
+        .ml-two-col > .ml-card { height: 100%; display: flex; flex-direction: column; min-height: 420px; }
+        .ml-analytics-panels > .ml-card { height: 100%; display: flex; flex-direction: column; min-height: 380px; }
+        /* Global card alignment — semua card sejajar */
+        .ml-card { display: flex; flex-direction: column; height: 100%; }
+        .ml-card-body { flex-grow: 1; min-height: 120px; }
 
         .ml-alert {
             padding: 12px 16px;
@@ -3549,6 +3560,7 @@
             color: var(--ml-subtle);
         }
     </style>
+    @stack('styles')
 </head>
 <body>
 
@@ -3560,68 +3572,72 @@
 {{-- ============================================================ --}}
 {{-- SIDEBAR --}}
 {{-- ============================================================ --}}
-<aside class="ml-sidebar" id="ml-sidebar" role="dialog" aria-modal="true" aria-label="Menu Navigasi">
+<aside class="ml-sidebar" id="ml-sidebar" role="dialog" aria-modal="true" aria-label="{{ __('navigation.menu') }}">
     <div class="ml-sidebar-logo" style="display: flex; align-items: center; justify-content: space-between;">
         <span style="display: inline-flex; align-items: center; gap: 8px;">
             <img src="{{ asset('images/logo.png') }}" alt="" style="width: 26px; height: 26px; object-fit: contain;" />
             MediLoop
         </span>
-        <button type="button" class="ml-sidebar-close" id="ml-sidebar-close" aria-label="Tutup Menu">
+        <button type="button" class="ml-sidebar-close" id="ml-sidebar-close" aria-label="{{ __('navigation.close_menu') }}">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
     </div>
     <nav class="ml-sidebar-nav">
         <a href="{{ route('dashboard') }}" class="ml-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-            Dashboard
+            {{ __('navigation.dashboard') }}
         </a>
         <a href="{{ route('batches.index') }}" class="ml-nav-item {{ request()->routeIs('batches.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            Stok &amp; Batch Obat
+            {{ __('navigation.batches') }}
+        </a>
+        <a href="{{ route('analytics.index') }}" class="ml-nav-item {{ request()->routeIs('analytics.*') ? 'active' : '' }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+            {{ __('navigation.analytics') }}
         </a>
         <a href="{{ route('network.index') }}" class="ml-nav-item {{ request()->routeIs('network.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.35-7-10a7 7 0 1114 0c0 5.65-7 10-7 10z"/><circle cx="12" cy="11" r="2.5"/></svg>
-            Peta Jaringan
+            {{ __('navigation.network') }}
         </a>
         <a href="{{ route('transfers.index') }}" class="ml-nav-item {{ request()->routeIs('transfers.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
-            Transfers &amp; Alokasi
+            {{ __('navigation.transfers') }}
         </a>
         <a href="{{ route('audit.index') }}" class="ml-nav-item {{ request()->routeIs('audit.*') ? 'active' : '' }}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/></svg>
-            Pengawasan &amp; Audit
+            {{ __('navigation.audit') }}
         </a>
 
         @auth
             @if(auth()->user()->isSysadmin())
-                <div class="ml-nav-label">Administrasi</div>
+                <div class="ml-nav-label">{{ __('navigation.admin') }}</div>
                 <a href="{{ route('admin.dashboard') }}" class="ml-nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2"/></svg>
-                    Ringkasan Admin
+                    {{ __('navigation.admin_overview') }}
                 </a>
                 <a href="{{ route('admin.facilities.index') }}" class="ml-nav-item {{ request()->routeIs('admin.facilities.*') ? 'active' : '' }}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5"/><path d="M9 9h.01M15 9h.01M9 12h.01M15 12h.01"/></svg>
-                    Registry Faskes
+                    {{ __('navigation.facility_registry') }}
                 </a>
                 <a href="{{ route('admin.facility-requests.index') }}" class="ml-nav-item {{ request()->routeIs('admin.facility-requests.*') ? 'active' : '' }}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6M7 3h10a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V5a2 2 0 0 1 2-2z"/></svg>
-                    Pengajuan Faskes
+                    {{ __('navigation.facility_requests') }}
                 </a>
                 <a href="{{ route('admin.users.index') }}" class="ml-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    Pengguna
+                    {{ __('navigation.users') }}
                 </a>
             @endif
 
             @if(auth()->user()->isFacilityApprover())
-                <div class="ml-nav-label">Fasilitas Anda</div>
+                <div class="ml-nav-label">{{ __('navigation.your_facility') }}</div>
                 <a href="{{ route('facility.team.index') }}" class="ml-nav-item {{ request()->routeIs('facility.team.*') ? 'active' : '' }}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                    Tim Faskes
+                    {{ __('navigation.facility_team') }}
                 </a>
                 <a href="{{ route('facility.settings.edit') }}" class="ml-nav-item {{ request()->routeIs('facility.settings.*') ? 'active' : '' }}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5"/></svg>
-                    Profil Faskes
+                    {{ __('navigation.facility_profile') }}
                 </a>
             @endif
         @endauth
@@ -3630,31 +3646,35 @@
         <div class="ml-settings-container">
             <button type="button" class="ml-nav-item" id="ml-settings-btn" aria-expanded="false" aria-haspopup="true">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-                <span>Pengaturan</span>
+                <span>{{ __('navigation.settings') }}</span>
                 <svg class="ml-caret" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: auto; opacity: 0.6;"><path d="M6 9l6 6 6-6"/></svg>
             </button>
 
             <!-- Settings Popup Dropdown -->
             <div id="ml-settings-dropdown" class="ml-menu-dropdown ml-settings-menu" style="display: none;">
-                <div class="ml-menu-header">Pengaturan Sistem</div>
+                <div class="ml-menu-header">{{ __('navigation.system_settings') }}</div>
                 <a href="{{ route('profile.edit') }}" class="ml-menu-item">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <span>Profil & Akun</span>
+                    <span>{{ __('navigation.profile_account') }}</span>
                 </a>
                 <a href="{{ route('appearance.edit') }}" class="ml-menu-item">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                    <span>Tampilan</span>
+                    <span>{{ __('navigation.appearance') }}</span>
                 </a>
                 <a href="{{ route('security.edit') }}" class="ml-menu-item">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <span>Keamanan</span>
+                    <span>{{ __('navigation.security') }}</span>
+                </a>
+                <a href="{{ route('language.edit') }}" class="ml-menu-item">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+                    <span>{{ __('navigation.language') }}</span>
                 </a>
                 <div class="ml-menu-divider"></div>
                 <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                     @csrf
                     <button type="submit" class="ml-menu-item ml-menu-item-danger">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        <span>Keluar</span>
+                        <span>{{ __('navigation.sign_out') }}</span>
                     </button>
                 </form>
             </div>
@@ -3669,7 +3689,7 @@
     {{-- TOPBAR --}}
     <header class="ml-topbar">
         {{-- MOBILE HAMBURGER TOGGLE --}}
-        <button type="button" class="ml-icon-btn ml-hamburger-btn" id="ml-hamburger-btn" aria-label="Buka Menu Navigasi" aria-expanded="false" aria-controls="ml-sidebar">
+        <button type="button" class="ml-icon-btn ml-hamburger-btn" id="ml-hamburger-btn" aria-label="{{ __('navigation.open_menu') }}" aria-expanded="false" aria-controls="ml-sidebar">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
 
@@ -3680,14 +3700,10 @@
 
         <div class="ml-search">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" placeholder="Cari cepat…" aria-label="Cari cepat">
+            <input type="text" placeholder="{{ __('navigation.quick_search') }}…" aria-label="{{ __('navigation.quick_search') }}">
         </div>
         <div class="ml-topbar-spacer"></div>
         <div class="ml-topbar-right">
-            <div class="ml-icon-btn">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                <span class="ml-badge-dot"></span>
-            </div>
 
             {{-- USER PROFILE CHIP WITH DROPDOWN --}}
             <div class="ml-profile-container">
@@ -3704,14 +3720,14 @@
                             @auth
                                 {{ auth()->user()->facility?->name ?? auth()->user()->name }}
                             @else
-                                Faskes Pengguna
+                                {{ __('navigation.guest_user') }}
                             @endauth
                         </div>
                         <div class="ml-user-role">
                             @auth
-                                ({{ auth()->user()->role_label ?? 'Staff' }})
+                                ({{ auth()->user()->role_label ?? __('enums.user_role.facility_staff') }})
                             @else
-                                (Farmasi)
+                                ({{ __('enums.user_role.facility_staff') }})
                             @endauth
                         </div>
                     </div>
@@ -3733,7 +3749,7 @@
                                 @auth
                                     {{ auth()->user()->name }}
                                 @else
-                                    Tenaga Kefarmasian
+                                    {{ __('navigation.guest_staff_name') }}
                                 @endauth
                             </div>
                             <div class="ml-profile-email">
@@ -3745,28 +3761,28 @@
                             </div>
                             <span class="ml-role-badge">
                                 @auth
-                                    {{ auth()->user()->role_label ?? 'Staff' }}
+                                    {{ auth()->user()->role_label ?? __('enums.user_role.facility_staff') }}
                                 @else
-                                    FARMASI
+                                    {{ __('enums.user_role.facility_staff') }}
                                 @endauth
                             </span>
                         </div>
                     </div>
-                    <div class="ml-menu-divider"></div>
+                        <div class="ml-menu-divider"></div>
                     <a href="{{ route('profile.edit') }}" class="ml-menu-item">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        <span>Edit Profil</span>
+                        <span>{{ __('navigation.edit_profile') }}</span>
                     </a>
                     <a href="{{ route('security.edit') }}" class="ml-menu-item">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <span>Keamanan Akun</span>
+                        <span>{{ __('navigation.account_security') }}</span>
                     </a>
                     <div class="ml-menu-divider"></div>
                     <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                         @csrf
                         <button type="submit" class="ml-menu-item ml-menu-item-danger">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                            <span>Keluar</span>
+                            <span>{{ __('navigation.sign_out') }}</span>
                         </button>
                     </form>
                 </div>
@@ -3781,38 +3797,44 @@
 </div>
 
 {{-- BOTTOM NAVIGATION (Android / Mobile Native-Feel App Bar) --}}
-<nav class="ml-bottom-nav" aria-label="Navigasi Bawah">
+<nav class="ml-bottom-nav" aria-label="{{ __('navigation.bottom') }}">
     <div class="ml-bottom-nav-inner">
         <a href="{{ route('dashboard') }}" class="ml-bottom-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24" fill="{{ request()->routeIs('dashboard') ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="{{ request()->routeIs('dashboard') ? '0' : '2' }}">
                 <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
             </svg>
-            <span>Dashboard</span>
+            <span>{{ __('navigation.dashboard') }}</span>
         </a>
         <a href="{{ route('batches.index') }}" class="ml-bottom-item {{ request()->routeIs('batches.*') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
-            <span>Stok Obat</span>
+            <span>{{ __('navigation.batches_short') }}</span>
+        </a>
+        <a href="{{ route('analytics.index') }}" class="ml-bottom-item {{ request()->routeIs('analytics.*') ? 'active' : '' }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+            </svg>
+            <span>{{ __('navigation.analytics_short') }}</span>
         </a>
         <a href="{{ route('transfers.index') }}" class="ml-bottom-item {{ request()->routeIs('transfers.*') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/>
             </svg>
-            <span>Redistribusi</span>
+            <span>{{ __('navigation.transfers_short') }}</span>
         </a>
         <a href="{{ route('network.index') }}" class="ml-bottom-item {{ request()->routeIs('network.*') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 21s-7-4.35-7-10a7 7 0 1114 0c0 5.65-7 10-7 10z"/>
                 <circle cx="12" cy="11" r="2.5"/>
             </svg>
-            <span>Peta</span>
+            <span>{{ __('navigation.network_short') }}</span>
         </a>
         <a href="{{ route('audit.index') }}" class="ml-bottom-item {{ request()->routeIs('audit.*') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/>
             </svg>
-            <span>Audit</span>
+            <span>{{ __('navigation.audit_short') }}</span>
         </a>
     </div>
 </nav>

@@ -30,13 +30,13 @@ class FacilityInvitationService
                 'role' => ['required', 'string', Rule::in(UserRole::facilityValues())],
             ],
             [
-                'email.unique' => 'Email ini sudah memiliki akun MediLoop.',
+                'email.unique' => __('invitations.errors.email_taken'),
             ],
         )->validate();
 
         if (! $facility->isActive()) {
             throw ValidationException::withMessages([
-                'email' => 'Fasilitas harus aktif sebelum mengundang anggota tim.',
+                'email' => __('invitations.errors.facility_inactive'),
             ]);
         }
 
@@ -63,7 +63,7 @@ class FacilityInvitationService
             $this->log(
                 $inviter,
                 'TEAM_INVITED',
-                "Undangan dikirim ke {$email} untuk {$facility->name}.",
+                __('invitations.audit.invited', ['email' => $email, 'facility' => $facility->name]),
                 $facility,
             );
 
@@ -82,7 +82,7 @@ class FacilityInvitationService
 
         if (User::query()->where('email', $invitation->email)->exists()) {
             throw ValidationException::withMessages([
-                'email' => 'Email ini sudah memiliki akun MediLoop.',
+                'email' => __('invitations.errors.email_taken'),
             ]);
         }
 
@@ -106,7 +106,7 @@ class FacilityInvitationService
             $this->log(
                 $user,
                 'INVITATION_ACCEPTED',
-                "{$user->name} bergabung dengan {$facility->name}.",
+                __('invitations.audit.joined', ['name' => $user->name, 'facility' => $facility->name]),
                 $facility,
             );
 
@@ -123,7 +123,7 @@ class FacilityInvitationService
         $this->log(
             $actor,
             'INVITATION_REVOKED',
-            "Undangan untuk {$invitation->email} dibatalkan.",
+            __('invitations.audit.revoked', ['email' => $invitation->email]),
             $facility,
         );
     }
@@ -137,25 +137,25 @@ class FacilityInvitationService
 
         if (! $invitation) {
             throw ValidationException::withMessages([
-                'token' => 'Undangan tidak ditemukan.',
+                'token' => __('invitations.errors.not_found'),
             ]);
         }
 
         if ($invitation->isAccepted()) {
             throw ValidationException::withMessages([
-                'token' => 'Undangan ini sudah digunakan.',
+                'token' => __('invitations.errors.already_used'),
             ]);
         }
 
         if ($invitation->isExpired()) {
             throw ValidationException::withMessages([
-                'token' => 'Undangan ini sudah kedaluwarsa. Minta undangan baru dari kepala fasilitas.',
+                'token' => __('invitations.errors.expired'),
             ]);
         }
 
         if (! $invitation->facility->isActive()) {
             throw ValidationException::withMessages([
-                'token' => 'Fasilitas ini sedang tidak aktif. Hubungi administrator platform.',
+                'token' => __('invitations.errors.facility_inactive_token'),
             ]);
         }
 

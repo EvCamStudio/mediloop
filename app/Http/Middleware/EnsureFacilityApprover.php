@@ -14,7 +14,7 @@ class EnsureFacilityApprover
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->user()?->canManageFacility()) {
-            abort(403, 'Hanya kepala fasilitas yang dapat mengelola tim.');
+            abort(403, __('http.facility_approver_only'));
         }
 
         return $next($request);

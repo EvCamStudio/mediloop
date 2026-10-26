@@ -1,34 +1,34 @@
-@extends('layouts.mediloop', ['title' => 'Administrasi'])
+@extends('layouts.mediloop', ['title' => __('admin.administration')])
 
 @section('content')
 <div class="ml-page-admin">
     <header class="ml-page-head">
         <div>
-            <h1 class="ml-page-title">Ringkasan administrasi</h1>
-            <p class="ml-page-sub">Antrean verifikasi dan kesehatan registry fasilitas MediLoop.</p>
+            <h1 class="ml-page-title">{{ __('admin.dashboard.heading') }}</h1>
+            <p class="ml-page-sub">{{ __('admin.dashboard.subtitle') }}</p>
         </div>
         <div class="ml-page-actions">
-            <a href="{{ route('admin.facilities.index') }}" class="ml-btn-quiet">Buka registry</a>
-            <a href="{{ route('admin.facility-requests.index') }}" class="ml-btn-primary">Tinjau pengajuan</a>
+            <a href="{{ route('admin.facilities.index') }}" class="ml-btn-quiet">{{ __('admin.dashboard.open_registry') }}</a>
+            <a href="{{ route('admin.facility-requests.index') }}" class="ml-btn-primary">{{ __('admin.dashboard.review_requests') }}</a>
         </div>
     </header>
 
-    <div class="ml-summary-bar" aria-label="Ringkasan platform">
+    <div class="ml-summary-bar" aria-label="{{ __('admin.dashboard.summary_aria') }}">
         <div class="ml-summary-item">
             <span class="ml-summary-value">{{ number_format($counts['active'], 0, ',', '.') }}</span>
-            <span class="ml-summary-label">Fasilitas aktif</span>
+            <span class="ml-summary-label">{{ __('admin.dashboard.active_facilities') }}</span>
         </div>
         <div class="ml-summary-item">
             <span class="ml-summary-value">{{ number_format($counts['pendingRequests'], 0, ',', '.') }}</span>
-            <span class="ml-summary-label">Pengajuan menunggu</span>
+            <span class="ml-summary-label">{{ __('admin.dashboard.pending_requests') }}</span>
         </div>
         <div class="ml-summary-item">
             <span class="ml-summary-value">{{ number_format($counts['pendingFacilities'], 0, ',', '.') }}</span>
-            <span class="ml-summary-label">Faskes belum terverifikasi</span>
+            <span class="ml-summary-label">{{ __('admin.dashboard.unverified_facilities') }}</span>
         </div>
         <div class="ml-summary-item">
             <span class="ml-summary-value">{{ number_format($counts['users'], 0, ',', '.') }}</span>
-            <span class="ml-summary-label">Akun pengguna</span>
+            <span class="ml-summary-label">{{ __('admin.dashboard.user_accounts') }}</span>
         </div>
     </div>
 
@@ -36,27 +36,26 @@
         <section class="ml-card" aria-labelledby="queue-title">
             <div class="ml-card-head" style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
                 <div>
-                    <h2 class="ml-card-title" id="queue-title">Antrean pengajuan</h2>
-                    <p class="ml-card-sub">Pengajuan fasilitas terbaru yang menunggu keputusan.</p>
+                    <h2 class="ml-card-title" id="queue-title">{{ __('admin.dashboard.queue_title') }}</h2>
+                    <p class="ml-card-sub">{{ __('admin.dashboard.queue_subtitle') }}</p>
                 </div>
-                <a href="{{ route('admin.facility-requests.index') }}" class="ml-link-action">Lihat semua</a>
+                <a href="{{ route('admin.facility-requests.index') }}" class="ml-link-action">{{ __('common.view_all') }}</a>
             </div>
 
             @if($pendingRequests->isEmpty())
                 <div class="ml-empty-state">
-                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
-                    <p class="ml-empty-title">Antrean bersih</p>
-                    <p class="ml-empty-copy">Tidak ada pengajuan yang menunggu review saat ini.</p>
+                    <p class="ml-empty-title">{{ __('admin.dashboard.queue_empty_title') }}</p>
+                    <p class="ml-empty-copy">{{ __('admin.dashboard.queue_empty_copy') }}</p>
                 </div>
             @else
                 <div class="ml-table-responsive">
                     <table class="ml-table">
-                        <caption class="ml-sr-only">Pengajuan fasilitas terbaru</caption>
+                        <caption class="ml-sr-only">{{ __('admin.dashboard.queue_caption') }}</caption>
                         <thead>
                             <tr>
-                                <th scope="col">Fasilitas</th>
-                                <th scope="col">Diajukan</th>
-                                <th scope="col"><span class="ml-sr-only">Aksi</span></th>
+                                <th scope="col">{{ __('admin.facility') }}</th>
+                                <th scope="col">{{ __('admin.submitted') }}</th>
+                                <th scope="col"><span class="ml-sr-only">{{ __('common.actions') }}</span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -68,7 +67,7 @@
                                     </td>
                                     <td class="ml-cell-meta" style="white-space: nowrap;">{{ $requestRecord->created_at->diffForHumans() }}</td>
                                     <td class="is-right">
-                                        <a href="{{ route('admin.facility-requests.show', $requestRecord) }}" class="ml-btn-quiet ml-btn-sm">Review</a>
+                                        <a href="{{ route('admin.facility-requests.show', $requestRecord) }}" class="ml-btn-quiet ml-btn-sm">{{ __('admin.review') }}</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -80,8 +79,8 @@
 
         <section class="ml-card" aria-labelledby="recent-title">
             <div class="ml-card-head">
-                <h2 class="ml-card-title" id="recent-title">Fasilitas terbaru</h2>
-                <p class="ml-card-sub">Lima entri terakhir di registry.</p>
+                <h2 class="ml-card-title" id="recent-title">{{ __('admin.dashboard.recent_title') }}</h2>
+                <p class="ml-card-sub">{{ __('admin.dashboard.recent_subtitle') }}</p>
             </div>
             <div class="ml-card-body">
                 @forelse($recentFacilities as $facility)
@@ -93,7 +92,7 @@
                         @include('admin.partials.status', ['status' => $facility->status, 'label' => $facility->status_label])
                     </div>
                 @empty
-                    <p class="ml-help" style="margin-top: 0;">Belum ada fasilitas di registry.</p>
+                    <p class="ml-help" style="margin-top: 0;">{{ __('admin.dashboard.no_facilities') }}</p>
                 @endforelse
             </div>
         </section>

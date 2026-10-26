@@ -51,13 +51,13 @@ new class extends Component {
 
         try {
             if (! $user || ! $user->two_factor_secret) {
-                throw new Exception('Two-factor setup secret is not available.');
+                throw new Exception(__('Two-factor setup secret is not available.'));
             }
 
             $this->qrCodeSvg = $user->twoFactorQrCodeSvg();
             $this->manualSetupKey = decrypt($user->two_factor_secret);
         } catch (Exception) {
-            $this->addError('setupData', 'Failed to fetch setup data.');
+            $this->addError('setupData', __('Failed to fetch setup data.'));
 
             $this->reset('qrCodeSvg', 'manualSetupKey');
         }
@@ -194,7 +194,7 @@ new class extends Component {
                             name="code"
                             wire:model="code"
                             length="6"
-                            label="OTP Code"
+                            label="{{ __('OTP Code') }}"
                             label:sr-only
                             class="mx-auto"
                         />

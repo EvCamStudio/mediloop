@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="id" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="MediLoop membantu fasilitas kesehatan mencegah pemusnahan obat kedaluwarsa melalui koordinasi redistribusi stok yang aman, terdokumentasi, dan berbasis keputusan petugas.">
-    <title>MediLoop — Platform Pendukung Keputusan Redistribusi Obat Antarfaskes</title>
+    <meta name="description" content="{{ __('landing.meta_description') }}">
+    <title>{{ __('landing.title') }}</title>
     @include('partials.favicons')
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,6 +15,7 @@
         rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script type="application/json" id="js-translations">@json(__('js'))</script>
     <style>
         :root {
             --brand-primary: #1D4ED8;
@@ -163,23 +164,22 @@
                 <div>
                     <span class="text-xl font-extrabold tracking-tight text-[#0B1F4B]">MediLoop</span>
                     <span
-                        class="hidden md:inline-block ml-2 px-2 py-0.5 text-[10px] font-semibold text-blue-800 bg-[#EAF1FF] rounded border border-[#DBE5F5]">Decision
-                        Support Only</span>
+                        class="hidden md:inline-block ml-2 px-2 py-0.5 text-[10px] font-semibold text-blue-800 bg-[#EAF1FF] rounded border border-[#DBE5F5]">{{ __('landing.top_badge') }}</span>
                 </div>
             </div>
 
             <nav class="flex items-center gap-3">
                 <a href="#simulator"
                     class="hidden sm:inline-block text-xs font-semibold text-[#52627F] hover:text-[#0B1F4B] px-3 py-2">
-                    Kalkulator Simulasi
+                    {{ __('landing.nav.simulator') }}
                 </a>
                 <a href="#prinsip"
                     class="hidden sm:inline-block text-xs font-semibold text-[#52627F] hover:text-[#0B1F4B] px-3 py-2">
-                    Prinsip Sistem
+                    {{ __('landing.nav.principles') }}
                 </a>
                 <a href="{{ route('login') }}"
                     class="px-4 py-2 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition">
-                    Buka Dashboard
+                    {{ __('landing.nav.open_dashboard') }}
                 </a>
             </nav>
         </div>
@@ -196,23 +196,22 @@
                     <div
                         class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EAF1FF] border border-[#DBE5F5] text-xs font-semibold text-[#1D4ED8] mb-6">
                         <span class="w-2 h-2 rounded-full bg-[#1D4ED8]"></span>
-                        Sistem Pendukung Keputusan Hibah & Redistribusi Obat Antarfaskes
+                        {{ __('landing.hero.badge') }}
                     </div>
 
                     <h1
                         class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#0B1F4B] tracking-tight leading-tight mb-6">
-                        Cegah Pemusnahan Obat Kedaluwarsa Melalui Koordinasi Antarfaskes.
+                        {{ __('landing.hero.title') }}
                     </h1>
 
                     <p class="text-base sm:text-lg text-[#52627F] leading-relaxed mb-8">
-                        MediLoop mendeteksi surplus obat berisiko kedaluwarsa di rumah sakit dan mencocokkannya dengan
-                        kebutuhan riil puskesmas terdekat secara terukur, aman, dan patuh regulasi Kemenkes.
+                        {{ __('landing.hero.body') }}
                     </p>
 
                     <div class="flex flex-wrap items-center gap-4">
                         <a href="{{ route('login') }}"
                             class="px-5 py-3 text-sm font-bold text-white bg-[#1D4ED8] hover:bg-blue-800 rounded-lg shadow-xs transition inline-flex items-center gap-2">
-                            <span>Mulai Simulasi</span>
+                            <span>{{ __('landing.hero.cta_simulation') }}</span>
                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -220,23 +219,23 @@
                         </a>
                         <a href="#simulator"
                             class="px-5 py-3 text-sm font-semibold text-[#0B1F4B] bg-slate-100 hover:bg-slate-200 rounded-lg transition border border-[#DBE5F5]">
-                            Uji Algoritma Prediksi Limbah
+                            {{ __('landing.hero.cta_algorithm') }}
                         </a>
                     </div>
 
                     <!-- Hard Operational Constraints (No PHI, Decision-Support Only) -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-10 pt-8 border-t border-[#DBE5F5] text-xs">
                         <div>
-                            <span class="block font-bold text-[#0B1F4B]">Zero Data Pasien</span>
-                            <span class="text-[#52627F]">Logistik batch tanpa identitas rekam medis (PHI).</span>
+                            <span class="block font-bold text-[#0B1F4B]">{{ __('landing.hero.phi_title') }}</span>
+                            <span class="text-[#52627F]">{{ __('landing.hero.phi_body') }}</span>
                         </div>
                         <div>
-                            <span class="block font-bold text-[#0B1F4B]">Persetujuan Manusia</span>
-                            <span class="text-[#52627F]">Wajib disahkan Kepala Instalasi Farmasi.</span>
+                            <span class="block font-bold text-[#0B1F4B]">{{ __('landing.hero.approval_title') }}</span>
+                            <span class="text-[#52627F]">{{ __('landing.hero.approval_body') }}</span>
                         </div>
                         <div>
-                            <span class="block font-bold text-[#0B1F4B]">Invarian Mutlak</span>
-                            <span class="text-[#52627F]">Stok hanya termutasi saat fisik terkonfirmasi tiba.</span>
+                            <span class="block font-bold text-[#0B1F4B]">{{ __('landing.hero.invariant_title') }}</span>
+                            <span class="text-[#52627F]">{{ __('landing.hero.invariant_body') }}</span>
                         </div>
                     </div>
                 </div>
@@ -283,9 +282,9 @@
                                                 aria-hidden="true"></span>
                                         </div>
                                         <div class="flex items-center gap-1 text-[10.5px] font-bold text-[var(--brand-risk)]">
-                                            <span>Proyeksi limbah 300 unit</span>
+                                            <span>{{ __('landing.chips.waste_projection', ['count' => '300']) }}</span>
                                             <span class="text-slate-400">•</span>
-                                            <span class="font-normal text-slate-600">Sisa 45 hari</span>
+                                            <span class="font-normal text-slate-600">{{ __('landing.chips.remaining_days', ['days' => '45']) }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -416,13 +415,13 @@
                                     </div>
                                     <div>
                                         <div class="text-[10px] font-bold uppercase tracking-wider text-slate-600">
-                                            Rekomendasi faskes
+                                            {{ __('landing.chips.facility_recommendation') }}
                                         </div>
                                         <div class="text-xs font-extrabold text-[var(--brand-navy)]">Puskesmas Gambir</div>
                                         <div class="flex items-center gap-1 text-[10.5px] font-semibold text-blue-700">
                                             <span>1,8 km</span>
                                             <span class="text-slate-400">•</span>
-                                            <span class="font-bold text-teal-700">Siap rantai dingin</span>
+                                            <span class="font-bold text-teal-700">{{ __('landing.chips.cold_chain_ready') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -437,13 +436,13 @@
                                         d="M5 13l4 4L19 7" />
                                 </svg>
                                 <div>
-                                    <div class="text-xs font-extrabold text-[var(--brand-navy)]">Contoh skor 92%</div>
+                                    <div class="text-xs font-extrabold text-[var(--brand-navy)]">{{ __('landing.chips.example_score') }}</div>
                                     <div class="font-mono text-[10px] text-slate-600">BATCH: CFT-2026-X89</div>
                                 </div>
                             </div>
                         </div>
                         <p class="mt-3 text-center text-[11px] font-medium leading-relaxed text-slate-600">
-                            Simulasi kasus PRD · data contoh, bukan data operasional.
+                            {{ __('landing.chips.simulation_note') }}
                         </p>
                     </div>
                 </div>
@@ -456,93 +455,87 @@
     <section id="simulator" class="scroll-mt-20 py-16 bg-[#EAF1FF]/40 border-b border-[#DBE5F5]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-12">
-                <span class="text-xs font-bold text-[#1D4ED8] uppercase tracking-wider">Algoritma PRD Section 9</span>
+                <span class="text-xs font-bold text-[#1D4ED8] uppercase tracking-wider">{{ __('landing.simulator.eyebrow') }}</span>
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0B1F4B] mt-2 mb-4">
-                    Kalkulator Simulasi Prediksi Limbah & Risiko Klinis
+                    {{ __('landing.simulator.title') }}
                 </h2>
                 <p class="text-sm text-[#52627F]">
-                    Coba ubah parameter stok, laju pemakaian harian (burn rate), dan sisa hari kedaluwarsa di bawah
-                    untuk melihat kalkulasi matematis secara langsung.
+                    {{ __('landing.simulator.subtitle') }}
                 </p>
             </div>
 
             <div class="max-w-4xl mx-auto bg-white rounded-2xl border border-[#DBE5F5] shadow-sm p-6 sm:p-8">
-                <!-- Preset Buttons -->
-                <div class="flex flex-wrap items-center gap-2 mb-8 pb-6 border-b border-[#DBE5F5]">
-                    <span class="text-xs font-semibold text-[#52627F]">Pilih Preset Skenario:</span>
-                    <button type="button" onclick="setPreset(480, 4.0, 45)"
-                        class="px-3 py-1.5 text-xs font-medium rounded-md bg-blue-50 text-[#1D4ED8] hover:bg-blue-100 border border-blue-200">
-                        Benchmark PRD: Ceftriaxone (480 stok, 4/hari, 45 hari)
-                    </button>
-                    <button type="button" onclick="setPreset(120, 1.0, 28)"
-                        class="px-3 py-1.5 text-xs font-medium rounded-md bg-orange-50 text-[#B33A0A] hover:bg-orange-100 border border-orange-200">
-                        Kritis: Insulin Cold-Chain (120 stok, 1/hari, 28 hari)
-                    </button>
-                    <button type="button" onclick="setPreset(300, 8.0, 80)"
-                        class="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-100 text-[#0B1F4B] hover:bg-slate-200 border border-slate-300">
-                        Aman: Amoxicillin (300 stok, 8/hari, 80 hari)
-                    </button>
+                <!-- Medicine Dropdown -->
+                <div class="mb-8 pb-6 border-b border-[#DBE5F5]">
+                    <label for="simMedicine" class="block text-xs font-semibold text-[#52627F] mb-2">{{ __('landing.simulator.medicine_select') }}</label>
+                    <select id="simMedicine" onchange="onMedicineChange(this.value)" class="w-full px-3 py-2.5 text-sm border border-[#DBE5F5] rounded-lg text-[#0B1F4B] focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none bg-white">
+                        <option value="">{{ __('landing.simulator.choose_medicine') }}</option>
+                        <option value="ceftriaxone">Ceftriaxone 1g Injeksi (480, 4.0, 45)</option>
+                        <option value="insulin">Insulin Glargine 100 IU/ml (120, 1.0, 28)</option>
+                        <option value="amoxicillin">Amoxicillin 500mg Tablet (300, 8.0, 80)</option>
+                        <option value="paracetamol">Paracetamol 500mg Tablet (300, 8.0, 80)</option>
+                    </select>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <!-- Input 1: Current Stock -->
                     <div>
                         <label for="simStock" class="block text-xs font-semibold text-[#0B1F4B] mb-2">
-                            Stok Fisik Saat Ini (S)
+                            {{ __('landing.simulator.stock_label') }}
                         </label>
                         <div class="relative">
                             <input type="number" id="simStock" value="480" min="1" max="10000" oninput="calculateSim()"
                                 class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                            <span class="absolute right-3 top-2 text-xs text-[#52627F]">Unit</span>
+                            <span class="absolute right-3 top-2 text-xs text-[#52627F]">{{ __('landing.simulator.unit') }}</span>
                         </div>
                     </div>
 
                     <!-- Input 2: Daily Burn Rate -->
                     <div>
                         <label for="simBurnRate" class="block text-xs font-semibold text-[#0B1F4B] mb-2">
-                            Laju Pemakaian Harian (B)
+                            {{ __('landing.simulator.burn_label') }}
                         </label>
                         <div class="relative">
                             <input type="number" id="simBurnRate" value="4.0" step="0.5" min="0" max="500"
                                 oninput="calculateSim()"
                                 class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                            <span class="absolute right-3 top-2 text-xs text-[#52627F]">Unit/hari</span>
+                            <span class="absolute right-3 top-2 text-xs text-[#52627F]">{{ __('landing.simulator.unit_per_day') }}</span>
                         </div>
                     </div>
 
                     <!-- Input 3: Days to Expiry -->
                     <div>
                         <label for="simDays" class="block text-xs font-semibold text-[#0B1F4B] mb-2">
-                            Sisa Waktu Kedaluwarsa (D_exp)
+                            {{ __('landing.simulator.expiry_label') }}
                         </label>
                         <div class="relative">
                             <input type="number" id="simDays" value="45" min="1" max="730" oninput="calculateSim()"
                                 class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                            <span class="absolute right-3 top-2 text-xs text-[#52627F]">Hari</span>
+                            <span class="absolute right-3 top-2 text-xs text-[#52627F]">{{ __('landing.simulator.days') }}</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Simulation Output Matrix -->
                 <div class="bg-slate-50 border border-[#DBE5F5] rounded-xl p-6">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#52627F] mb-4">Hasil Evaluasi Algoritma:
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-[#52627F] mb-4">{{ __('landing.simulator.results_title') }}
                     </h3>
 
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                         <div class="p-3 bg-white rounded-lg border border-[#DBE5F5]">
-                            <span class="block text-[11px] text-[#52627F]">Hari Habis (D_dep):</span>
-                            <span id="outDeplete" class="text-lg font-mono font-bold text-[#0B1F4B]">120.0 hari</span>
+                            <span class="block text-[11px] text-[#52627F]">{{ __('landing.simulator.days_to_deplete') }}</span>
+                            <span id="outDeplete" class="text-lg font-mono font-bold text-[#0B1F4B]">{{ __('landing.simulator.initial_days') }}</span>
                         </div>
                         <div class="p-3 bg-white rounded-lg border border-[#DBE5F5]">
-                            <span class="block text-[11px] text-[#52627F]">Proyeksi Terpakai:</span>
-                            <span id="outConsumed" class="text-lg font-mono font-bold text-[#0B1F4B]">180 unit</span>
+                            <span class="block text-[11px] text-[#52627F]">{{ __('landing.simulator.projected_consumption') }}</span>
+                            <span id="outConsumed" class="text-lg font-mono font-bold text-[#0B1F4B]">{{ __('landing.simulator.initial_consumed') }}</span>
                         </div>
                         <div class="p-3 bg-white rounded-lg border border-[#DBE5F5]">
-                            <span class="block text-[11px] text-[#52627F]">Proyeksi Limbah (W):</span>
-                            <span id="outWaste" class="text-lg font-mono font-bold text-[#B33A0A]">300 unit</span>
+                            <span class="block text-[11px] text-[#52627F]">{{ __('landing.simulator.projected_waste') }}</span>
+                            <span id="outWaste" class="text-lg font-mono font-bold text-[#B33A0A]">{{ __('landing.simulator.initial_waste') }}</span>
                         </div>
                         <div class="p-3 bg-white rounded-lg border border-[#DBE5F5]">
-                            <span class="block text-[11px] text-[#52627F]">Rasio Limbah:</span>
+                            <span class="block text-[11px] text-[#52627F]">{{ __('landing.simulator.waste_ratio') }}</span>
                             <span id="outRatio" class="text-lg font-mono font-bold text-[#B33A0A]">62.5%</span>
                         </div>
                     </div>
@@ -551,16 +544,16 @@
                     <div
                         class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white rounded-lg border border-[#DBE5F5] gap-4">
                         <div>
-                            <span class="text-xs text-[#52627F] block">Klasifikasi Tingkat Risiko Klinis:</span>
+                            <span class="text-xs text-[#52627F] block">{{ __('landing.simulator.risk_classification') }}</span>
                             <span id="outRiskBadge"
                                 class="inline-block mt-1 px-3 py-1 text-xs font-bold rounded bg-orange-100 text-[#B33A0A] border border-orange-300">
-                                [HIGH RISK: 300 unit proyeksi terbuang]
+                                {{ __('landing.simulator.initial_badge') }}
                             </span>
                         </div>
                         <div class="text-right">
-                            <span class="text-xs text-[#52627F] block">Rekomendasi Tindakan:</span>
+                            <span class="text-xs text-[#52627F] block">{{ __('landing.simulator.recommendation') }}</span>
                             <span id="outAction" class="text-xs font-bold text-[#1D4ED8]">
-                                Wajib diajukan redistribusi ke faskes sekunder
+                                {{ __('landing.simulator.initial_action') }}
                             </span>
                         </div>
                     </div>
@@ -573,13 +566,12 @@
     <section id="prinsip" class="py-16 bg-white border-b border-[#DBE5F5]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="max-w-3xl mx-auto text-center mb-12">
-                <span class="text-xs font-bold text-[#1D4ED8] uppercase tracking-wider">Tata Kelola & Kepatuhan</span>
+                <span class="text-xs font-bold text-[#1D4ED8] uppercase tracking-wider">{{ __('landing.principles.eyebrow') }}</span>
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-[#0B1F4B] mt-2 mb-4">
-                    4 Batasan Arsitektur & Prinsip Regulasi
+                    {{ __('landing.principles.title') }}
                 </h2>
                 <p class="text-sm text-[#52627F]">
-                    MediLoop dirancang secara khusus untuk memenuhi standar distribusi kefarmasian Indonesia tanpa celah
-                    komersialisasi liar atau pelanggaran data pribadi.
+                    {{ __('landing.principles.subtitle') }}
                 </p>
             </div>
 
@@ -590,12 +582,9 @@
                         class="w-10 h-10 rounded-lg bg-[#EAF1FF] text-[#1D4ED8] flex items-center justify-center font-bold mb-4">
                         01
                     </div>
-                    <h3 class="text-base font-bold text-[#0B1F4B] mb-2">Bukan Marketplace Terbuka (Decision Support
-                        Only)</h3>
+                    <h3 class="text-base font-bold text-[#0B1F4B] mb-2">{{ __('landing.principles.one_title') }}</h3>
                     <p class="text-xs text-[#52627F] leading-relaxed">
-                        Sistem tidak melakukan transaksi otomatis atau jual-beli bebas. MediLoop bertindak murni sebagai
-                        pendukung keputusan berbasis data. Setiap usulan redistribusi hibah wajib mendapatkan
-                        persetujuan manual bertingkat dari Kepala Instalasi Farmasi dan Direktur Faskes terkait.
+                        {{ __('landing.principles.one_body') }}
                     </p>
                 </div>
 
@@ -605,11 +594,9 @@
                         class="w-10 h-10 rounded-lg bg-[#EAF1FF] text-[#1D4ED8] flex items-center justify-center font-bold mb-4">
                         02
                     </div>
-                    <h3 class="text-base font-bold text-[#0B1F4B] mb-2">Nol Data Pribadi Pasien (Zero PHI)</h3>
+                    <h3 class="text-base font-bold text-[#0B1F4B] mb-2">{{ __('landing.principles.two_title') }}</h3>
                     <p class="text-xs text-[#52627F] leading-relaxed">
-                        Sistem sama sekali tidak menyimpan rekam medis, identitas pasien, atau resep individual. Data
-                        yang diproses murni berupa agregat logistik: nomor batch pabrik, tanggal kedaluwarsa, dan
-                        rata-rata pengeluaran stok per hari sesuai UU Perlindungan Data Pribadi (UU PDP).
+                        {{ __('landing.principles.two_body') }}
                     </p>
                 </div>
 
@@ -619,12 +606,9 @@
                         class="w-10 h-10 rounded-lg bg-[#EAF1FF] text-[#1D4ED8] flex items-center justify-center font-bold mb-4">
                         03
                     </div>
-                    <h3 class="text-base font-bold text-[#0B1F4B] mb-2">Pencocokan Cerdas & Pembatas Serapan (Intake
-                        Cap)</h3>
+                    <h3 class="text-base font-bold text-[#0B1F4B] mb-2">{{ __('landing.principles.three_title') }}</h3>
                     <p class="text-xs text-[#52627F] leading-relaxed">
-                        Kandidat penerima dihitung menggunakan rumus Jarak Haversine (30%), Kebutuhan Riil (50%), dan
-                        Kesiapan Cold-Chain (20%). Dilengkapi algoritma pembatas jumlah serapan agar obat yang
-                        dipindahkan tidak mengalami kedaluwarsa sekunder di tempat penerima.
+                        {{ __('landing.principles.three_body') }}
                     </p>
                 </div>
 
@@ -634,11 +618,9 @@
                         class="w-10 h-10 rounded-lg bg-[#EAF1FF] text-[#1D4ED8] flex items-center justify-center font-bold mb-4">
                         04
                     </div>
-                    <h3 class="text-base font-bold text-[#0B1F4B] mb-2">Invarian Stok Non-Destruktif</h3>
+                    <h3 class="text-base font-bold text-[#0B1F4B] mb-2">{{ __('landing.principles.four_title') }}</h3>
                     <p class="text-xs text-[#52627F] leading-relaxed">
-                        Saldo persediaan donor tidak pernah dipotong selama tahap pengusulan, persetujuan, atau
-                        perjalanan fisik kurir. Pengurangan stok donor dan penambahan stok penerima terjadi secara
-                        atomik HANYA saat obat diverifikasi secara fisik oleh penanggung jawab penerima.
+                        {{ __('landing.principles.four_body') }}
                     </p>
                 </div>
             </div>
@@ -649,20 +631,19 @@
     <section class="py-16 bg-[#0B1F4B] text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-2xl sm:text-3xl font-extrabold mb-4">
-                Siap Menguji Alur Redistribusi Obat Secara Lengkap?
+                {{ __('landing.cta.title') }}
             </h2>
             <p class="text-sm text-blue-200/90 max-w-2xl mx-auto mb-8">
-                Masuk dengan akun fasilitas kesehatan Anda untuk menguji alur pengusulan, persetujuan, penerimaan,
-                hingga audit pengawasan. Fasilitas baru dapat mengajukan verifikasi tanpa membuat akun terlebih dahulu.
+                {{ __('landing.cta.body') }}
             </p>
             <div class="flex flex-wrap justify-center gap-4">
                 <a href="{{ route('login') }}"
                     class="px-6 py-3 rounded-lg bg-[#1D4ED8] hover:bg-blue-600 font-bold text-sm text-white shadow-lg transition">
-                    Masuk ke Dashboard
+                    {{ __('landing.cta.sign_in') }}
                 </a>
                 <a href="{{ route('facility-requests.create') }}"
                     class="px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 font-semibold text-sm text-white border border-white/20 transition">
-                    Ajukan Fasilitas
+                    {{ __('landing.cta.request_facility') }}
                 </a>
             </div>
         </div>
@@ -671,13 +652,22 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-[#DBE5F5] py-6 text-center text-xs text-[#52627F]">
-        <p><strong>MediLoop</strong> — Dikembangkan untuk Kompetisi Inovasi Layanan Kesehatan Digital 2026.</p>
-        <p class="mt-1 font-mono text-[11px]">Bebas ketergantungan framework eksternal pada kalkulasi domain • WCAG 2.2
-            Level AA</p>
+        <p><strong>MediLoop</strong> — {{ __('landing.footer.competition') }}</p>
+        <p class="mt-1 font-mono text-[11px]">{{ __('landing.footer.standards') }}</p>
     </footer>
 
     <!-- Interactive Simulator Script (Vanilla JS) -->
     <script>
+        const simStrings = @json(__('landing.simulator.js'));
+        const simLocale = @json(str_replace('_', '-', app()->getLocale()) === 'id' ? 'id-ID' : 'en-US');
+        const simDecimal = new Intl.NumberFormat(simLocale, {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+        });
+        const simInteger = new Intl.NumberFormat(simLocale, {
+            maximumFractionDigits: 0,
+        });
+
         function setPreset(stock, burn, days) {
             document.getElementById('simStock').value = stock;
             document.getElementById('simBurnRate').value = burn;
@@ -685,46 +675,60 @@
             calculateSim();
         }
 
+        function onMedicineChange(val) {
+            if (val === 'ceftriaxone') setPreset(480, 4.0, 45);
+            else if (val === 'insulin') setPreset(120, 1.0, 28);
+            else if (val === 'amoxicillin') setPreset(300, 8.0, 80);
+            else if (val === 'paracetamol') setPreset(300, 8.0, 80);
+            else setPreset(480, 4.0, 45);
+        }
+
         function calculateSim() {
             const stock = Math.max(0, parseFloat(document.getElementById('simStock').value) || 0);
             const burn = Math.max(0, parseFloat(document.getElementById('simBurnRate').value) || 0);
             const days = Math.max(0, parseFloat(document.getElementById('simDays').value) || 0);
 
-            const daysToDeplete = burn > 0 ? (stock / burn).toFixed(1) : 'Tak Hingga';
+            const daysToDeplete = burn > 0 ? simDecimal.format(stock / burn) : simStrings.infinite;
             const expectedConsumption = Math.floor(burn * days);
             const projectedWaste = Math.max(0, stock - expectedConsumption);
             const wasteRatio = stock > 0 ? ((projectedWaste / stock) * 100).toFixed(1) : '0.0';
 
-            document.getElementById('outDeplete').textContent = daysToDeplete + (burn > 0 ? ' hari' : '');
-            document.getElementById('outConsumed').textContent = expectedConsumption + ' unit';
-            document.getElementById('outWaste').textContent = projectedWaste + ' unit';
-            document.getElementById('outRatio').textContent = wasteRatio + '%';
+            document.getElementById('outDeplete').textContent = burn > 0
+                ? simStrings.days_suffix.replace(':value', daysToDeplete)
+                : daysToDeplete;
+            document.getElementById('outConsumed').textContent = simStrings.unit_suffix.replace(':value', simInteger.format(expectedConsumption));
+            document.getElementById('outWaste').textContent = simStrings.unit_suffix.replace(':value', simInteger.format(projectedWaste));
+            document.getElementById('outRatio').textContent = simDecimal.format(wasteRatio) + '%';
 
             const badge = document.getElementById('outRiskBadge');
             const action = document.getElementById('outAction');
 
             if (projectedWaste === 0) {
                 badge.className = 'inline-block mt-1 px-3 py-1 text-xs font-bold rounded bg-slate-100 text-slate-700 border border-slate-300';
-                badge.textContent = '[LOW: Konsumsi Cukup Sebelum Kedaluwarsa]';
-                action.textContent = 'Stok aman, tidak memerlukan tindakan redistribusi.';
+                badge.textContent = simStrings.low_badge;
+                action.textContent = simStrings.low_action;
                 action.className = 'text-xs font-bold text-slate-700';
             } else if (days <= 30) {
                 badge.className = 'inline-block mt-1 px-3 py-1 text-xs font-bold rounded bg-red-100 text-[#B33A0A] border border-red-300';
-                badge.textContent = '[CRITICAL: Kedaluwarsa <= 30 Hari, ' + projectedWaste + ' unit terancam musnah]';
-                action.textContent = 'Mendesak! Segera koordinasikan transfer hari ini.';
+                badge.textContent = simStrings.critical_badge.replace(':count', simInteger.format(projectedWaste));
+                action.textContent = simStrings.critical_action;
                 action.className = 'text-xs font-bold text-[#B33A0A]';
             } else if (days <= 60 || parseFloat(wasteRatio) >= 25) {
                 badge.className = 'inline-block mt-1 px-3 py-1 text-xs font-bold rounded bg-orange-100 text-[#B33A0A] border border-orange-300';
-                badge.textContent = '[HIGH RISK: ' + projectedWaste + ' unit (' + wasteRatio + '%) proyeksi limbah]';
-                action.textContent = 'Wajib diajukan usulan redistribusi ke faskes kandidat.';
+                badge.textContent = simStrings.high_badge
+                    .replace(':count', simInteger.format(projectedWaste))
+                    .replace(':ratio', simDecimal.format(wasteRatio));
+                action.textContent = simStrings.high_action;
                 action.className = 'text-xs font-bold text-[#1D4ED8]';
             } else {
                 badge.className = 'inline-block mt-1 px-3 py-1 text-xs font-bold rounded bg-amber-100 text-[#B7791F] border border-amber-300';
-                badge.textContent = '[MEDIUM: ' + projectedWaste + ' unit proyeksi sisa]';
-                action.textContent = 'Pantau peningkatan laju konsumsi mingguan.';
+                badge.textContent = simStrings.medium_badge.replace(':count', simInteger.format(projectedWaste));
+                action.textContent = simStrings.medium_action;
                 action.className = 'text-xs font-bold text-[#B7791F]';
             }
         }
+
+        calculateSim();
     </script>
 </body>
 

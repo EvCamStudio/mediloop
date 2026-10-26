@@ -1,6 +1,7 @@
 import './mediloop-shell';
 import './form-validation';
 import './batch-form';
+import { t } from './i18n';
 
 const passwordToggles = document.querySelectorAll('[data-password-toggle]');
 
@@ -15,8 +16,8 @@ passwordToggles.forEach((toggle) => {
         return;
     }
 
-    const showLabel = toggle.dataset.labelShow ?? 'Tampilkan password';
-    const hideLabel = toggle.dataset.labelHide ?? 'Sembunyikan password';
+    const showLabel = toggle.dataset.labelShow ?? t('js.password.show');
+    const hideLabel = toggle.dataset.labelHide ?? t('js.password.hide');
 
     toggle.addEventListener('click', () => {
         const isVisible = input.type === 'text';

@@ -1,0 +1,106 @@
+<?php
+
+return [
+
+    'meta_description' => 'MediLoop membantu fasilitas kesehatan mencegah pemusnahan obat kedaluwarsa melalui koordinasi redistribusi stok yang aman, terdokumentasi, dan berbasis keputusan petugas.',
+    'title' => 'MediLoop — Platform Pendukung Keputusan Redistribusi Obat Antarfaskes',
+    'top_badge' => 'Hanya Pendukung Keputusan',
+    'nav' => [
+        'simulator' => 'Kalkulator Simulasi',
+        'principles' => 'Prinsip Sistem',
+        'open_dashboard' => 'Buka Dashboard',
+    ],
+
+    'hero' => [
+        'badge' => 'Sistem Pendukung Keputusan Hibah & Redistribusi Obat Antarfaskes',
+        'title' => 'Cegah Pemusnahan Obat Kedaluwarsa Melalui Koordinasi Antarfaskes.',
+        'body' => 'MediLoop mendeteksi surplus obat berisiko kedaluwarsa di rumah sakit dan mencocokkannya dengan kebutuhan riil puskesmas terdekat secara terukur, aman, dan patuh regulasi Kemenkes.',
+        'cta_simulation' => 'Mulai Simulasi',
+        'cta_algorithm' => 'Uji Algoritma Prediksi Limbah',
+        'phi_title' => 'Zero Data Pasien',
+        'phi_body' => 'Logistik batch tanpa identitas rekam medis (PHI).',
+        'approval_title' => 'Persetujuan Manusia',
+        'approval_body' => 'Wajib disahkan Kepala Instalasi Farmasi.',
+        'invariant_title' => 'Invarian Mutlak',
+        'invariant_body' => 'Stok hanya termutasi saat fisik terkonfirmasi tiba.',
+    ],
+
+    'chips' => [
+        'waste_projection' => 'Proyeksi limbah :count unit',
+        'remaining_days' => 'Sisa :days hari',
+        'facility_recommendation' => 'Rekomendasi faskes',
+        'cold_chain_ready' => 'Siap rantai dingin',
+        'example_score' => 'Contoh skor 92%',
+        'simulation_note' => 'Simulasi kasus PRD — data contoh, bukan data operasional.',
+    ],
+
+    'simulator' => [
+        'eyebrow' => 'Algoritma PRD Section 9',
+        'title' => 'Kalkulator Simulasi Prediksi Limbah & Risiko Klinis',
+        'subtitle' => 'Coba ubah parameter stok, laju pemakaian harian (burn rate), dan sisa hari kedaluwarsa di bawah untuk melihat kalkulasi matematis secara langsung.',
+        'preset_label' => 'Pilih Preset Skenario:',
+        'medicine_select' => 'Pilih jenis obat:',
+        'choose_medicine' => 'Pilih obat...',
+        'preset_benchmark' => 'Benchmark PRD: Ceftriaxone (480 stok, 4/hari, 45 hari)',
+        'preset_critical' => 'Kritis: Insulin Cold-Chain (120 stok, 1/hari, 28 hari)',
+        'preset_safe' => 'Aman: Amoxicillin (300 stok, 8/hari, 80 hari)',
+        'stock_label' => 'Stok Fisik Saat Ini (S)',
+        'burn_label' => 'Laju Pemakaian Harian (B)',
+        'expiry_label' => 'Sisa Waktu Kedaluwarsa (D_exp)',
+        'unit' => 'Unit',
+        'unit_per_day' => 'Unit/hari',
+        'days' => 'Hari',
+        'results_title' => 'Hasil Evaluasi Algoritma:',
+        'days_to_deplete' => 'Hari Habis (D_dep):',
+        'projected_consumption' => 'Proyeksi Terpakai:',
+        'projected_waste' => 'Proyeksi Limbah (W):',
+        'waste_ratio' => 'Rasio Limbah:',
+        'risk_classification' => 'Klasifikasi Tingkat Risiko Klinis:',
+        'recommendation' => 'Rekomendasi Tindakan:',
+        'initial_days' => '120,0 hari',
+        'initial_consumed' => '180 unit',
+        'initial_waste' => '300 unit',
+        'initial_badge' => '[HIGH RISK: 300 unit proyeksi terbuang]',
+        'initial_action' => 'Wajib diajukan redistribusi ke faskes sekunder',
+        'js' => [
+            'infinite' => 'Tak Hingga',
+            'days_suffix' => ':value hari',
+            'unit_suffix' => ':value unit',
+            'low_badge' => '[LOW: Konsumsi Cukup Sebelum Kedaluwarsa]',
+            'low_action' => 'Stok aman, tidak memerlukan tindakan redistribusi.',
+            'critical_badge' => '[CRITICAL: Kedaluwarsa <= 30 Hari, :count unit terancam musnah]',
+            'critical_action' => 'Mendesak! Segera koordinasikan transfer hari ini.',
+            'high_badge' => '[HIGH RISK: :count unit (:ratio%) proyeksi limbah]',
+            'high_action' => 'Wajib diajukan usulan redistribusi ke faskes kandidat.',
+            'medium_badge' => '[MEDIUM: :count unit proyeksi sisa]',
+            'medium_action' => 'Pantau peningkatan laju konsumsi mingguan.',
+        ],
+    ],
+
+    'principles' => [
+        'eyebrow' => 'Tata Kelola & Kepatuhan',
+        'title' => '4 Batasan Arsitektur & Prinsip Regulasi',
+        'subtitle' => 'MediLoop dirancang secara khusus untuk memenuhi standar distribusi kefarmasian Indonesia tanpa celah komersialisasi liar atau pelanggaran data pribadi.',
+        'one_title' => 'Bukan Marketplace Terbuka (Decision Support Only)',
+        'one_body' => 'Sistem tidak melakukan transaksi otomatis atau jual-beli bebas. MediLoop bertindak murni sebagai pendukung keputusan berbasis data. Setiap usulan redistribusi hibah wajib mendapatkan persetujuan manual bertingkat dari Kepala Instalasi Farmasi dan Direktur Faskes terkait.',
+        'two_title' => 'Nol Data Pribadi Pasien (Zero PHI)',
+        'two_body' => 'Sistem sama sekali tidak menyimpan rekam medis, identitas pasien, atau resep individual. Data yang diproses murni berupa agregat logistik: nomor batch pabrik, tanggal kedaluwarsa, dan rata-rata pengeluaran stok per hari sesuai UU Perlindungan Data Pribadi (UU PDP).',
+        'three_title' => 'Pencocokan Cerdas & Pembatas Serapan (Intake Cap)',
+        'three_body' => 'Kandidat penerima dihitung menggunakan rumus Jarak Haversine (30%), Kebutuhan Riil (50%), dan Kesiapan Cold-Chain (20%). Dilengkapi algoritma pembatas jumlah serapan agar obat yang dipindahkan tidak mengalami kedaluwarsa sekunder di tempat penerima.',
+        'four_title' => 'Invarian Stok Non-Destruktif',
+        'four_body' => 'Saldo persediaan donor tidak pernah dipotong selama tahap pengusulan, persetujuan, atau perjalanan fisik kurir. Pengurangan stok donor dan penambahan stok penerima terjadi secara atomik HANYA saat obat diverifikasi secara fisik oleh penanggung jawab penerima.',
+    ],
+
+    'cta' => [
+        'title' => 'Siap Menguji Alur Redistribusi Obat Secara Lengkap?',
+        'body' => 'Masuk dengan akun fasilitas kesehatan Anda untuk menguji alur pengusulan, persetujuan, penerimaan, hingga audit pengawasan. Fasilitas baru dapat mengajukan verifikasi tanpa membuat akun terlebih dahulu.',
+        'sign_in' => 'Masuk ke Dashboard',
+        'request_facility' => 'Ajukan Fasilitas',
+    ],
+
+    'footer' => [
+        'competition' => 'Dikembangkan untuk Kompetisi Inovasi Layanan Kesehatan Digital 2026.',
+        'standards' => 'Bebas ketergantungan framework eksternal pada kalkulasi domain · WCAG 2.2 Level AA',
+    ],
+
+];

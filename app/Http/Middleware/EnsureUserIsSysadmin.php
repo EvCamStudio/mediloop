@@ -14,7 +14,7 @@ class EnsureUserIsSysadmin
     public function handle(Request $request, Closure $next): Response
     {
         if (! $request->user()?->isSysadmin()) {
-            abort(403, 'Halaman ini hanya untuk administrator platform.');
+            abort(403, __('http.sysadmin_only'));
         }
 
         return $next($request);

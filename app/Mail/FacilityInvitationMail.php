@@ -24,7 +24,7 @@ class FacilityInvitationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Undangan bergabung dengan '.$this->facility->name,
+            subject: __('emails.invitation.subject', ['facility' => $this->facility->name]),
         );
     }
 

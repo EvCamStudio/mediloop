@@ -1,22 +1,22 @@
-@extends('layouts.mediloop', ['title' => 'Lacak Transfer #' . $transfer->transfer_code])
+@extends('layouts.mediloop', ['title' => __('transfers.show.page_title', ['code' => $transfer->transfer_code])])
 
 @section('content')
 @php
     $statusLabels = [
-        'PROPOSED' => ['label' => 'Menunggu otorisasi donor', 'tone' => 'pending'],
-        'APPROVED' => ['label' => 'Menunggu kesediaan penerima', 'tone' => 'active'],
-        'ACCEPTED' => ['label' => 'Siap kirim', 'tone' => 'active'],
-        'IN_TRANSIT' => ['label' => 'Dalam pengiriman', 'tone' => 'transit'],
-        'COMPLETED' => ['label' => 'Selesai', 'tone' => 'inactive'],
-        'CANCELLED' => ['label' => 'Dibatalkan', 'tone' => 'suspended'],
+        'PROPOSED' => ['label' => __('transfers.show.status.proposed'), 'tone' => 'pending'],
+        'APPROVED' => ['label' => __('transfers.show.status.approved'), 'tone' => 'active'],
+        'ACCEPTED' => ['label' => __('transfers.tabs.ready_to_ship'), 'tone' => 'active'],
+        'IN_TRANSIT' => ['label' => __('transfers.tabs.in_transit'), 'tone' => 'transit'],
+        'COMPLETED' => ['label' => __('transfers.tabs.completed'), 'tone' => 'inactive'],
+        'CANCELLED' => ['label' => __('transfers.tabs.cancelled'), 'tone' => 'suspended'],
     ];
     $statusMeta = $statusLabels[$transfer->status] ?? ['label' => $transfer->status, 'tone' => 'inactive'];
     $stages = [
-        'PROPOSED' => ['label' => 'Pengusulan', 'time' => $transfer->proposed_at],
-        'APPROVED' => ['label' => 'Otorisasi donor', 'time' => $transfer->approved_at],
-        'ACCEPTED' => ['label' => 'Kesediaan penerima', 'time' => $transfer->accepted_at],
-        'IN_TRANSIT' => ['label' => 'Pengiriman', 'time' => $transfer->shipped_at],
-        'COMPLETED' => ['label' => 'Penerimaan & mutasi', 'time' => $transfer->completed_at],
+        'PROPOSED' => ['label' => __('transfers.show.stages.proposed'), 'time' => $transfer->proposed_at],
+        'APPROVED' => ['label' => __('transfers.show.stages.approved'), 'time' => $transfer->approved_at],
+        'ACCEPTED' => ['label' => __('transfers.show.stages.accepted'), 'time' => $transfer->accepted_at],
+        'IN_TRANSIT' => ['label' => __('transfers.show.stages.in_transit'), 'time' => $transfer->shipped_at],
+        'COMPLETED' => ['label' => __('transfers.show.stages.completed'), 'time' => $transfer->completed_at],
     ];
     $statusOrder = ['PROPOSED' => 1, 'APPROVED' => 2, 'ACCEPTED' => 3, 'IN_TRANSIT' => 4, 'COMPLETED' => 5];
     $currentRank = $statusOrder[$transfer->status] ?? 0;
@@ -32,10 +32,10 @@
 @endphp
 
 <div class="ml-page-admin">
-    <nav class="ml-breadcrumb" aria-label="Breadcrumb">
-        <a href="{{ route('dashboard') }}">Dashboard</a>
+    <nav class="ml-breadcrumb" aria-label="{{ __('transfers.breadcrumb_aria') }}">
+        <a href="{{ route('dashboard') }}">{{ __('navigation.dashboard') }}</a>
         <span class="ml-breadcrumb-sep">/</span>
-        <a href="{{ route('transfers.index') }}">Redistribusi</a>
+        <a href="{{ route('transfers.index') }}">{{ __('transfers.breadcrumb') }}</a>
         <span class="ml-breadcrumb-sep">/</span>
         <span>{{ $transfer->transfer_code }}</span>
     </nav>
@@ -46,7 +46,7 @@
 
     @if($errors->any())
         <div class="ml-alert ml-alert-error" role="alert">
-            <strong>Periksa kembali isian berikut:</strong>
+            <strong>{{ __('transfers.show.errors_heading') }}</strong>
             <ul>
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -61,11 +61,8 @@
             <path d="M12 8v4m0 4h.01" />
         </svg>
         <div>
-            <strong>Kepatuhan regulasi kefarmasian</strong>
-            <p>
-                MediLoop adalah sistem pendukung keputusan, bukan marketplace. Setiap otorisasi transfer
-                tetap memerlukan persetujuan petugas berwenang dan verifikasi penerimaan fisik.
-            </p>
+            <strong>{{ __('transfers.compliance.title') }}</strong>
+            <p>{{ __('transfers.compliance.tracking') }}</p>
         </div>
     </div>
 
@@ -78,7 +75,7 @@
                 </svg>
             </span>
             <div class="ml-passport-copy">
-                <p class="ml-passport-eyebrow">Transfer obat · {{ $transfer->transfer_code }}</p>
+                <p class="ml-passport-eyebrow">{{ __('transfers.show.eyebrow', ['code' => $transfer->transfer_code]) }}</p>
                 <div class="ml-passport-title-row">
                     <h1 class="ml-page-title">{{ $transfer->batch->medicine->name }}</h1>
                     <span class="ml-status ml-status-{{ $statusMeta['tone'] }}">{{ $statusMeta['label'] }}</span>
@@ -86,24 +83,24 @@
                 <p class="ml-passport-meta">
                     {{ number_format($transfer->quantity) }} {{ $transfer->batch->medicine->unit }}
                     <span class="ml-meta-dot">·</span>
-                    Diajukan {{ $transfer->created_at->format('d M Y, H:i') }}
+                    {{ __('transfers.show.submitted_at', ['date' => $transfer->created_at->format('d M Y, H:i')]) }}
                     <span class="ml-meta-dot">·</span>
-                    Skor {{ $transfer->match_score }}%
+                    {{ __('transfers.show.score', ['score' => $transfer->match_score]) }}
                 </p>
             </div>
         </div>
         <div class="ml-passport-actions">
-            <a href="{{ route('transfers.index') }}" class="ml-btn-quiet">Kembali ke daftar</a>
+            <a href="{{ route('transfers.index') }}" class="ml-btn-quiet">{{ __('transfers.show.back_to_list') }}</a>
         </div>
     </header>
 
     <section class="ml-card" aria-labelledby="progress-title">
         <div class="ml-card-head ml-card-head-split">
             <div>
-                <h2 class="ml-card-title" id="progress-title">Progres transfer</h2>
-                <p class="ml-card-sub">Setiap tahap memerlukan otorisasi pihak yang berwenang.</p>
+                <h2 class="ml-card-title" id="progress-title">{{ __('transfers.show.progress.title') }}</h2>
+                <p class="ml-card-sub">{{ __('transfers.show.progress.subtitle') }}</p>
             </div>
-            <span class="ml-card-index" aria-hidden="true">5 TAHAP</span>
+            <span class="ml-card-index" aria-hidden="true">{{ __('transfers.show.progress.stage_count') }}</span>
         </div>
         <div class="ml-card-body">
             <ol class="ml-transfer-stages">
@@ -123,7 +120,7 @@
                         </span>
                         <span class="ml-transfer-stage-copy">
                             <span class="ml-transfer-stage-label">{{ $stage['label'] }}</span>
-                            <span class="ml-transfer-stage-time">{{ $stage['time'] ? $stage['time']->format('d M Y, H:i') : 'Menunggu' }}</span>
+                            <span class="ml-transfer-stage-time">{{ $stage['time'] ? $stage['time']->format('d M Y, H:i') : __('transfers.show.awaiting') }}</span>
                         </span>
                     </li>
                 @endforeach
@@ -135,20 +132,19 @@
         <div>
             @if($transfer->status !== 'COMPLETED')
                 <div class="ml-alert ml-alert-warning ml-invariant-note" role="status">
-                    <strong>Stok donor belum dipotong</strong>
-                    <p>
-                        Mutasi stok donor dan penerima hanya dijalankan saat penerima mengonfirmasi
-                        penerimaan fisik. Sebelum tahap itu, stok donor tetap utuh.
-                    </p>
+                    <strong>{{ __('transfers.show.invariant.pending_title') }}</strong>
+                    <p>{{ __('transfers.show.invariant.pending_body') }}</p>
                 </div>
             @else
                 <div class="ml-alert ml-alert-success ml-invariant-note" role="status">
-                    <strong>Mutasi stok selesai</strong>
-                    <p>
-                        {{ number_format($transfer->quantity) }} {{ $transfer->batch->medicine->unit }}
-                        telah dipotong dari {{ $transfer->donorFacility->name }} dan ditambahkan ke
-                        {{ $transfer->recipientFacility->name }} pada {{ $transfer->completed_at?->format('d M Y, H:i') }}.
-                    </p>
+                    <strong>{{ __('transfers.show.invariant.completed_title') }}</strong>
+                    <p>{{ __('transfers.show.invariant.completed_body', [
+                        'quantity' => number_format($transfer->quantity),
+                        'unit' => $transfer->batch->medicine->unit,
+                        'donor' => $transfer->donorFacility->name,
+                        'recipient' => $transfer->recipientFacility->name,
+                        'date' => $transfer->completed_at?->format('d M Y, H:i'),
+                    ]) }}</p>
                 </div>
             @endif
 
@@ -156,89 +152,87 @@
                 <section class="ml-card ml-action-panel" aria-labelledby="action-title">
                     <div class="ml-card-head ml-card-head-split">
                         <div>
-                            <h2 class="ml-card-title" id="action-title">Tindakan tahap ini</h2>
+                            <h2 class="ml-card-title" id="action-title">{{ __('transfers.show.action.title') }}</h2>
                             <p class="ml-card-sub">{{ $user->name }} · {{ $user->job_title }}</p>
                         </div>
                         <span class="ml-role-chip">{{ \App\Enums\UserRole::tryFrom($user->role)?->label() ?? $user->role }}</span>
                     </div>
                     <div class="ml-card-body">
                         @if($transfer->status === 'PROPOSED')
-                            <p class="ml-action-copy">Menunggu persetujuan Kepala Instalasi Farmasi fasilitas donor.</p>
+                            <p class="ml-action-copy">{{ __('transfers.show.action.awaiting_approval') }}</p>
                             @if($canApprove)
                                 <form method="POST" action="{{ route('transfers.approve', $transfer) }}">
                                     @csrf
-                                    <button type="submit" class="ml-btn-primary">Setujui pengeluaran obat</button>
+                                    <button type="submit" class="ml-btn-primary">{{ __('transfers.show.action.approve') }}</button>
                                 </form>
                             @else
-                                <p class="ml-action-note">Hanya Kepala Instalasi Farmasi fasilitas donor yang berwenang menyetujui tahap ini.</p>
+                                <p class="ml-action-note">{{ __('transfers.show.action.approve_note') }}</p>
                             @endif
                         @elseif($transfer->status === 'APPROVED')
-                            <p class="ml-action-copy">Donor telah menyetujui. Menunggu kesediaan menerima dari fasilitas penerima.</p>
+                            <p class="ml-action-copy">{{ __('transfers.show.action.awaiting_acceptance') }}</p>
                             @if($canAccept)
                                 <form method="POST" action="{{ route('transfers.accept', $transfer) }}">
                                     @csrf
-                                    <button type="submit" class="ml-btn-primary">Konfirmasi kesediaan menerima</button>
+                                    <button type="submit" class="ml-btn-primary">{{ __('transfers.show.action.accept') }}</button>
                                 </form>
                             @else
-                                <p class="ml-action-note">Hanya Apoteker atau Kepala Fasilitas penerima yang berwenang.</p>
+                                <p class="ml-action-note">{{ __('transfers.show.action.accept_note') }}</p>
                             @endif
                         @elseif($transfer->status === 'ACCEPTED')
-                            <p class="ml-action-copy">Penerima siap. Masukkan rincian kurir untuk memberangkatkan obat.</p>
+                            <p class="ml-action-copy">{{ __('transfers.show.action.ready_to_dispatch') }}</p>
                             @if($canDispatch)
                                 <form method="POST" action="{{ route('transfers.dispatch', $transfer) }}">
                                     @csrf
                                     <div class="ml-form-grid">
                                         <div class="ml-field">
-                                            <label for="courier_type" class="ml-label">Jenis kurir / transportasi <span class="ml-required">*</span></label>
-                                            <input id="courier_type" name="courier_type" type="text" class="ml-input" value="{{ old('courier_type', 'Kurir farmasi berpendingin (cold-box)') }}" required>
+                                            <label for="courier_type" class="ml-label">{{ __('transfers.show.action.courier_label') }} <span class="ml-required">*</span></label>
+                                            <input id="courier_type" name="courier_type" type="text" class="ml-input" value="{{ old('courier_type', __('transfers.show.action.courier_default')) }}" required>
                                         </div>
                                         <div class="ml-field">
-                                            <label for="tracking_number" class="ml-label">Nomor resi / surat jalan <span class="ml-required">*</span></label>
+                                            <label for="tracking_number" class="ml-label">{{ __('transfers.show.action.tracking_label') }} <span class="ml-required">*</span></label>
                                             <input
                                                 id="tracking_number"
                                                 name="tracking_number"
                                                 type="text"
                                                 class="ml-input is-mono"
                                                 value="{{ old('tracking_number') }}"
-                                                placeholder="Contoh: EXP-DKI-2026-001"
+                                                placeholder="{{ __('transfers.show.action.tracking_placeholder') }}"
                                                 aria-describedby="tracking-number-help"
                                                 autocomplete="off"
                                                 required
                                             >
-                                            <p id="tracking-number-help" class="ml-help">Isi sesuai nomor resi atau surat jalan fisik.</p>
+                                            <p id="tracking-number-help" class="ml-help">{{ __('transfers.show.action.tracking_help') }}</p>
                                         </div>
                                     </div>
-                                    <button type="submit" class="ml-btn-primary">Berangkatkan pengiriman</button>
+                                    <button type="submit" class="ml-btn-primary">{{ __('transfers.show.action.dispatch') }}</button>
                                 </form>
                             @else
-                                <p class="ml-action-note">Hanya staf fasilitas donor yang dapat memberangkatkan pengiriman.</p>
+                                <p class="ml-action-note">{{ __('transfers.show.action.dispatch_note') }}</p>
                             @endif
                         @elseif($transfer->status === 'IN_TRANSIT')
                             <div class="ml-transit-banner">
-                                <span class="ml-detail-label">Sedang dalam perjalanan</span>
+                                <span class="ml-detail-label">{{ __('transfers.show.action.in_transit_label') }}</span>
                                 <div class="ml-transit-meta">
-                                    <span>Resi <strong>{{ $transfer->tracking_number }}</strong></span>
+                                    <span>{{ __('transfers.show.action.tracking_short') }} <strong>{{ $transfer->tracking_number }}</strong></span>
                                     <span>{{ $transfer->courier_type }}</span>
                                 </div>
                             </div>
-                            <p class="ml-action-copy">
-                                Penerima memeriksa kondisi fisik, segel kemasan, dan suhu dingin sebelum mengonfirmasi penerimaan.
-                            </p>
+                            <p class="ml-action-copy">{{ __('transfers.show.action.verify_copy') }}</p>
                             @if($canComplete)
                                 <form method="POST" action="{{ route('transfers.complete', $transfer) }}">
                                     @csrf
-                                    <button type="submit" class="ml-btn-primary">Konfirmasi penerimaan fisik &amp; mutasi stok</button>
+                                    <button type="submit" class="ml-btn-primary">{{ __('transfers.show.action.complete') }}</button>
                                 </form>
                             @else
-                                <p class="ml-action-note">Menunggu konfirmasi Kepala Fasilitas penerima sebelum stok dimutasi.</p>
+                                <p class="ml-action-note">{{ __('transfers.show.action.complete_note') }}</p>
                             @endif
                         @endif
 
                         @if($canCancel)
                             <div class="ml-action-cancel">
-                                <form method="POST" action="{{ route('transfers.cancel', $transfer) }}" onsubmit="return confirm('Batalkan transfer ini? Tindakan tidak dapat dibatalkan.');">
+                                <form method="POST" action="{{ route('transfers.cancel', $transfer) }}" onsubmit="return confirm('{{ __('transfers.show.action.cancel_confirm') }}');">
                                     @csrf
-                                    <button type="submit" class="ml-link-action ml-link-danger">Batalkan transfer</button>
+                                    <button type="submit" class="ml-link-action ml-link-danger">{{ __('transfers.show.action.cancel') }}</button>
                                 </form>
                             </div>
                         @endif
@@ -249,40 +243,40 @@
             <section class="ml-card" aria-labelledby="details-title">
                 <div class="ml-card-head ml-card-head-split">
                     <div>
-                        <h2 class="ml-card-title" id="details-title">Detail logistik</h2>
-                        <p class="ml-card-sub">Rute, jumlah, dan hasil pencocokan kandidat.</p>
+                        <h2 class="ml-card-title" id="details-title">{{ __('transfers.show.details.title') }}</h2>
+                        <p class="ml-card-sub">{{ __('transfers.show.details.subtitle') }}</p>
                     </div>
-                    <span class="ml-card-index" aria-hidden="true">DATA</span>
+                    <span class="ml-card-index" aria-hidden="true">{{ __('transfers.show.details.index_label') }}</span>
                 </div>
                 <div class="ml-card-body">
                     <div class="ml-detail-grid">
                         <div>
-                            <div class="ml-detail-label">Batch</div>
+                            <div class="ml-detail-label">{{ __('transfers.show.details.batch') }}</div>
                             <div class="ml-detail-value is-mono">{{ $transfer->batch->batch_number }}</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Jumlah</div>
+                            <div class="ml-detail-label">{{ __('common.quantity') }}</div>
                             <div class="ml-detail-value">{{ number_format($transfer->quantity) }} {{ $transfer->batch->medicine->unit }}</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Donor</div>
+                            <div class="ml-detail-label">{{ __('transfers.show.details.donor') }}</div>
                             <div class="ml-detail-value">{{ $transfer->donorFacility->name }}</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Penerima</div>
+                            <div class="ml-detail-label">{{ __('transfers.show.details.recipient') }}</div>
                             <div class="ml-detail-value">{{ $transfer->recipientFacility->name }}</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Jarak udara</div>
+                            <div class="ml-detail-label">{{ __('transfers.show.details.distance') }}</div>
                             <div class="ml-detail-value">{{ $transfer->distance_km }} km</div>
                         </div>
                         <div>
-                            <div class="ml-detail-label">Batas serapan penerima</div>
-                            <div class="ml-detail-value">{{ $transfer->recipient_intake_cap }} unit</div>
+                            <div class="ml-detail-label">{{ __('transfers.show.details.intake_cap') }}</div>
+                            <div class="ml-detail-value">{{ $transfer->recipient_intake_cap }} {{ __('common.units') }}</div>
                         </div>
                         <div class="is-full">
-                            <div class="ml-detail-label">Catatan</div>
-                            <div class="ml-detail-value">{{ $transfer->notes ?: 'Tidak ada catatan tambahan.' }}</div>
+                            <div class="ml-detail-label">{{ __('common.notes') }}</div>
+                            <div class="ml-detail-value">{{ $transfer->notes ?: __('transfers.show.details.notes_empty') }}</div>
                         </div>
                     </div>
                 </div>
@@ -291,15 +285,15 @@
             <section class="ml-card" aria-labelledby="audit-title">
                 <div class="ml-card-head ml-card-head-split">
                     <div>
-                        <h2 class="ml-card-title" id="audit-title">Jejak audit</h2>
-                        <p class="ml-card-sub">Riwayat otorisasi dan perubahan status.</p>
+                        <h2 class="ml-card-title" id="audit-title">{{ __('transfers.show.audit.title') }}</h2>
+                        <p class="ml-card-sub">{{ __('transfers.show.audit.subtitle') }}</p>
                     </div>
-                    <span class="ml-card-index" aria-hidden="true">LOG</span>
+                    <span class="ml-card-index" aria-hidden="true">{{ __('transfers.show.audit.index_label') }}</span>
                 </div>
                 @if($transfer->auditLogs->isEmpty())
                     <div class="ml-empty-state">
-                        <p class="ml-empty-title">Belum ada catatan audit</p>
-                        <p class="ml-empty-copy">Aktivitas transfer akan muncul di sini.</p>
+                        <p class="ml-empty-title">{{ __('transfers.show.audit.empty_title') }}</p>
+                        <p class="ml-empty-copy">{{ __('transfers.show.audit.empty_copy') }}</p>
                     </div>
                 @else
                     <ol class="ml-audit-list">
@@ -308,7 +302,7 @@
                                 <span class="ml-audit-dot" aria-hidden="true"></span>
                                 <div class="ml-audit-time">{{ $log->created_at->format('d M Y · H:i') }}</div>
                                 <div class="ml-audit-body">
-                                    <strong>{{ $log->actor->name ?? 'Sistem' }}</strong>
+                                    <strong>{{ $log->actor->name ?? __('transfers.show.audit.system') }}</strong>
                                     <span>{{ $log->description }}</span>
                                     <code>{{ $log->action }}</code>
                                 </div>
@@ -322,44 +316,44 @@
         <aside>
             <section class="ml-card ml-sticky" aria-labelledby="summary-title">
                 <div class="ml-card-head">
-                    <h2 class="ml-card-title" id="summary-title">Ringkasan transfer</h2>
+                    <h2 class="ml-card-title" id="summary-title">{{ __('transfers.show.summary.title') }}</h2>
                 </div>
                 <div class="ml-card-body">
                     <div class="ml-route-vertical">
                         <div>
-                            <span class="ml-detail-label">Donor</span>
+                            <span class="ml-detail-label">{{ __('transfers.show.summary.donor') }}</span>
                             <div class="ml-detail-value">{{ $transfer->donorFacility->name }}</div>
                         </div>
                         <span class="ml-route-line" aria-hidden="true"></span>
                         <div>
-                            <span class="ml-detail-label">Penerima</span>
+                            <span class="ml-detail-label">{{ __('transfers.show.summary.recipient') }}</span>
                             <div class="ml-detail-value">{{ $transfer->recipientFacility->name }}</div>
                         </div>
                     </div>
 
                     <div class="ml-score-list">
                         <div class="ml-score-row">
-                            <span>Kebutuhan (50%)</span>
+                            <span>{{ __('transfers.show.scores.need') }}</span>
                             <strong>{{ $transfer->need_score }}%</strong>
                         </div>
                         <div class="ml-score-bar" aria-hidden="true"><span style="width: {{ $transfer->need_score }}%"></span></div>
                         <div class="ml-score-row">
-                            <span>Jarak (30%)</span>
+                            <span>{{ __('transfers.show.scores.proximity') }}</span>
                             <strong>{{ $transfer->proximity_score }}%</strong>
                         </div>
                         <div class="ml-score-bar" aria-hidden="true"><span style="width: {{ $transfer->proximity_score }}%"></span></div>
                         <div class="ml-score-row">
-                            <span>Logistik (20%)</span>
+                            <span>{{ __('transfers.show.scores.logistics') }}</span>
                             <strong>{{ $transfer->logistics_score }}%</strong>
                         </div>
                         <div class="ml-score-bar" aria-hidden="true"><span style="width: {{ $transfer->logistics_score }}%"></span></div>
                         <div class="ml-score-total">
-                            <span>Skor kecocokan</span>
+                            <span>{{ __('transfers.show.scores.match') }}</span>
                             <strong>{{ $transfer->match_score }}%</strong>
                         </div>
                     </div>
 
-                    <p class="ml-help">Rekomendasi bersifat saran. Setiap transfer memerlukan persetujuan petugas fasilitas.</p>
+                    <p class="ml-help">{{ __('transfers.show.summary.note') }}</p>
                 </div>
             </section>
         </aside>

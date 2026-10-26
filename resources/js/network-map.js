@@ -1,9 +1,15 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { intlLocale, t } from './i18n';
 
 const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 const TILE_ATTRIBUTION =
     '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+
+const decimalFormatter = new Intl.NumberFormat(intlLocale(), {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
 
 function hasCoordinates(point) {
     return Number.isFinite(point?.lat) && Number.isFinite(point?.lng);
@@ -11,10 +17,10 @@ function hasCoordinates(point) {
 
 function distanceLabel(distanceKm) {
     if (!Number.isFinite(distanceKm)) {
-        return 'Jarak tidak tersedia';
+        return t('js.network_map.distance_unavailable');
     }
 
-    return `${distanceKm.toFixed(2).replace('.', ',')} km dari faskes Anda`;
+    return t('js.network_map.distance_from_facility', { distance: decimalFormatter.format(distanceKm) });
 }
 
 function originIcon() {
@@ -62,14 +68,14 @@ function buildPopup(facility, isOrigin = false) {
 
     const distance = document.createElement('p');
     distance.className = 'ml-map-popup-distance';
-    distance.textContent = isOrigin ? 'Faskes asal perhitungan jarak' : distanceLabel(facility.distanceKm);
+    distance.textContent = isOrigin ? t('js.network_map.origin') : distanceLabel(facility.distanceKm);
 
     root.append(title, meta, distance);
 
     if (facility.coldChainReady) {
         const coldChain = document.createElement('p');
         coldChain.className = 'ml-map-popup-cold';
-        coldChain.textContent = 'Siap rantai dingin';
+        coldChain.textContent = t('js.network_map.cold_chain_ready');
         root.append(coldChain);
     }
 
@@ -81,7 +87,7 @@ function addZoomHint(map) {
 
     hint.onAdd = () => {
         const element = L.DomUtil.create('div', 'ml-map-hint');
-        element.textContent = 'Ctrl + scroll untuk zoom';
+        element.textContent = t('js.network_map.zoom_hint');
 
         return element;
     };
@@ -95,7 +101,7 @@ function addRadiusControl(map, radiusBounds, maxRadiusKm) {
     control.onAdd = () => {
         const button = L.DomUtil.create('button', 'ml-map-radius-btn');
         button.type = 'button';
-        button.textContent = `Lihat radius ${maxRadiusKm} km`;
+        button.textContent = t('js.network_map.show_radius', { radius: maxRadiusKm });
         L.DomEvent.disableClickPropagation(button);
         button.addEventListener('click', () => {
             map.fitBounds(radiusBounds, { padding: [24, 24] });
@@ -121,7 +127,7 @@ function initNetworkMap() {
         data = JSON.parse(dataElement.textContent ?? '{}');
     } catch {
         container.querySelector('.ml-network-map-fallback')?.replaceChildren(
-            document.createTextNode('Data peta tidak dapat dibaca. Gunakan daftar faskes di bawah.')
+            document.createTextNode(t('js.network_map.invalid_data'))
         );
 
         return;
@@ -159,8 +165,8 @@ function initNetworkMap() {
         L.marker([origin.lat, origin.lng], {
             icon: originIcon(),
             keyboard: true,
-            title: `${origin.name} (faskes Anda)`,
-            alt: `${origin.name}, faskes Anda`,
+            title: `${origin.name} (${t('navigation.your_facility')})`,
+            alt: `${origin.name}, ${t('navigation.your_facility')}`,
             zIndexOffset: 1000,
         })
             .bindPopup(buildPopup(origin, true))

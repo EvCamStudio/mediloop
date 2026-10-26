@@ -134,9 +134,9 @@ test('the dispatch form shows the compliance notice and does not prefill a track
     $this->actingAs($fixture['donor']['staff'])
         ->get(route('transfers.show', $fixture['transfer']))
         ->assertOk()
-        ->assertSee('Kepatuhan regulasi kefarmasian')
-        ->assertSee('Contoh: EXP-DKI-2026-001')
-        ->assertSee('Isi sesuai nomor resi atau surat jalan fisik.')
+        ->assertSee('Pharmacy regulatory compliance')
+        ->assertSee('Example: EXP-DKI-2026-001')
+        ->assertSee('Enter the number from the physical tracking slip or delivery note.')
         ->assertDontSee('value="EXP-DKI-', false);
 });
 

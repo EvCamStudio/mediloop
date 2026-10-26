@@ -213,6 +213,6 @@ test('audit oversight page renders for dinkes auditor', function () {
     $response = $this->actingAs($auditor)->get('/audit');
 
     $response->assertStatus(200);
-    $response->assertSee('Pengawasan Logistik');
-    $response->assertSee('Jejak Audit Sistem');
+    $response->assertSee('Regional Oversight & Audit');
+    $response->assertSee('System Audit Trail');
 });

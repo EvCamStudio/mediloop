@@ -57,18 +57,18 @@ class PublicFacilityRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama fasilitas wajib diisi.',
-            'code.unique' => 'Kode fasilitas sudah terdaftar. Hubungi administrator bila ini fasilitas Anda.',
-            'type.required' => 'Pilih jenis fasilitas.',
-            'address.required' => 'Alamat lengkap wajib diisi.',
-            'city.required' => 'Kota/kabupaten wajib diisi.',
-            'province.required' => 'Provinsi wajib diisi.',
-            'latitude.required' => 'Tentukan titik lokasi fasilitas pada peta.',
-            'longitude.required' => 'Tentukan titik lokasi fasilitas pada peta.',
-            'contact_person.required' => 'Nama penanggung jawab wajib diisi.',
-            'phone.required' => 'Nomor telepon wajib diisi.',
-            'email.required' => 'Email resmi fasilitas wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
+            'name.required' => __('facility.request.name_required'),
+            'code.unique' => __('facility.request.code_unique'),
+            'type.required' => __('facility.request.type_required'),
+            'address.required' => __('facility.request.address_required'),
+            'city.required' => __('facility.request.city_required'),
+            'province.required' => __('facility.request.province_required'),
+            'latitude.required' => __('facility.request.coordinates_required'),
+            'longitude.required' => __('facility.request.coordinates_required'),
+            'contact_person.required' => __('facility.request.contact_person_required'),
+            'phone.required' => __('facility.request.phone_required'),
+            'email.required' => __('facility.request.email_required'),
+            'email.email' => __('facility.request.email_invalid'),
         ];
     }
 }

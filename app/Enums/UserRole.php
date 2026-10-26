@@ -5,17 +5,13 @@ namespace App\Enums;
 enum UserRole: string
 {
     case Sysadmin = 'SYSADMIN';
-    case DinkesAuditor = 'DINKES_AUDITOR';
-    case FacilityApprover = 'FACILITY_APPROVER';
     case FacilityStaff = 'FACILITY_STAFF';
 
     public function label(): string
     {
         return match ($this) {
-            self::Sysadmin => 'Administrator Platform',
-            self::DinkesAuditor => 'Auditor Dinkes',
-            self::FacilityApprover => 'Kepala Fasilitas',
-            self::FacilityStaff => 'Staf Farmasi',
+            self::Sysadmin => __('enums.user_role.sysadmin'),
+            self::FacilityStaff => __('enums.user_role.facility_staff'),
         };
     }
 
@@ -32,6 +28,6 @@ enum UserRole: string
      */
     public static function facilityValues(): array
     {
-        return [self::FacilityApprover->value, self::FacilityStaff->value];
+        return [self::FacilityStaff->value];
     }
 }

@@ -77,7 +77,7 @@ class FacilityController extends Controller
 
         return redirect()
             ->route('admin.facilities.show', $facility)
-            ->with('status', 'Fasilitas dibuat. Periksa data lalu verifikasi untuk mengaktifkan.');
+            ->with('status', __('admin.messages.created'));
     }
 
     public function show(Facility $facility): View
@@ -95,10 +95,10 @@ class FacilityController extends Controller
             'auditLogs' => $facility->auditLogs()->with('actor')->latest('created_at')->limit(20)->get(),
             'requestRecord' => FacilityRequest::where('facility_id', $facility->id)->latest()->first(),
             'verificationChecklist' => [
-                ['label' => 'Nomor izin fasilitas', 'complete' => filled($facility->license_number)],
-                ['label' => 'Alamat lengkap', 'complete' => filled($facility->address)],
-                ['label' => 'Titik koordinat', 'complete' => filled($facility->latitude) && filled($facility->longitude)],
-                ['label' => 'Kontak penanggung jawab', 'complete' => filled($facility->contact_person) && filled($facility->phone)],
+                ['label' => __('admin.checklist.license_number'), 'complete' => filled($facility->license_number)],
+                ['label' => __('admin.checklist.address'), 'complete' => filled($facility->address)],
+                ['label' => __('admin.checklist.coordinates'), 'complete' => filled($facility->latitude) && filled($facility->longitude)],
+                ['label' => __('admin.checklist.contact'), 'complete' => filled($facility->contact_person) && filled($facility->phone)],
             ],
         ]);
     }
@@ -117,7 +117,7 @@ class FacilityController extends Controller
 
         return redirect()
             ->route('admin.facilities.show', $facility)
-            ->with('status', 'Data fasilitas diperbarui.');
+            ->with('status', __('admin.messages.updated'));
     }
 
     public function verify(
@@ -126,12 +126,12 @@ class FacilityController extends Controller
         FacilityOnboardingService $onboarding,
     ): RedirectResponse {
         if ($facility->isActive()) {
-            return back()->with('status', 'Fasilitas sudah aktif.');
+            return back()->with('status', __('admin.messages.already_active'));
         }
 
         $onboarding->verifyFacility($facility, $request->user());
 
-        return back()->with('status', "Fasilitas {$facility->name} berhasil diverifikasi.");
+        return back()->with('status', __('admin.messages.verified', ['name' => $facility->name]));
     }
 
     public function suspend(
@@ -140,12 +140,12 @@ class FacilityController extends Controller
         FacilityOnboardingService $onboarding,
     ): RedirectResponse {
         if ($facility->status === FacilityStatus::Suspended->value) {
-            return back()->with('status', 'Fasilitas sudah ditangguhkan.');
+            return back()->with('status', __('admin.messages.already_suspended'));
         }
 
         $onboarding->suspendFacility($facility, $request->user());
 
-        return back()->with('status', "Fasilitas {$facility->name} ditangguhkan.");
+        return back()->with('status', __('admin.messages.suspended', ['name' => $facility->name]));
     }
 
     public function reactivate(
@@ -155,7 +155,7 @@ class FacilityController extends Controller
     ): RedirectResponse {
         $onboarding->reactivateFacility($facility, $request->user());
 
-        return back()->with('status', "Fasilitas {$facility->name} aktif kembali.");
+        return back()->with('status', __('admin.messages.reactivated', ['name' => $facility->name]));
     }
 
     public function invite(
@@ -181,7 +181,7 @@ class FacilityController extends Controller
             $user,
         );
 
-        return back()->with('status', 'Undangan dikirim. Tautan berlaku selama 7 hari.');
+        return back()->with('status', __('admin.messages.invitation_sent'));
     }
 
     public function revokeInvitation(
@@ -194,6 +194,6 @@ class FacilityController extends Controller
 
         $invitations->revoke($invitation, $request->user());
 
-        return back()->with('status', 'Undangan dibatalkan.');
+        return back()->with('status', __('admin.messages.invitation_revoked'));
     }
 }

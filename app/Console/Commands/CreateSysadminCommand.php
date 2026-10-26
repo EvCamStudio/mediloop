@@ -24,7 +24,7 @@ class CreateSysadminCommand extends Command
         $emailArgument = $this->argument('email');
 
         if (! is_string($emailArgument) || $emailArgument === '') {
-            $this->error('Email administrator wajib diisi.');
+            $this->error('Administrator email is required.');
 
             return self::FAILURE;
         }
