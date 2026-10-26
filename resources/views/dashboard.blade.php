@@ -212,7 +212,6 @@
                 </div>
                 <a href="{{ route('batches.index') }}" class="ml-section-link">
                     <span>Lihat semua stok</span>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                 </a>
             </div>
 

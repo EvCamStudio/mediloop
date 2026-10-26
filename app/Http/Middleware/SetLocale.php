@@ -18,8 +18,16 @@ class SetLocale
         $locale = $this->resolveLocale($request);
 
         app()->setLocale($locale);
-        Carbon::setLocale($locale);
-        CarbonImmutable::setLocale($locale);
+        try {
+            Carbon::setLocale($locale);
+        } catch (\Exception $e) {
+            // Locale not installed on server; keep default
+        }
+        try {
+            CarbonImmutable::setLocale($locale);
+        } catch (\Exception $e) {
+            // Locale not installed on server; keep default
+        }
 
         return $next($request);
     }
