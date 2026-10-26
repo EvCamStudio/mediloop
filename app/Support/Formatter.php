@@ -13,7 +13,7 @@ final class Formatter
      */
     public static function idr(int|float|string $amount): string
     {
-        return 'Rp '.Number::format((float) $amount, maxPrecision: 0, locale: self::locale());
+        return 'Rp '.self::number($amount, 0);
     }
 
     /**
@@ -21,9 +21,27 @@ final class Formatter
      */
     public static function number(int|float|string $value, int $maxPrecision = 0): string
     {
-        $formatted = Number::format((float) $value, maxPrecision: $maxPrecision, locale: self::locale());
+        $val = (float) $value;
+        if (extension_loaded('intl')) {
+            try {
+                $formatted = Number::format($val, maxPrecision: $maxPrecision, locale: self::locale());
+                if ($formatted !== false) {
+                    return $formatted;
+                }
+            } catch (\Throwable) {
+                // Fallback to native PHP formatting if intl is unavailable or misconfigured
+            }
+        }
 
-        return $formatted !== false ? $formatted : (string) (float) $value;
+        $isId = self::locale() === 'id';
+        $decPoint = $isId ? ',' : '.';
+        $thousandsSep = $isId ? '.' : ',';
+
+        if ($maxPrecision > 0 && floor($val) != $val) {
+            return rtrim(rtrim(number_format($val, $maxPrecision, $decPoint, $thousandsSep), '0'), $decPoint);
+        }
+
+        return number_format($val, 0, $decPoint, $thousandsSep);
     }
 
     /**

@@ -2054,16 +2054,13 @@
             border-radius: 12px;
             overflow: hidden;
         }
-        /* Global card alignment — semua card sejajar */
-        .ml-card { display: flex; flex-direction: column; height: 100%; }
-        .ml-card-body { flex-grow: 1; min-height: 120px; }
         .ml-card + .ml-card { margin-top: 20px; }
         .ml-card-head {
             padding: 18px 20px;
             border-bottom: 1px solid var(--ml-border);
         }
-        .ml-card-body { padding: 20px; flex-grow: 1; }
-        .ml-empty-state { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .ml-card-body { padding: 20px; }
+        .ml-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .ml-card-title {
             margin: 0;
             font-family: var(--font-heading);
@@ -2080,16 +2077,12 @@
         .ml-two-col {
             display: grid;
             grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.8fr);
-            grid-template-rows: 1fr;
             gap: 20px;
-            align-items: stretch;
+            align-items: start;
         }
         .ml-sticky { position: sticky; top: 84px; }
-        .ml-two-col > .ml-card { height: 100%; display: flex; flex-direction: column; min-height: 420px; }
         .ml-analytics-panels > .ml-card { height: 100%; display: flex; flex-direction: column; min-height: 380px; }
-        /* Global card alignment — semua card sejajar */
-        .ml-card { display: flex; flex-direction: column; height: 100%; }
-        .ml-card-body { flex-grow: 1; min-height: 120px; }
+        .ml-analytics-panels > .ml-card > .ml-card-body { flex-grow: 1; }
 
         .ml-alert {
             padding: 12px 16px;
