@@ -15,7 +15,7 @@ return [
 
     'name' => env('APP_NAME', 'MediLoop'),
 
-    'demo_password' => env('DEMO_PASSWORD', 'password'),
+    'demo_password' => env('DEMO_PASSWORD', 'mediloop#demo2026'),
 
     /*
     |--------------------------------------------------------------------------

@@ -91,7 +91,7 @@ Simulator publik yang memungkinkan pengunjung dan juri menguji perhitungan matem
 
 ## 4. Akun Demonstrasi Pengujian (Demo Accounts)
 
-Semua akun demo di bawah ini menggunakan kata sandi standar: `password`
+Semua akun demo di bawah ini menggunakan kata sandi standar: `mediloop#demo2026`
 
 | Peran Akun | Alamat Email | Fasilitas Terhubung | Hak Akses Utama |
 | :--- | :--- | :--- | :--- |

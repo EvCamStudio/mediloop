@@ -318,7 +318,7 @@ class MediLoopSeeder extends Seeder
         }
 
         // 2. Seed Multi-Role Demonstration Accounts
-        $password = Hash::make((string) config('seed.demo_password', config('app.demo_password', 'password')));
+        $password = Hash::make((string) config('seed.demo_password', config('app.demo_password', 'mediloop#demo2026')));
 
         User::create([
             'name' => 'Administrator MediLoop',
