@@ -67,9 +67,7 @@
                 <select name="facility_id" id="facility_id" class="ml-analytics-select">
                     <option value="">{{ __('analytics.all_facilities') }}</option>
                     @foreach($facilitiesList as $facilityOption)
-                        <option value="{{ $facilityOption->id }}" @selected((int) request('facility_id') === $facilityOption->id)
-                            {{ $facilityOption->name }}
-                        </option>
+                        <option value="{{ $facilityOption->id }}" @selected((int) request('facility_id') === $facilityOption->id)>{{ $facilityOption->name }}</option>
                     @endforeach
                 </select>
                 <button type="submit" class="ml-btn-quiet">{{ __('analytics.apply_filter') }}</button>
@@ -258,6 +256,8 @@
         display: flex;
         flex-direction: column;
         height: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
     }
     .ml-analytics-panel.is-five { grid-column: span 5; }
     .ml-analytics-panel.is-seven { grid-column: span 7; }
@@ -269,6 +269,7 @@
         gap: 10px 16px;
         padding-bottom: 14px;
         border-bottom: 1px solid var(--ml-border);
+        flex-shrink: 0;
     }
     .ml-analytics-panel-title {
         margin: 0;
@@ -302,6 +303,7 @@
         position: relative;
         height: 238px;
         padding: 14px 0 4px;
+        flex-grow: 1;
     }
     .ml-analytics-chart.is-tall { height: 268px; }
     .ml-analytics-chart canvas { width: 100% !important; height: 100% !important; }
