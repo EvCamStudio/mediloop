@@ -145,6 +145,9 @@ Dokumen ini mencatat seluruh perubahan, perbaikan bug, penyempurnaan UI/UX, dan 
      - Desain Donut Chart 200px SVG, posisi keterangan di bawah donat, tab pemilih multi-obat, kartu transparansi skor 3 bobot, dan sorotan baris tabel **100% terjaga utuh**.
      - Halaman stok obat (`/batches`) tetap langsung menyajikan tabel inventaris tanpa kartu KPI dan banner redundan di bagian atas.
      - Zoom otomatis roda mouse pada Leaflet map tetap aktif dan mulus.
+  4. **Perbaikan Bug Formatter & Layout Kartu Propose**:
+     - Memperbaiki helper `Formatter.php` agar tidak lagi bergantung secara kaku pada ekstensi PHP `intl` (yang sering kali tidak terpasang di server PHP standar). Kini menggunakan mekanisme fallback mandiri berbasis `number_format` bawaan PHP, sehingga halaman `/analytics` terbuka lancar tanpa pesan error *The "intl" PHP extension is required*.
+     - Memperbaiki tata letak CSS `.ml-card` dan `.ml-two-col` pada `layouts/mediloop.blade.php`. Sebelumnya properti `height: 100%` yang dipasang secara global menyebabkan kartu informasi batch di halaman pengusulan transfer (`/transfers/propose`) memanjang ke bawah dan menyisakan ruang putih kosong besar serta mendorong daftar kandidat faskes ke dasar halaman. Dengan mengembalikan `align-items: start` dan menghapus `height: 100%` global, daftar faskes kandidat kini langsung terlihat berdampingan secara rapi di samping formulir usulan transfer.
 - **Berkas yang Diubah / Ditambahkan**:
   - `app/Http/Controllers/AnalyticsController.php`
   - `app/Services/AnalyticsService.php`
