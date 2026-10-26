@@ -4,7 +4,7 @@ MediLoop adalah sistem pendukung keputusan (*Clinical Decision Support System - 
 
 ---
 
-## 1. Narasi & Latar Belakang Masalah
+## 1. Latar Belakang Masalah
 
 ### Problem Statement
 Setiap tahunnya, fasilitas pelayanan kesehatan di Indonesia menghadapi ironi ganda dalam tata kelola logistik farmasi:
