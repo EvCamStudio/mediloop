@@ -5,12 +5,13 @@ namespace App\Livewire;
 use App\Models\Batch;
 use App\Models\Transfer;
 use App\Services\AnalyticsService;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 
 class AnalyticsCharts extends Component
 {
     public ?int $facilityId = null;
+
     public bool $isRegional = false;
 
     public array $chartData = [];
@@ -76,10 +77,10 @@ class AnalyticsCharts extends Component
         $this->loadChartData();
     }
 
-    private function scopedBatches(): \Illuminate\Database\Eloquent\Collection
+    private function scopedBatches(): Collection
     {
         if (! $this->isRegional && $this->facilityId === null) {
-            return new \Illuminate\Database\Eloquent\Collection;
+            return new Collection;
         }
 
         return Batch::with(['medicine', 'facility'])
@@ -89,10 +90,10 @@ class AnalyticsCharts extends Component
             ->get();
     }
 
-    private function completedTransfers(): \Illuminate\Database\Eloquent\Collection
+    private function completedTransfers(): Collection
     {
         if (! $this->isRegional && $this->facilityId === null) {
-            return new \Illuminate\Database\Eloquent\Collection;
+            return new Collection;
         }
 
         return Transfer::with('batch')

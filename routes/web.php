@@ -42,7 +42,7 @@ Route::middleware(['auth', 'active', 'facility.active'])->group(function () {
 
     // Pharmaceutical Inventory & Batch Data Management
     Route::get('/batches', [BatchController::class, 'index'])->name('batches.index');
-    Route::get('/batches/template-csv', [BatchController::class, 'csvTemplate'])->name('batches.csvTemplate');
+    Route::get('/batches/csv-template', [BatchController::class, 'downloadTemplate'])->name('batches.csvTemplate');
     Route::post('/batches/import-csv', [BatchController::class, 'importCsv'])->name('batches.importCsv');
     Route::get('/batches/create', [BatchController::class, 'create'])->name('batches.create');
     Route::post('/batches', [BatchController::class, 'store'])->name('batches.store');

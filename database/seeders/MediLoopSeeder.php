@@ -431,8 +431,12 @@ class MediLoopSeeder extends Seeder
                 'requires_cold_chain' => $m[7],
                 'handling_instructions' => $m[8],
             ];
-            if (isset($m[9])) $data['storage_min_temp'] = $m[9];
-            if (isset($m[10])) $data['storage_max_temp'] = $m[10];
+            if (isset($m[9])) {
+                $data['storage_min_temp'] = $m[9];
+            }
+            if (isset($m[10])) {
+                $data['storage_max_temp'] = $m[10];
+            }
             $medicineRefs[$data['sku']] = Medicine::create($data);
         }
 
