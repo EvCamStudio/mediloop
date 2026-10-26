@@ -52,6 +52,17 @@ class AnalyticsCharts extends Component
                 ],
                 'values' => array_values($analytics['expiryBuckets'] ?? []),
             ],
+            'surplus' => [
+                'items' => $analytics['surplus'] ?? [],
+                'labels' => [
+                    'medicine_name' => __('analytics.surplus.medicine_name'),
+                    'batch_number' => __('analytics.surplus.batch_number'),
+                    'current_stock' => __('analytics.surplus.current_stock'),
+                    'days_to_expiry' => __('analytics.surplus.days_to_expiry'),
+                    'surplus_ratio' => __('analytics.surplus.surplus_ratio'),
+                    'projected_waste' => __('analytics.surplus.projected_waste'),
+                ],
+            ],
             'labels' => [
                 'waste_value' => __('analytics.charts.waste_value'),
                 'batches' => __('analytics.charts.batches'),

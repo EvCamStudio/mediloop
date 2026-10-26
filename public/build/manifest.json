@@ -3,10 +3,6 @@
     "file": "assets/fonts-C9MNnjVw.css",
     "src": "_fonts-C9MNnjVw.css"
   },
-  "_i18n-DRVD2_F0.js": {
-    "file": "assets/i18n-DRVD2_F0.js",
-    "name": "i18n"
-  },
   "_instrument-sans-400-normal-D1W7dsQl.woff": {
     "file": "assets/instrument-sans-400-normal-D1W7dsQl.woff",
     "src": "_instrument-sans-400-normal-D1W7dsQl.woff"
@@ -60,7 +56,7 @@
     "src": "node_modules/leaflet/dist/images/marker-icon.png"
   },
   "resources/css/app.css": {
-    "file": "assets/app-Cl3k56Af.css",
+    "file": "assets/app-B75YUZLS.css",
     "name": "app",
     "names": [
       "app.css"
@@ -69,22 +65,19 @@
     "isEntry": true
   },
   "resources/js/analytics.js": {
-    "file": "assets/analytics-BEjFJia1.js",
+    "file": "assets/analytics-D-VcKv0W.js",
     "name": "analytics",
     "src": "resources/js/analytics.js",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-D-gWW--H.js",
+    "file": "assets/app-D5-8WK_z.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true,
-    "imports": [
-      "_i18n-DRVD2_F0.js"
-    ]
+    "isEntry": true
   },
   "resources/js/facility-map-picker.js": {
-    "file": "assets/facility-map-picker-DVjNzamW.js",
+    "file": "assets/facility-map-picker-CmTgSkOg.js",
     "name": "facility-map-picker",
     "src": "resources/js/facility-map-picker.js",
     "isEntry": true,
@@ -93,13 +86,12 @@
     ]
   },
   "resources/js/network-map.js": {
-    "file": "assets/network-map-XEcCMmzm.js",
+    "file": "assets/network-map-_u8stO0g.js",
     "name": "network-map",
     "src": "resources/js/network-map.js",
     "isEntry": true,
     "imports": [
-      "_leaflet-DxTFkk7_.js",
-      "_i18n-DRVD2_F0.js"
+      "_leaflet-DxTFkk7_.js"
     ]
   },
   "resources/js/passkeys.js": {

@@ -150,6 +150,8 @@
         flex-wrap: wrap;
         align-items: flex-end;
         gap: 8px;
+        position: relative;
+        z-index: 10;
     }
     .ml-analytics-filter-label {
         width: 100%;
@@ -246,13 +248,16 @@
         grid-template-columns: repeat(12, minmax(0, 1fr));
         grid-template-rows: 1fr;
         gap: 18px;
-        align-items: start;
+        align-items: stretch;
     }
     .ml-analytics-panel {
         grid-column: span 12;
         min-width: 0;
         padding: 18px 20px 20px;
         border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
     .ml-analytics-panel.is-five { grid-column: span 5; }
     .ml-analytics-panel.is-seven { grid-column: span 7; }

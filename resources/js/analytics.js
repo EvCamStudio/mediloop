@@ -278,8 +278,13 @@ function reinitializeCharts() {
 
 // Re-initialize charts ketika Livewire memperbarui DOM
 // Livewire v3 men-trigger event 'livewire:navigated' saat navigasi dan 'livewire:update' saat data berubah
-document.addEventListener('livewire:navigated', reinitializeCharts);
-document.addEventListener('livewire:update', reinitializeCharts);
+document.addEventListener('livewire:navigated', () => setTimeout(reinitializeCharts, 150));
+document.addEventListener('livewire:updated', () => setTimeout(reinitializeCharts, 150));
+document.addEventListener('livewire:load', () => setTimeout(reinitializeCharts, 150));
 
 // Jalankan inisialisasi pertama saat halaman dimuat
-reinitializeCharts();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(reinitializeCharts, 200));
+} else {
+    setTimeout(reinitializeCharts, 200);
+}
