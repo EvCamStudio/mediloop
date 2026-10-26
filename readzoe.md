@@ -151,6 +151,10 @@ Dokumen ini mencatat seluruh perubahan, perbaikan bug, penyempurnaan UI/UX, dan 
   4. **Perbaikan Bug Formatter & Layout Kartu Propose**:
      - Memperbaiki helper `Formatter.php` agar tidak lagi bergantung secara kaku pada ekstensi PHP `intl` (yang sering kali tidak terpasang di server PHP standar). Kini menggunakan mekanisme fallback mandiri berbasis `number_format` bawaan PHP, sehingga halaman `/analytics` terbuka lancar tanpa pesan error *The "intl" PHP extension is required*.
      - Memperbaiki tata letak CSS `.ml-card` dan `.ml-two-col` pada `layouts/mediloop.blade.php`. Sebelumnya properti `height: 100%` yang dipasang secara global menyebabkan kartu informasi batch di halaman pengusulan transfer (`/transfers/propose`) memanjang ke bawah dan menyisakan ruang putih kosong besar serta mendorong daftar kandidat faskes ke dasar halaman. Dengan mengembalikan `align-items: start` dan menghapus `height: 100%` global, daftar faskes kandidat kini langsung terlihat berdampingan secara rapi di samping formulir usulan transfer.
+  5. **Penyelarasan 2 Mode (Admin & User Faskes) & Pembersihan Sidebar**:
+     - Menyatukan wewenang pengelolaan faskes ke `SYSADMIN` (Admin Platform) pada `app/Models/User.php`.
+     - Menghilangkan bagian menu `YOUR FACILITY` (`Facility Team` & `Facility Profile`) dari sidebar akun user biasa (`FACILITY_STAFF`).
+     - Akun user biasa kembali bersih murni untuk operasional inventaris, pencocokan redistribusi obat, dan pengusulan transfer tanpa menu yang membingungkan alur kerja pengguna.
 - **Berkas yang Diubah / Ditambahkan**:
   - `app/Http/Controllers/AnalyticsController.php`
   - `app/Services/AnalyticsService.php`

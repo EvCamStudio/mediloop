@@ -93,7 +93,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 
     public function isFacilityApprover(): bool
     {
-        return $this->role === UserRole::FacilityStaff->value;
+        return $this->isSysadmin() && $this->facility_id !== null;
     }
 
     public function isFacilityStaff(): bool
@@ -108,12 +108,12 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 
     public function canManageFacility(): bool
     {
-        return $this->isSysadmin() || $this->isFacilityApprover();
+        return $this->isSysadmin();
     }
 
     public function canApproveDonorTransfer(): bool
     {
-        return $this->isSysadmin() || $this->isFacilityApprover();
+        return $this->isSysadmin() || $this->hasFacilityRole();
     }
 
     public function canAcceptRecipientTransfer(): bool
@@ -123,7 +123,7 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 
     public function canConfirmPhysicalArrival(): bool
     {
-        return $this->isSysadmin() || $this->isFacilityApprover();
+        return $this->isSysadmin() || $this->hasFacilityRole();
     }
 
     public function isActive(): bool
