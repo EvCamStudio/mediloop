@@ -21,10 +21,13 @@ Dokumen ini mencatat seluruh perubahan, perbaikan bug, penyempurnaan UI/UX, dan 
   2. Seluruh rumah sakit kandidat memiliki persentase kecocokan yang hampir seragam (~94%) dan kapasitas serap yang statis (50 unit). Hal ini terjadi karena faskes mitra lain belum memiliki data inventaris aktif sehingga sistem mengasumsikan stok kosong dan kebutuhan statis.
   3. Pengguna tidak mengetahui dari mana asal angka persentase tersebut dan mengapa faskes tertentu menjadi prioritas.
 - **Perubahan & Solusi**:
-  1. **Multi-Medicine Selector (Tab & Baris Tabel Interaktif)**:
-     - Dibuat tab pill interaktif di atas kartu rekomendasi yang menampilkan seluruh obat berisiko di fasilitas pengguna.
-     - Setiap baris obat di tabel ringkasan atas (`.ml-table-dashboard`) kini dapat diklik langsung (atau melalui tombol *Rekomendasi* di kolom aksi).
-     - Mengklik obat langsung memicu fungsi JavaScript `selectRecBatch(batchId)` yang secara instan mengganti panel rekomendasi obat di bawahnya, menyorot baris tabel aktif dengan warna biru (`.is-selected-batch`), dan menyelaraskan parameter URL `?batch_id=...` tanpa reload halaman.
+  1. **Multi-Medicine Selector (Dropdown Rapi & Sinkronisasi Baris Tabel Interaktif)**:
+     - Mengganti deretan tombol tab dengan komponen dropdown selektor yang elegan (`<select id="rec-batch-select">`), berbingkai biru muda lembut (`#BFDBFE`), sudut membulat 10px, dan tanda panah custom SVG yang rapi sesuai kebutuhan desain pengguna.
+     - Dropdown menampilkan nama obat, nomor batch, dan tingkat risiko secara jelas: `{Nama Obat} — Batch {Nomor Batch} ({Tingkat Risiko})`.
+     - Sinkronisasi dua arah interaktif tetap berjalan penuh:
+       - Memilih obat di dropdown langsung memperbarui kartu faskes yang membutuhkan obat tersebut dan menyorot baris tabel terkait.
+       - Mengklik baris obat pada tabel overview di atas (`.ml-table-dashboard`) atau tombol *Rekomendasi* langsung memperbarui nilai dropdown ke obat terkait dan menampilkan faskes yang membutuhkan obat tersebut.
+       - Parameter URL `?batch_id=...` diselaraskan secara instan tanpa reload halaman via `history.replaceState`.
   2. **Algoritma Skor Kebutuhan Dinamis (`RedistributionEngine.php`)**:
      - Skor kecocokan ($100\%$) dihitung secara transparan dari 3 bobot:
        $$\text{Skor} = (0.50 \times \text{Kebutuhan Riil}) + (0.30 \times \text{Jarak}) + (0.20 \times \text{Logistik})$$

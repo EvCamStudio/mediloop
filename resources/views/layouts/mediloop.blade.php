@@ -884,15 +884,56 @@
             background-color: #F8FAFC;
         }
         .ml-rec-selector-wrap {
-            padding: 0 24px 14px;
+            padding: 16px 24px;
+            background: #F8FAFC;
+            border-bottom: 1px solid var(--ml-border);
         }
         .ml-rec-selector-label {
-            font-size: 11.5px;
-            font-weight: 600;
-            color: var(--ml-muted);
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
             margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.03em;
+            letter-spacing: 0.04em;
+        }
+        .ml-rec-select-box {
+            position: relative;
+            max-width: 560px;
+            width: 100%;
+        }
+        .ml-rec-select {
+            width: 100%;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background: #FFFFFF;
+            border: 2px solid #BFDBFE;
+            border-radius: 10px;
+            padding: 10px 42px 10px 14px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #1E293B;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .ml-rec-select:hover {
+            border-color: #93C5FD;
+        }
+        .ml-rec-select:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+        }
+        .ml-rec-select-arrow {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #64748B;
         }
         .ml-rec-batch-tabs {
             display: flex;

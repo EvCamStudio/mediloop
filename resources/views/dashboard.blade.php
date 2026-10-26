@@ -457,27 +457,26 @@
                 </div>
             </div>
 
-            <!-- Interactive Medicine Selector Tabs -->
+            <!-- Interactive Medicine Selector Dropdown -->
             <div class="ml-rec-selector-wrap">
-                <div class="ml-rec-selector-label">
-                    <span>Pilih Obat Berisiko untuk Melihat Faskes yang Membutuhkan:</span>
-                </div>
-                <div class="ml-rec-batch-tabs">
-                    @foreach($batchRecommendations as $bId => $recData)
-                        @php
-                            $b = $recData['batch'];
-                            $isActive = ($b->id === $selectedBatch->id);
-                        @endphp
-                        <button type="button"
-                            class="ml-rec-tab-btn {{ $isActive ? 'is-active' : '' }}"
-                            id="tab-btn-{{ $b->id }}"
-                            data-batch-id="{{ $b->id }}"
-                            onclick="selectRecBatch({{ $b->id }})">
-                            <span class="ml-rec-tab-dot is-{{ strtolower($b->risk_level) }}" aria-hidden="true"></span>
-                            <span class="ml-rec-tab-name">{{ $b->medicine->name }}</span>
-                            <span class="ml-rec-tab-badge">Batch {{ $b->batch_number }}</span>
-                        </button>
-                    @endforeach
+                <label for="rec-batch-select" class="ml-rec-selector-label">
+                    PILIH OBAT BERISIKO UNTUK MELIHAT FASKES YANG MEMBUTUHKAN:
+                </label>
+                <div class="ml-rec-select-box">
+                    <select id="rec-batch-select" class="ml-rec-select" onchange="selectRecBatch(this.value)" aria-label="Pilih obat berisiko untuk melihat faskes yang membutuhkan">
+                        @foreach($batchRecommendations as $bId => $recData)
+                            @php
+                                $b = $recData['batch'];
+                                $isSelected = ($b->id === $selectedBatch->id);
+                            @endphp
+                            <option value="{{ $b->id }}" @selected($isSelected)>
+                                {{ $b->medicine->name }} — Batch {{ $b->batch_number }} ({{ $b->risk_level }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <svg class="ml-rec-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m6 9 6 6 6-6"/>
+                    </svg>
                 </div>
             </div>
 
@@ -616,6 +615,8 @@
 
 <script>
 function selectRecBatch(batchId) {
+    batchId = String(batchId);
+
     // 1. Hide all recommendation panels, show target
     document.querySelectorAll('.ml-rec-batch-panel').forEach(function(panel) {
         panel.style.display = 'none';
@@ -625,13 +626,10 @@ function selectRecBatch(batchId) {
         targetPanel.style.display = 'block';
     }
 
-    // 2. Update active medicine tab button
-    document.querySelectorAll('.ml-rec-tab-btn').forEach(function(btn) {
-        btn.classList.remove('is-active');
-    });
-    var targetBtn = document.getElementById('tab-btn-' + batchId);
-    if (targetBtn) {
-        targetBtn.classList.add('is-active');
+    // 2. Synchronize dropdown selector
+    var selectEl = document.getElementById('rec-batch-select');
+    if (selectEl && selectEl.value !== batchId) {
+        selectEl.value = batchId;
     }
 
     // 3. Highlight the clicked row in the overview table
