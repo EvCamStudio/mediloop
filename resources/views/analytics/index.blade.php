@@ -132,7 +132,7 @@
             @endif
         </section>
     @else
-        <livewire:analytics.charts :facilityId="$facility?->id" :isRegional="$isRegional" />
+        <livewire:analytics-charts :facilityId="$facility?->id" :isRegional="$isRegional" />
     @endif
 </div>
 @endsection

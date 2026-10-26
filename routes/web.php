@@ -1,20 +1,11 @@
 <?php
 
+namespace App\Http\Controllers;
+
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FacilityController as AdminFacilityController;
 use App\Http\Controllers\Admin\FacilityRequestController as AdminFacilityRequestController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\AnalyticsController;
-use App\Http\Controllers\AuditController;
-use App\Http\Controllers\BatchController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\FacilityRequestController;
-use App\Http\Controllers\FacilitySettingsController;
-use App\Http\Controllers\FacilityTeamController;
-use App\Http\Controllers\InvitationController;
-use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\NetworkController;
-use App\Http\Controllers\TransferController;
 use Illuminate\Support\Facades\Route;
 
 // Public Landing Page
@@ -51,6 +42,8 @@ Route::middleware(['auth', 'active', 'facility.active'])->group(function () {
 
     // Pharmaceutical Inventory & Batch Data Management
     Route::get('/batches', [BatchController::class, 'index'])->name('batches.index');
+    Route::get('/batches/template-csv', [BatchController::class, 'csvTemplate'])->name('batches.csvTemplate');
+    Route::post('/batches/import-csv', [BatchController::class, 'importCsv'])->name('batches.importCsv');
     Route::get('/batches/create', [BatchController::class, 'create'])->name('batches.create');
     Route::post('/batches', [BatchController::class, 'store'])->name('batches.store');
     Route::get('/batches/{batch}/edit', [BatchController::class, 'edit'])->name('batches.edit');
@@ -91,7 +84,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'active', 'sysadmin'
     Route::post('/facilities/{facility}/suspend', [AdminFacilityController::class, 'suspend'])->name('facilities.suspend');
     Route::post('/facilities/{facility}/reactivate', [AdminFacilityController::class, 'reactivate'])->name('facilities.reactivate');
     Route::post('/facilities/{facility}/invitations', [AdminFacilityController::class, 'invite'])->name('facilities.invitations.store');
-    Route::delete('/facilities/{facility}/invitations/{invitation}', [AdminFacilityController::class, 'revokeInvitation'])->name('facilities.invitations.destroy');
+    Route::delete('/facilities/{facility}/invitations/{invitation}', [AdminFacilityController::class, 'destroy'])->name('facilities.invitations.destroy');
 
     Route::get('/facility-requests', [AdminFacilityRequestController::class, 'index'])->name('facility-requests.index');
     Route::get('/facility-requests/{facilityRequest}', [AdminFacilityRequestController::class, 'show'])->name('facility-requests.show');

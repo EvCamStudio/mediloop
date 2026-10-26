@@ -7,8 +7,10 @@ use App\Models\Batch;
 use App\Models\Facility;
 use App\Models\Medicine;
 use App\Services\RedistributionEngine;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -327,5 +329,72 @@ class BatchController extends Controller
 
         return redirect()->route('batches.index')
             ->with('status', __('batches.flash.deleted', ['batch' => $batchNumber]));
+    }
+
+    /**
+     * Handle CSV import for batch inventory.
+     */
+    public function importCsv(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:5120',
+        ]);
+
+        $file = $request->file('csv_file');
+        $user = Auth::user();
+        $facilityId = $user->facility_id;
+
+        if ($user->isSysadmin() && $request->filled('facility_id')) {
+            $facilityId = (int) $request->get('facility_id');
+        }
+
+        $data = array_map('str_getcsv', file($file->getRealPath()));
+        $header = array_shift($data);
+
+        $imported = 0;
+        $errors = [];
+
+        foreach ($data as $index => $row) {
+            if (count($row) < 5) {
+                $errors[] = 'Baris '.($index + 2).': Kolom tidak lengkap.';
+
+                continue;
+            }
+
+            try {
+                $medicineName = trim($row[0]);
+                $batchNumber = strtoupper(trim($row[1]));
+                $stock = (int) $row[2];
+                $expiryDate = Carbon::parse($row[3])->format('Y-m-d');
+                $burnRate = (float) $row[4];
+
+                $medicine = Medicine::firstOrCreate(
+                    ['name' => $medicineName],
+                    ['generic_name' => 'N/A', 'sku' => 'MED-'.Str::random(6), 'category' => 'General', 'dosage_form' => 'Tablet', 'unit' => 'unit', 'unit_price_idr' => 0]
+                );
+
+                Batch::updateOrCreate(
+                    ['facility_id' => $facilityId, 'batch_number' => $batchNumber],
+                    ['medicine_id' => $medicine->id, 'current_stock' => $stock, 'expiry_date' => $expiryDate, 'daily_burn_rate' => $burnRate, 'status' => 'ACTIVE']
+                );
+                $imported++;
+            } catch (\Exception $e) {
+                $errors[] = 'Baris '.($index + 2).': Format data tidak valid.';
+            }
+        }
+
+        if (! empty($errors)) {
+            return back()->withErrors(['csv_file' => implode(' | ', $errors)])->withInput();
+        }
+
+        return redirect()->route('batches.index')->with('status', "Berhasil mengimpor $imported batch.");
+    }
+
+    public function csvTemplate(): Response
+    {
+        $headers = ['nama_obat', 'nomor_batch', 'stok_saat_ini', 'tanggal_kadaluwarsa', 'laju_pemakaian_harian'];
+        $content = implode(',', $headers);
+
+        return response($content, 200, ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="template_batch.csv"']);
     }
 }
