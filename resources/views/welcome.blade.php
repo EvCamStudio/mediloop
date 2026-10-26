@@ -33,6 +33,17 @@
             color: #0B1F4B;
         }
 
+        /* Suppress native number input spin buttons to prevent suffix text overlap */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
         /* Hero illustration tokens */
         :root {
             --hero-capsule-white: #FFFFFF;
@@ -483,10 +494,10 @@
                         <label for="simStock" class="block text-xs font-semibold text-[#0B1F4B] mb-2">
                             {{ __('landing.simulator.stock_label') }}
                         </label>
-                        <div class="relative">
+                        <div class="relative flex items-center">
                             <input type="number" id="simStock" value="480" min="1" max="10000" oninput="calculateSim()"
-                                class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                            <span class="absolute right-3 top-2 text-xs text-[#52627F]">{{ __('landing.simulator.unit') }}</span>
+                                class="w-full pl-3 pr-14 py-2 border border-[#DBE5F5] rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
+                            <span class="absolute right-3 text-xs text-[#52627F] font-medium pointer-events-none select-none">{{ __('landing.simulator.unit') }}</span>
                         </div>
                     </div>
 
@@ -495,11 +506,11 @@
                         <label for="simBurnRate" class="block text-xs font-semibold text-[#0B1F4B] mb-2">
                             {{ __('landing.simulator.burn_label') }}
                         </label>
-                        <div class="relative">
+                        <div class="relative flex items-center">
                             <input type="number" id="simBurnRate" value="4.0" step="0.5" min="0" max="500"
                                 oninput="calculateSim()"
-                                class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                            <span class="absolute right-3 top-2 text-xs text-[#52627F]">{{ __('landing.simulator.unit_per_day') }}</span>
+                                class="w-full pl-3 pr-20 py-2 border border-[#DBE5F5] rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
+                            <span class="absolute right-3 text-xs text-[#52627F] font-medium pointer-events-none select-none">{{ __('landing.simulator.unit_per_day') }}</span>
                         </div>
                     </div>
 
@@ -508,10 +519,10 @@
                         <label for="simDays" class="block text-xs font-semibold text-[#0B1F4B] mb-2">
                             {{ __('landing.simulator.expiry_label') }}
                         </label>
-                        <div class="relative">
+                        <div class="relative flex items-center">
                             <input type="number" id="simDays" value="45" min="1" max="730" oninput="calculateSim()"
-                                class="w-full px-3 py-2 border border-[#DBE5F5] rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
-                            <span class="absolute right-3 top-2 text-xs text-[#52627F]">{{ __('landing.simulator.days') }}</span>
+                                class="w-full pl-3 pr-14 py-2 border border-[#DBE5F5] rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#1D4ED8] focus:outline-none">
+                            <span class="absolute right-3 text-xs text-[#52627F] font-medium pointer-events-none select-none">{{ __('landing.simulator.days') }}</span>
                         </div>
                     </div>
                 </div>

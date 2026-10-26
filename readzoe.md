@@ -162,6 +162,9 @@ Dokumen ini mencatat seluruh perubahan, perbaikan bug, penyempurnaan UI/UX, dan 
        - Sedang (Medium): `#D97706` (Kuning Amber)
        - Aman (Low): `#16A34A` (Hijau Segar, menggantikan warna abu-abu slate `#475569` sebelumnya)
      - Menambahkan baris legenda dot warna interaktif di bawah grafik donat analitik pada `resources/views/livewire/analytics-charts.blade.php` sehingga pengguna mendapatkan pemahaman visual yang seragam di seluruh halaman sistem.
+  7. **Verifikasi Kalkulator Simulasi Algoritma & Perbaikan Overlapping Spin-Button (`welcome.blade.php`)**:
+     - Mengonfirmasi kalkulasi matematika dan klasifikasi risiko klinis pada simulator algoritma (`Days to deplete`, `Projected consumption`, `Projected waste`, `Waste ratio`, dan `Clinical risk classification`) 100% akurat dan identik dengan standar `RedistributionEngine.php`.
+     - Memperbaiki bug visual input angka di mana panah stepper bawaan browser bertumpuk di atas teks satuan (`Unit`, `Unit/day`, `Days`). Tombol spinner bawaan browser disembunyikan via CSS dan padding kanan diatur proporsional sehingga tampilan angka dan satuan bersih sempurna.
 - **Berkas yang Diubah / Ditambahkan**:
   - `app/Http/Controllers/AnalyticsController.php`
   - `app/Services/AnalyticsService.php`

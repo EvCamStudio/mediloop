@@ -139,6 +139,17 @@
 }
 
 @layer components {
+    /* Suppress native number input spin buttons to avoid overlapping custom suffix labels */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+
     .password-control {
         position: relative;
     }
