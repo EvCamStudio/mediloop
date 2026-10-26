@@ -339,12 +339,12 @@
         height: 9px;
         flex-shrink: 0;
         border-radius: 999px;
-        background: var(--color-risk-low);
+        background: var(--color-risk-low, #16A34A);
     }
-    .ml-analytics-dot.is-critical { background: var(--color-risk-critical); }
-    .ml-analytics-dot.is-high { background: var(--color-risk-high); }
-    .ml-analytics-dot.is-medium { background: var(--color-risk-medium); }
-    .ml-analytics-dot.is-low { background: var(--color-risk-low); }
+    .ml-analytics-dot.is-critical { background: var(--color-risk-critical, #DC2626); }
+    .ml-analytics-dot.is-high { background: var(--color-risk-high, #EA580C); }
+    .ml-analytics-dot.is-medium { background: var(--color-risk-medium, #D97706); }
+    .ml-analytics-dot.is-low { background: var(--color-risk-low, #16A34A); }
 
     .ml-analytics-inline-link {
         flex-shrink: 0;

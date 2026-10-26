@@ -155,6 +155,13 @@ Dokumen ini mencatat seluruh perubahan, perbaikan bug, penyempurnaan UI/UX, dan 
      - Menyatukan wewenang pengelolaan faskes ke `SYSADMIN` (Admin Platform) pada `app/Models/User.php`.
      - Menghilangkan bagian menu `YOUR FACILITY` (`Facility Team` & `Facility Profile`) dari sidebar akun user biasa (`FACILITY_STAFF`).
      - Akun user biasa kembali bersih murni untuk operasional inventaris, pencocokan redistribusi obat, dan pengusulan transfer tanpa menu yang membingungkan alur kerja pengguna.
+  6. **Penyelarasan Warna Grafik Donat / Pie Risiko (`/analytics` & Dashboard)**:
+     - Menyamakan seluruh palet warna token risiko pada `resources/css/app.css` dan `resources/js/analytics.js` agar 100% konsisten dengan grafik donat dashboard:
+       - Kritis (Critical): `#DC2626` (Merah)
+       - Tinggi (High): `#EA580C` (Oranye)
+       - Sedang (Medium): `#D97706` (Kuning Amber)
+       - Aman (Low): `#16A34A` (Hijau Segar, menggantikan warna abu-abu slate `#475569` sebelumnya)
+     - Menambahkan baris legenda dot warna interaktif di bawah grafik donat analitik pada `resources/views/livewire/analytics-charts.blade.php` sehingga pengguna mendapatkan pemahaman visual yang seragam di seluruh halaman sistem.
 - **Berkas yang Diubah / Ditambahkan**:
   - `app/Http/Controllers/AnalyticsController.php`
   - `app/Services/AnalyticsService.php`

@@ -53,13 +53,13 @@ function reinitializeCharts() {
     });
 
     const palette = {
-        primary: cssValue('--color-brand-primary'),
-        critical: cssValue('--color-risk-critical'),
-        high: cssValue('--color-risk-high'),
-        medium: cssValue('--color-risk-medium'),
-        low: cssValue('--color-risk-low'),
-        grid: cssValue('--color-chart-grid'),
-        text: cssValue('--color-text-muted'),
+        primary: cssValue('--color-brand-primary') || '#1D4ED8',
+        critical: cssValue('--color-risk-critical') || '#DC2626',
+        high: cssValue('--color-risk-high') || '#EA580C',
+        medium: cssValue('--color-risk-medium') || '#D97706',
+        low: cssValue('--color-risk-low') || '#16A34A',
+        grid: cssValue('--color-chart-grid') || '#E2E8F0',
+        text: cssValue('--color-text-muted') || '#64748B',
     };
 
     Chart.defaults.font.family = cssValue('--font-sans') || 'sans-serif';
@@ -97,7 +97,7 @@ function reinitializeCharts() {
                 datasets: [{
                     data: analytics.risk.values,
                     backgroundColor: [palette.critical, palette.high, palette.medium, palette.low],
-                    borderColor: cssValue('--color-surface-raised'),
+                    borderColor: cssValue('--color-surface-raised') || '#FFFFFF',
                     borderWidth: 2,
                     hoverOffset: 4,
                 }],

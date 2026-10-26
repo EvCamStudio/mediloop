@@ -23,10 +23,10 @@
     --color-brand-warning: #B7791F;
 
     /* Risk and chart tokens (never rely on colour alone for status). */
-    --color-risk-critical: #B91C1C;
-    --color-risk-high: #C2410C;
-    --color-risk-medium: #B7791F;
-    --color-risk-low: #475569;
+    --color-risk-critical: #DC2626;
+    --color-risk-high: #EA580C;
+    --color-risk-medium: #D97706;
+    --color-risk-low: #16A34A;
     --color-chart-grid: #E2E8F0;
     --color-warning-surface: #FFF7ED;
     --color-warning-ink: #9A3412;

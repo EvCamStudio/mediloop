@@ -12,6 +12,28 @@
             <div class="ml-analytics-chart">
                 <canvas id="riskDonutChart" role="img" aria-label="{{ __('analytics.risk.aria') }}"></canvas>
             </div>
+            <ul class="ml-analytics-legend">
+                <li>
+                    <span class="ml-analytics-dot is-critical" aria-hidden="true"></span>
+                    <span>{{ __('analytics.risk.critical_with_code') }}</span>
+                    <strong>{{ number_format($chartData['risk']['values'][0] ?? 0, 0, ',', '.') }}</strong>
+                </li>
+                <li>
+                    <span class="ml-analytics-dot is-high" aria-hidden="true"></span>
+                    <span>{{ __('analytics.risk.high_with_code') }}</span>
+                    <strong>{{ number_format($chartData['risk']['values'][1] ?? 0, 0, ',', '.') }}</strong>
+                </li>
+                <li>
+                    <span class="ml-analytics-dot is-medium" aria-hidden="true"></span>
+                    <span>{{ __('analytics.risk.medium_with_code') }}</span>
+                    <strong>{{ number_format($chartData['risk']['values'][2] ?? 0, 0, ',', '.') }}</strong>
+                </li>
+                <li>
+                    <span class="ml-analytics-dot is-low" aria-hidden="true"></span>
+                    <span>{{ __('analytics.risk.low_with_code') }}</span>
+                    <strong>{{ number_format($chartData['risk']['values'][3] ?? 0, 0, ',', '.') }}</strong>
+                </li>
+            </ul>
         </section>
     @endif
 
