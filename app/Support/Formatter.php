@@ -22,6 +22,7 @@ final class Formatter
     public static function number(int|float|string $value, int $maxPrecision = 0): string
     {
         $formatted = Number::format((float) $value, maxPrecision: $maxPrecision, locale: self::locale());
+
         return $formatted !== false ? $formatted : (string) (float) $value;
     }
 
