@@ -62,45 +62,51 @@ Simulator publik yang memungkinkan pengunjung dan juri menguji perhitungan matem
 
 ---
 
-## 3. Alur Penggunaan Aplikasi (User Journey)
+## 3. Alur Penggunaan Aplikasi (Berdasarkan 2 Mode Utama)
 
-### Alur 1: Faskes Pengirim (Donor) — Mencegah Obat Kedaluwarsa
-1. Masuk (*login*) menggunakan akun faskes pengirim (misal: RSUD Tarakan).
-2. Pada **Dashboard**, amati grafik komposisi risiko stok dan tabel batch berisiko.
-3. Pilih batch obat yang ingin diredistribusikan melalui dropdown atau klik langsung pada baris tabel overview.
-4. Sistem otomatis menampilkan daftar rekomendasi faskes terdekat yang benar-benar membutuhkan obat tersebut beserta rincian skor kecocokannya.
-5. Klik **Ajukan Transfer** pada faskes penerima yang dipilih.
-6. Masukkan jumlah unit obat yang akan dialokasikan, lalu kirim usulan transfer.
-7. Setelah faskes penerima menyetujui, input nomor resi kurir dan kirimkan barang.
+Sistem MediLoop dirancang dengan 2 mode akses utama yang bersih dan terfokus: **Mode Operasional Faskes (User)** dan **Mode Administrator Platform (Admin)**.
 
-### Alur 2: Faskes Penerima (Recipient) — Mengatasi Defisit Pasokan
-1. Masuk menggunakan akun faskes penerima (misal: Puskesmas Gambir).
+### Mode 1: Operasional Faskes (User) — Siklus Lengkap Redistribusi Obat
+Setiap fasilitas pelayanan kesehatan (Rumah Sakit, Puskesmas, maupun Klinik) menggunakan antarmuka operasional terpadu yang mencakup dua skenario redistribusi:
+
+#### A. Skenario Pengirim (Saat Mengalami Surplus Stok Obat)
+1. Masuk (*login*) menggunakan akun staf faskes (contoh: `donor@mediloop.test` — RSUD Tarakan).
+2. Pada **Dashboard**, amati grafik komposisi risiko stok dan daftar batch obat berisiko tinggi.
+3. Pilih batch obat berisiko melalui dropdown selektor atau klik langsung pada baris tabel obat.
+4. Sistem otomatis menghitung dan menampilkan rekomendasi faskes terdekat yang sedang defisit obat tersebut beserta skor kecocokannya.
+5. Klik **Ajukan Transfer** pada faskes penerima yang dipilih, masukkan kuantitas alokasi, lalu setujui pengiriman.
+6. Masukkan nomor resi / surat jalan ekspedisi farmasi saat obat diberangkatkan.
+
+#### B. Skenario Penerima (Saat Mengalami Defisit Pasokan Obat)
+1. Masuk (*login*) menggunakan akun staf faskes mitra (contoh: `recipient@mediloop.test` — Puskesmas Gambir).
 2. Buka menu **Transfers & Allocation** ([`/transfers`](file:///home/arisyah/.gemini/antigravity/scratch/mediloop-main/routes/web.php#L54)).
-3. Tinjau usulan transfer masuk dari faskes mitra.
-4. Klik **Terima Alokasi** jika jumlah dan spesifikasi obat sesuai kebutuhan.
-5. Pantau nomor resi pengiriman pada detail transfer.
-6. Saat paket obat tiba, periksa fisik kemasan, nomor batch, serta indikator suhu, lalu klik **Konfirmasi Penerimaan Fisik**. Stok obat otomatis bertambah ke inventaris faskes penerima.
+3. Tinjau usulan transfer masuk dari faskes donor, lalu klik **Terima Alokasi**.
+4. Pantau status perjalanan logistik paket obat.
+5. Saat fisik obat tiba di lokasi, periksa kemasan, nomor batch, serta suhu rantai dingin, lalu klik **Konfirmasi Penerimaan Fisik**. Stok obat otomatis bertambah ke inventaris faskes penerima.
 
-### Alur 3: Administrator Platform — Tata Kelola Ekosistem
-1. Masuk menggunakan akun Administrator Platform ([`admin@mediloop.test`](mailto:admin@mediloop.test)).
-2. Buka menu **Admin Overview** ([`/admin`](file:///home/arisyah/.gemini/antigravity/scratch/mediloop-main/routes/web.php#L80)) untuk melihat metrik agregat seluruh faskes se-wilayah.
-3. Buka **Registri Fasilitas** ([`/admin/facilities`](file:///home/arisyah/.gemini/antigravity/scratch/mediloop-main/routes/web.php#L82)) untuk memverifikasi faskes baru, mengubah profil faskes, serta mengelola staf dan undangan anggota faskes.
-4. Tinjau permohonan faskes baru pada menu **Permohonan Faskes** ([`/admin/facility-requests`](file:///home/arisyah/.gemini/antigravity/scratch/mediloop-main/routes/web.php#L89)).
+---
+
+### Mode 2: Administrator Platform (Admin) — Tata Kelola Ekosistem Regional
+Akun regulator wilayah (Dinas Kesehatan / Pengelola Sistem) untuk pengawasan menyeluruh:
+1. Masuk (*login*) menggunakan akun Administrator Platform ([`admin@mediloop.test`](mailto:admin@mediloop.test)).
+2. Buka menu **Admin Overview** ([`/admin`](file:///home/arisyah/.gemini/antigravity/scratch/mediloop-main/routes/web.php#L80)) untuk memantau metrik agregat seluruh faskes se-wilayah (total faskes aktif, nilai aset terselamatkan, rasio pemanfaatan obat).
+3. Buka **Registri Fasilitas** ([`/admin/facilities`](file:///home/arisyah/.gemini/antigravity/scratch/mediloop-main/routes/web.php#L82)) untuk memverifikasi faskes baru, mengelola profil fasilitas, serta mengatur hak akses staf faskes.
+4. Tinjau dan setujui permohonan fasilitas kesehatan baru pada menu **Permohonan Faskes** ([`/admin/facility-requests`](file:///home/arisyah/.gemini/antigravity/scratch/mediloop-main/routes/web.php#L89)).
 
 ---
 
 ## 4. Akun Demonstrasi Pengujian (Demo Accounts)
 
-Semua akun demo di bawah ini menggunakan kata sandi standar: `mediloop#demo2026`
+Sistem menyediakan 2 mode akun siap pakai untuk pengujian dan evaluasi juri. Seluruh akun menggunakan kata sandi seragam: `mediloop#demo2026`
 
-| Peran Akun | Alamat Email | Fasilitas Terhubung | Hak Akses Utama |
+| Mode Akun | Alamat Email | Fasilitas Terhubung | Hak Akses & Skenario Uji |
 | :--- | :--- | :--- | :--- |
-| **Administrator Platform** | `admin@mediloop.test` | Kantor Dinkes DKI | Registri faskes, verifikasi onboarding, manajemen user platform |
-| **Faskes Pengirim (Donor)** | `donor@mediloop.test` | RSUD Tarakan | Manajemen stok batch obat, monitoring risiko, pengajuan transfer donor |
-| **Kepala Faskes Donor** | `donor.head@mediloop.test` | RSUD Tarakan | Otorisasi persetujuan pengiriman obat donor |
-| **Faskes Penerima (Recipient)** | `recipient@mediloop.test` | Puskesmas Gambir | Monitoring defisit stok, penerimaan alokasi, konfirmasi fisik barang |
-| **Kepala Faskes Penerima** | `recipient.head@mediloop.test` | Puskesmas Gambir | Otorisasi penerimaan obat dari faskes mitra |
-| **Pengawas Farmasi (Auditor)** | `auditor@mediloop.test` | Dinkes DKI Jakarta | Pengawasan audit trail regional, analisis limbah lintas faskes |
+| **Mode Admin Platform** | `admin@mediloop.test` | Kantor Dinkes DKI | Pengawasan ekosistem, registri faskes se-wilayah, verifikasi onboarding faskes baru |
+| **Mode User Faskes (Donor/Surplus)** | `donor@mediloop.test` | RSUD Tarakan | Manajemen stok faskes, visualisasi risiko, pengajuan alokasi transfer obat surplus |
+| **Mode User Faskes (Recipient/Defisit)** | `recipient@mediloop.test` | Puskesmas Gambir | Monitoring defisit stok, penerimaan usulan alokasi, konfirmasi penerimaan fisik obat |
+
+> [!NOTE]
+> Akun faskes pengirim (`donor@`) dan faskes penerima (`recipient@`) sama-sama berada dalam **Mode User Faskes** (`FACILITY_STAFF`). Keduanya disiapkan agar penguji dapat langsung menyimulasikan transaksi redistribusi obat dua arah antara Rumah Sakit dan Puskesmas.
 
 ---
 
