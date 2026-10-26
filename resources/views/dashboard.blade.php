@@ -225,7 +225,7 @@
                             <th scope="col">Obat &amp; batch</th>
                             <th scope="col">Stok fisik</th>
                             <th scope="col">Sisa umur batch</th>
-                            <th scope="col" class="is-right">Aksi</th>
+                            <th scope="col" class="is-left">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
