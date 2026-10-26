@@ -126,7 +126,7 @@ final class AnalyticsService
      * @param  Collection<int, Batch>  $batches
      * @return array<int, array<string, int|float|string>>
      */
-    public static function surplusAnomalies(Collection $batches, int $limit = 3): array
+    public static function surplusAnomalies(Collection $batches, int $limit = 4): array
     {
         return $batches
             ->filter(fn (Batch $batch): bool => $batch->daily_burn_rate > 0)

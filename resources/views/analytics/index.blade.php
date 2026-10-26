@@ -245,6 +245,7 @@
         display: grid;
         grid-template-columns: repeat(12, minmax(0, 1fr));
         grid-template-rows: 1fr;
+        grid-auto-rows: 1fr;
         gap: 18px;
         align-items: stretch;
     }
@@ -270,6 +271,7 @@
         padding-bottom: 14px;
         border-bottom: 1px solid var(--ml-border);
         flex-shrink: 0;
+        min-height: 76px;
     }
     .ml-analytics-panel-title {
         margin: 0;
