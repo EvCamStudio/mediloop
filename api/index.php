@@ -1,8 +1,8 @@
 <?php
 
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 
 define('LARAVEL_START', microtime(true));
 
@@ -53,10 +53,12 @@ $schemaMarker = $storagePath.'/schema-ready-'.$migrationSignature;
 
 if ($needsDatabaseSetup || ! is_file($schemaMarker)) {
     try {
-        Artisan::call('migrate', ['--force' => true]);
+        $console = $app->make(Kernel::class);
+
+        $console->call('migrate', ['--force' => true]);
 
         if ($needsDatabaseSetup) {
-            Artisan::call('db:seed', ['--force' => true]);
+            $console->call('db:seed', ['--force' => true]);
         }
 
         touch($schemaMarker);
