@@ -64,6 +64,8 @@ test('staff can view batches index with search and filters', function () {
 });
 
 test('staff can access batch create form but auditor is forbidden', function () {
+    config(['app.locale' => 'id']);
+
     $facility = Facility::create([
         'name' => 'RSUD Tarakan Jakarta',
         'code' => 'FSK-RSUD-TRK',
@@ -86,6 +88,8 @@ test('staff can access batch create form but auditor is forbidden', function () 
 });
 
 test('sysadmin can input a batch for a selected facility', function () {
+    config(['app.locale' => 'id']);
+
     $facility = Facility::create([
         'name' => 'RSUD Tarakan Jakarta',
         'code' => 'FSK-RSUD-TRK',
@@ -389,7 +393,7 @@ test('staff cannot delete batch with active transfer', function () {
     expect(Batch::find($batch->id))->not->toBeNull();
 });
 
-test('batches index renders top risk candidates recommendations without errors', function () {
+test('dashboard renders top risk candidates recommendations without errors', function () {
     $donor = Facility::create([
         'name' => 'RSUD Tarakan Jakarta',
         'code' => 'FSK-RSUD-TRK',
@@ -441,11 +445,12 @@ test('batches index renders top risk candidates recommendations without errors',
         'status' => 'ACTIVE',
     ]);
 
-    $response = $this->actingAs($user)->get('/batches');
+    $response = $this->actingAs($user)->get('/dashboard');
     $response->assertStatus(200);
-    $response->assertSee('REKOMENDASI MATCH UTAMA');
+    $response->assertSee('PILIH OBAT BERISIKO UNTUK MELIHAT FASKES YANG MEMBUTUHKAN:');
+    $response->assertSee('AMX-RISK-01');
     $response->assertSee('Puskesmas Gambir');
-    $response->assertSee('Batas Alokasi:');
+    $response->assertSee('Skor Kecocokan = Kebutuhan Riil (50%) + Jarak (30%) + Logistik (20%)');
 });
 
 test('batch form renders server validation errors through shared components', function () {

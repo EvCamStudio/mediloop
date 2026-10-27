@@ -11,13 +11,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('public landing page renders with clinical decision-support content and simulator', function () {
+    config(['app.locale' => 'id']);
+
     $response = $this->get('/');
 
     $response->assertStatus(200);
     $response->assertSee('MediLoop');
     $response->assertSee('Sistem Pendukung Keputusan Hibah');
     $response->assertSee('Kalkulator Simulasi Prediksi Limbah');
-    $response->assertSee('Benchmark PRD: Ceftriaxone');
+    $response->assertSee('Ceftriaxone 1g Injeksi (480, 4.0, 45)');
 });
 
 test('public landing page exposes a main landmark and meta description', function () {
@@ -29,6 +31,8 @@ test('public landing page exposes a main landmark and meta description', functio
 });
 
 test('landing call-to-action sends guests to login and demo shortcut is removed', function () {
+    config(['app.locale' => 'id']);
+
     $response = $this->get('/');
 
     $response->assertOk();
@@ -85,7 +89,7 @@ test('dashboard displays inventory ledger and risk badges', function () {
     $response->assertSee('CFT-2026-X89');
     $response->assertSee('Ceftriaxone 1g Injeksi');
     $response->assertSee('Tinggi');
-    $response->assertSee('Cari penerima');
+    $response->assertSee('Rekomendasi');
 });
 
 test('complete transfer lifecycle and invariant verification', function () {

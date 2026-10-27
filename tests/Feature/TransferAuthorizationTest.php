@@ -95,14 +95,14 @@ test('a recipient approver cannot approve a donor transfer', function () {
     expect($fixture['transfer']->fresh()->status)->toBe('PROPOSED');
 });
 
-test('a donor staff member cannot approve a donor transfer', function () {
+test('a donor staff member can approve their own donor transfer', function () {
     $fixture = transferFixture();
 
     $this->actingAs($fixture['donor']['staff'])
         ->post(route('transfers.approve', $fixture['transfer']))
-        ->assertForbidden();
+        ->assertRedirect();
 
-    expect($fixture['transfer']->fresh()->status)->toBe('PROPOSED');
+    expect($fixture['transfer']->fresh()->status)->toBe('APPROVED');
 });
 
 test('a donor staff member cannot confirm physical arrival at the recipient', function () {

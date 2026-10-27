@@ -86,29 +86,49 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
         return $this->role === UserRole::Sysadmin->value;
     }
 
+    /**
+     * Regional oversight access. The Health Agency auditor role is merged into
+     * the platform administrator role, so legacy DINKES_AUDITOR accounts keep
+     * their read-only regional visibility without gaining admin write access.
+     */
     public function isDinkesAuditor(): bool
     {
-        return $this->role === UserRole::Sysadmin->value;
+        return in_array($this->role, [
+            UserRole::DinkesAuditor->value,
+            UserRole::Sysadmin->value,
+        ], true);
     }
 
+    /**
+     * The facility approver role is merged into the facility staff role, which
+     * owns the whole redistribution lifecycle for its own facility.
+     */
     public function isFacilityApprover(): bool
     {
-        return $this->isSysadmin() && $this->facility_id !== null;
+        return $this->isFacilityStaff();
     }
 
     public function isFacilityStaff(): bool
     {
-        return $this->role === UserRole::FacilityStaff->value;
+        return in_array($this->role, [
+            UserRole::FacilityApprover->value,
+            UserRole::FacilityStaff->value,
+        ], true);
     }
 
     public function hasFacilityRole(): bool
     {
-        return $this->isFacilityApprover() || $this->isFacilityStaff();
+        return $this->isFacilityStaff();
     }
 
+    /**
+     * Facility settings and team management edit the user's own facility, so
+     * they belong to the facility role. Platform administrators keep access so
+     * existing admin tooling is unaffected.
+     */
     public function canManageFacility(): bool
     {
-        return $this->isSysadmin();
+        return $this->isSysadmin() || $this->hasFacilityRole();
     }
 
     public function canApproveDonorTransfer(): bool

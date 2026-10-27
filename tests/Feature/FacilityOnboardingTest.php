@@ -47,6 +47,8 @@ function makeSysadmin(): User
 }
 
 test('the public facility request form can be rendered', function () {
+    config(['app.locale' => 'id']);
+
     $this->get(route('facility-requests.create'))
         ->assertOk()
         ->assertSee('Ajukan fasilitas kesehatan Anda');
@@ -193,6 +195,8 @@ test('an invited approver can activate an account and join the facility', functi
 });
 
 test('an invitation for a suspended facility cannot be used', function () {
+    config(['app.locale' => 'id']);
+
     $facility = makeFacility(['status' => FacilityStatus::Suspended->value]);
     $token = 'undangan-fasilitas-suspended';
 
@@ -337,6 +341,8 @@ test('a rejected request code can be submitted again', function () {
 });
 
 test('a facility approver can invite a staff member but cannot invite another approver', function () {
+    config(['app.locale' => 'id']);
+
     Mail::fake();
 
     $facility = makeFacility();
