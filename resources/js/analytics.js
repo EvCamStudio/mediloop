@@ -80,17 +80,32 @@ function reinitializeCharts() {
     };
 
     /**
+     * Reuse the chart already bound to a canvas so a Livewire re-render only
+     * swaps the data instead of blanking the canvas. When the DOM morph
+     * replaced the canvas node, a fresh instance is created instead.
+     */
+    const upsertChart = (canvas, config) => {
+        const existing = Chart.getChart(canvas);
+
+        if (existing) {
+            existing.data = config.data;
+            existing.update('none');
+
+            return existing;
+        }
+
+        return new Chart(canvas, config);
+    };
+
+    /**
      * Render pie/donut chart (risk)
      */
     const renderRiskChart = () => {
         const canvas = document.getElementById('riskDonutChart');
         if (!(canvas instanceof HTMLCanvasElement)) return;
 
-        // Destroy existing chart if present
-        const existing = Chart.getChart(canvas);
-        if (existing) existing.destroy();
-
-        new Chart(canvas, {
+        // Reuse the existing instance when the canvas survived the DOM morph.
+        upsertChart(canvas, {
             type: 'doughnut',
             data: {
                 labels: analytics.risk.labels,
@@ -132,10 +147,7 @@ function reinitializeCharts() {
         const canvas = document.getElementById('categoryWasteChart');
         if (!(canvas instanceof HTMLCanvasElement)) return;
 
-        const existing = Chart.getChart(canvas);
-        if (existing) existing.destroy();
-
-        new Chart(canvas, {
+        upsertChart(canvas, {
             type: 'bar',
             data: {
                 labels: analytics.category.labels,
@@ -185,10 +197,7 @@ function reinitializeCharts() {
         const canvas = document.getElementById('expiryHorizonChart');
         if (!(canvas instanceof HTMLCanvasElement)) return;
 
-        const existing = Chart.getChart(canvas);
-        if (existing) existing.destroy();
-
-        new Chart(canvas, {
+        upsertChart(canvas, {
             type: 'bar',
             data: {
                 labels: analytics.horizon.labels,
@@ -227,60 +236,32 @@ function reinitializeCharts() {
         window.expiryHorizonChart = { instance: Chart.getChart(canvas) };
     };
 
-    /**
-     * Render bar chart utama (waste per kategori)
-     */
-    const renderBarChart = () => {
-        const canvas = document.getElementById('barChart');
-        if (!(canvas instanceof HTMLCanvasElement)) return;
-
-        const existing = Chart.getChart(canvas);
-        if (existing) existing.destroy();
-
-        new Chart(canvas, {
-            type: 'bar',
-            data: {
-                labels: analytics.category.labels,
-                datasets: [{
-                    label: analytics.labels.waste_value,
-                    data: analytics.category.values,
-                    backgroundColor: palette.critical,
-                    borderRadius: 6,
-                    maxBarThickness: 36,
-                }],
-            },
-            options: {
-                ...baseOptions,
-                plugins: {
-                    ...baseOptions.plugins,
-                    tooltip: {
-                        callbacks: {
-                            label: (context) => ` ${analytics.labels.waste_value}: ${currencyFormatter.format(context.raw)}`,
-                        },
-                    },
-                },
-                scales: {
-                    x: { grid: { display: false }, ticks: { font: { size: 10.5 }, maxRotation: 20 } },
-                    y: { beginAtZero: true, grid: { color: palette.grid }, ticks: { font: { size: 10 }, callback: (value) => compactCurrencyFormatter.format(value) } },
-                },
-            },
-        });
-
-        window.barChart = { instance: Chart.getChart(canvas) };
-    };
-
     // Render semua chart
     renderRiskChart();
     renderCategoryChart();
     renderHorizonChart();
-    renderBarChart();
 }
 
-// Re-initialize charts ketika Livewire memperbarui DOM
-// Livewire v3 men-trigger event 'livewire:navigated' saat navigasi dan 'livewire:update' saat data berubah
-document.addEventListener('livewire:navigated', () => setTimeout(reinitializeCharts, 150));
-document.addEventListener('livewire:updated', () => setTimeout(reinitializeCharts, 150));
-document.addEventListener('livewire:load', () => setTimeout(reinitializeCharts, 150));
+// Livewire 4 only emits `livewire:init` and `livewire:navigated`; component
+// re-renders such as `wire:poll` must be observed through the JS hook API.
+let chartSyncTimer;
+
+const scheduleChartSync = () => {
+    clearTimeout(chartSyncTimer);
+    chartSyncTimer = setTimeout(reinitializeCharts, 120);
+};
+
+document.addEventListener('livewire:init', () => {
+    Livewire.hook('morph.updated', ({ el }) => {
+        if (!(el instanceof Element) || !el.closest('.ml-analytics-panels')) {
+            return;
+        }
+
+        scheduleChartSync();
+    });
+});
+
+document.addEventListener('livewire:navigated', scheduleChartSync);
 
 // Jalankan inisialisasi pertama saat halaman dimuat
 if (document.readyState === 'loading') {

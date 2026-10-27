@@ -308,7 +308,7 @@
         flex-grow: 1;
     }
     .ml-analytics-chart.is-tall { height: 268px; }
-    .ml-analytics-chart canvas { width: 100% !important; height: 100% !important; }
+    .ml-analytics-chart canvas { display: block; max-width: 100%; }
 
     .ml-analytics-legend {
         display: grid;

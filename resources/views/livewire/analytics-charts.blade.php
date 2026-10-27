@@ -9,7 +9,7 @@
                     <p class="ml-analytics-panel-sub">{{ __('analytics.risk.subtitle') }}</p>
                 </div>
             </div>
-            <div class="ml-analytics-chart">
+            <div class="ml-analytics-chart" wire:ignore>
                 <canvas id="riskDonutChart" role="img" aria-label="{{ __('analytics.risk.aria') }}"></canvas>
             </div>
             <ul class="ml-analytics-legend">
@@ -45,7 +45,7 @@
                     <p class="ml-analytics-panel-sub">{{ __('analytics.category.subtitle') }}</p>
                 </div>
             </div>
-            <div class="ml-analytics-chart">
+            <div class="ml-analytics-chart" wire:ignore>
                 <canvas id="categoryWasteChart" role="img" aria-label="{{ __('analytics.charts.category_aria') }}"></canvas>
             </div>
         </section>
@@ -59,7 +59,7 @@
                     <p class="ml-analytics-panel-sub">{{ __('analytics.horizon.subtitle') }}</p>
                 </div>
             </div>
-            <div class="ml-analytics-chart">
+            <div class="ml-analytics-chart" wire:ignore>
                 <canvas id="expiryHorizonChart" role="img" aria-label="{{ __('analytics.horizon.aria') }}"></canvas>
             </div>
         </section>
