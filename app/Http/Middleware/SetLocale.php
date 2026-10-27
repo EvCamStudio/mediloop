@@ -2,8 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
@@ -16,6 +18,16 @@ class SetLocale
         $locale = $this->resolveLocale($request);
 
         app()->setLocale($locale);
+        try {
+            Carbon::setLocale($locale);
+        } catch (\Throwable $e) {
+            // Locale not installed on server; keep default
+        }
+        try {
+            CarbonImmutable::setLocale($locale);
+        } catch (\Throwable $e) {
+            // Locale not installed on server; keep default
+        }
 
         return $next($request);
     }
