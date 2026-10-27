@@ -20,12 +20,12 @@ class SetLocale
         app()->setLocale($locale);
         try {
             Carbon::setLocale($locale);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Locale not installed on server; keep default
         }
         try {
             CarbonImmutable::setLocale($locale);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Locale not installed on server; keep default
         }
 
