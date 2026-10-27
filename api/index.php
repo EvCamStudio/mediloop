@@ -45,10 +45,21 @@ require __DIR__.'/../vendor/autoload.php';
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
-if ($needsDatabaseSetup) {
+$migrationSignature = md5(implode('|', array_map(
+    static fn (string $file): string => basename($file).':'.(string) md5_file($file),
+    glob(__DIR__.'/../database/migrations/*.php') ?: [],
+)));
+$schemaMarker = $storagePath.'/schema-ready-'.$migrationSignature;
+
+if ($needsDatabaseSetup || ! is_file($schemaMarker)) {
     try {
         Artisan::call('migrate', ['--force' => true]);
-        Artisan::call('db:seed', ['--force' => true]);
+
+        if ($needsDatabaseSetup) {
+            Artisan::call('db:seed', ['--force' => true]);
+        }
+
+        touch($schemaMarker);
     } catch (Throwable $exception) {
         error_log('[mediloop] database bootstrap failed: '.$exception->getMessage());
     }
