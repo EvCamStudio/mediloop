@@ -55,7 +55,13 @@ if ($needsDatabaseSetup || ! is_file($schemaMarker)) {
     try {
         $console = $app->make(Kernel::class);
 
-        $console->call('migrate', ['--force' => true]);
+        $migrateExitCode = $console->call('migrate', ['--force' => true]);
+
+        if ($migrateExitCode !== 0) {
+            error_log('[mediloop] database migration exited with code '.$migrateExitCode);
+
+            throw new RuntimeException('Database migration failed.');
+        }
 
         if ($needsDatabaseSetup) {
             $console->call('db:seed', ['--force' => true]);
